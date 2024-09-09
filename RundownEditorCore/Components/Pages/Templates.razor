@@ -1,0 +1,38 @@
+﻿@page "/templates"
+
+@inject IHttpClientFactory ClientFactory
+
+<h3>Templates</h3>
+
+@if (templates == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ul>
+        @foreach (var template in templates)
+        {
+            <li>@template.Name</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Template> templates;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = ClientFactory.CreateClient("TemplatesAPI");
+
+        // Call the API to get templates
+        templates = await client.GetFromJsonAsync<List<Template>>("Template");
+    }
+
+    public class Template
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+}
+

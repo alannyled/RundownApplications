@@ -7,6 +7,12 @@ using RundownEditorCore.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add named HttpClients for different APIs
+builder.Services.AddHttpClient("TemplatesAPI", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7247/api/");
+});
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

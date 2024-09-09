@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownDbService", "RundownDbService\RundownDbService.csproj", "{61FC86BF-C261-49F0-9E89-686C1D0483B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RundownEditorCore", "RundownEditorCore\RundownEditorCore.csproj", "{07A467F8-72CD-4CD4-BAEE-6AD4E1358931}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownEditorCore", "RundownEditorCore\RundownEditorCore.csproj", "{07A467F8-72CD-4CD4-BAEE-6AD4E1358931}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

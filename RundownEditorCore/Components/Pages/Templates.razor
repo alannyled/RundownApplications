@@ -34,9 +34,13 @@ else
     private bool isLoading = true;
     private string errorMessage;
     private int retryCount = 0; // Track retry attempts
+    private bool hasError = false; // Track if there is an error
 
     protected override async Task OnInitializedAsync()
     {
+        // Ensure this method is only called once
+        if (!isLoading) return;
+
         try
         {
             var client = ClientFactory.CreateClient("TemplatesAPI");
@@ -74,20 +78,32 @@ else
                     InvokeAsync(StateHasChanged); // Ensure the UI is updated on each retry
                 });
 
-        // Log that the policy is being executed
-        Console.WriteLine("Executing policy...");
-
-        // Execute the retry policy
-        await retryPolicy.ExecuteAsync(async () =>
+        // Execute the retry policy and catch the exception after the last retry
+        try
         {
-            Console.WriteLine("Calling API...");
-            templates = await client.GetFromJsonAsync<List<Template>>("Template");
+            Console.WriteLine("Executing policy...");
 
-            if (templates == null || templates.Count == 0)
+            // Execute the retry policy
+            await retryPolicy.ExecuteAsync(async () =>
             {
-                errorMessage = "Ingen templates fundet.";
-            }
-        });
+                Console.WriteLine("Calling API...");
+                templates = await client.GetFromJsonAsync<List<Template>>("Template");
+
+                if (templates == null || templates.Count == 0)
+                {
+                    errorMessage = "Ingen templates fundet.";
+                    hasError = true;
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            // After the last retry, if still failing, show error message
+            errorMessage = "Kunne ikke hente templates efter flere forsøg.";
+            hasError = true;
+            Console.WriteLine($"All retries failed: {ex.Message}");
+            InvokeAsync(StateHasChanged); // Update UI with the error message
+        }
     }
 
     public class Template

@@ -1,12 +1,23 @@
 ﻿@page "/templates"
+@using Polly
+@using Polly.Extensions.Http
+@using Polly.Retry
 
 @inject IHttpClientFactory ClientFactory
 
-<h3>Templates</h3>
+<h3>Templates i databasen</h3>
 
-@if (templates == null)
+@if (isLoading && retryCount == 0)
 {
     <p><em>Loading...</em></p>
+}
+else if (retryCount > 0)
+{
+    <p>Forsøg @retryCount...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="text-danger">@errorMessage</p>
 }
 else
 {
@@ -20,13 +31,63 @@ else
 
 @code {
     private List<Template> templates;
+    private bool isLoading = true;
+    private string errorMessage;
+    private int retryCount = 0; // Track retry attempts
 
     protected override async Task OnInitializedAsync()
     {
-        var client = ClientFactory.CreateClient("TemplatesAPI");
+        try
+        {
+            var client = ClientFactory.CreateClient("TemplatesAPI");
 
-        // Call the API to get templates
-        templates = await client.GetFromJsonAsync<List<Template>>("Template");
+            // Fetch templates with retry logic directly in component
+            await FetchTemplatesWithRetryAsync(client);
+        }
+        catch (HttpRequestException httpEx)
+        {
+            errorMessage = $"Fejl ved hentning af data: {httpEx.Message}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"En uventet fejl opstod: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // Fetch templates with retry logic in component
+    private async Task FetchTemplatesWithRetryAsync(HttpClient client)
+    {
+        // Define the retry policy
+        var retryPolicy = Polly.Policy
+            .Handle<HttpRequestException>()
+            .WaitAndRetryAsync(
+                3,  // Number of retries
+                retryAttempt => TimeSpan.FromSeconds(2),  // Fixed backoff (2 seconds)
+                onRetry: (exception, timespan, retryAttempt, context) =>
+                {
+                    retryCount = retryAttempt;
+                    Console.WriteLine($"Retry attempt {retryAttempt}. Waiting {timespan.Seconds} seconds.");
+                    InvokeAsync(StateHasChanged); // Ensure the UI is updated on each retry
+                });
+
+        // Log that the policy is being executed
+        Console.WriteLine("Executing policy...");
+
+        // Execute the retry policy
+        await retryPolicy.ExecuteAsync(async () =>
+        {
+            Console.WriteLine("Calling API...");
+            templates = await client.GetFromJsonAsync<List<Template>>("Template");
+
+            if (templates == null || templates.Count == 0)
+            {
+                errorMessage = "Ingen templates fundet.";
+            }
+        });
     }
 
     public class Template
@@ -35,4 +96,3 @@ else
         public string Name { get; set; }
     }
 }
-

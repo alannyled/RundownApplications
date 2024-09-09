@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Extensions.Http;
+using Polly.Retry;
+using System.Diagnostics;
 using RundownEditorCore.Components;
 using RundownEditorCore.Components.Account;
 using RundownEditorCore.Data;
@@ -67,3 +71,17 @@ app.MapRazorComponents<App>()
 app.MapAdditionalIdentityEndpoints();
 
 app.Run();
+
+// Define retry policy
+//static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+//{
+//    return HttpPolicyExtensions
+//        .HandleTransientHttpError()
+//        .WaitAndRetryAsync(
+//            3, // Number of retries
+//            retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), // Exponential backoff
+//            onRetry: (outcome, timespan, retryAttempt, context) =>
+//            {
+//                Console.WriteLine($"Retry attempt {retryAttempt}");
+//            });
+//}

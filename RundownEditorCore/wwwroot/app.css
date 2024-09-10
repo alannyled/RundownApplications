@@ -1,6 +1,16 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+.bi::before { /* Imødekommer bootstrap Icons i navmenuen */  
+    position: relative;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.75rem;
+    top: -1px;
+    background-size: cover;
+    font-size: 20px !important;
+    vertical-align: 0.36em;
+}
 
 a, .btn-link {
     color: #006bb7;

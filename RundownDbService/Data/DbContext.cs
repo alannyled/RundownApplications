@@ -13,11 +13,11 @@ namespace RundownDbService.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Many-to-many relation mellem Template og Video
-            modelBuilder.Entity<Template>()
+            // Many-to-many relation mellem Rundowns og Video
+            modelBuilder.Entity<Rundown>()
                 .HasMany(t => t.VideoObjects)
-                .WithMany(v => v.Templates)
-                .UsingEntity(j => j.ToTable("TemplateVideos"));
+                .WithMany(v => v.Rundowns)
+                .UsingEntity(j => j.ToTable("RundownVideos"));
         }
     }
 }

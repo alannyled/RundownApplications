@@ -21,12 +21,29 @@ else if (hasError)
 }
 else
 {
-    <ul>
-        @foreach (var template in templates)
-        {
-            <li>@template.Name</li>
-        }
-    </ul>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Desciption</th>
+                <th>Type</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var template in templates)
+            {
+                <tr>
+                    <td>@template.Id</td>
+                    <td>@template.Name</td>
+                    <td>@template.Description</td>
+                    <td>@template.Type</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 @code {
@@ -111,5 +128,7 @@ else
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
+        public string Type { get; set; }
     }
 }

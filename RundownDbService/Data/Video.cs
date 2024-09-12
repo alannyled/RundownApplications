@@ -7,9 +7,10 @@
         public string Description { get; set; }
         public string VideoUrl { get; set; }
         public string ThumbnailUrl { get; set; }
+        public TimeOnly StartTime { get; set; }
         public TimeOnly Duration { get; set; }
 
-        // Navigation property til de relaterede templates
-        public List<Template> Templates { get; set; }
+        // Navigation property til de relaterede Rundowns
+        public List<Rundown>? Rundowns { get; set; }
     }
 }

@@ -56,8 +56,10 @@ namespace RundownDbService.Controllers
 
         // PUT: api/Templates/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Template template)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Type")] Template template)
         {
+            Console.WriteLine($"id: {id}, template.Id: {template.Id}");
+
             if (id != template.Id)
             {
                 return BadRequest();

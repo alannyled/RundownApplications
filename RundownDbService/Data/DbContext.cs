@@ -10,6 +10,8 @@ namespace RundownDbService.Data
 
         public DbSet<Template> Templates { get; set; } 
         public DbSet<Video> Videos { get; set; }
+        public DbSet<Rundown> Rundowns { get; set; }
+        public DbSet<TeleprompterTest> TeleprompterTests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

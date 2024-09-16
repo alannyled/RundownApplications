@@ -20,8 +20,6 @@ dotnet build
 ```
 
 ```
-docker run --name kafka bitnami/kafka:latest
-docker run -d --name zookeeper bitnami/zookeeper:latest
+docker run -d --name zookeeper --env ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:latest
 docker run -d --name kafka --env KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 --env ALLOW_PLAINTEXT_LISTENER=yes --network="bridge" bitnami/kafka:latest
-
 ```

@@ -19,3 +19,6 @@ taskkill /F /IM RundownDbService.exe
 dotnet build
 ```
 
+```
+docker run --name kafka bitnami/kafka:latest
+```

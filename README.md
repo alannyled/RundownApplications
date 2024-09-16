@@ -19,3 +19,11 @@ taskkill /F /IM RundownDbService.exe
 dotnet build
 ```
 
+Start Kafka (Vigtigt at Zookeeper startes først)
+```
+docker network create kafka-net
+
+docker run -d --name zookeeper --network kafka-net --env ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:latest
+docker run -d --name kafka --network kafka-net --env KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 --env ALLOW_PLAINTEXT_LISTENER=yes bitnami/kafka:latest
+
+```

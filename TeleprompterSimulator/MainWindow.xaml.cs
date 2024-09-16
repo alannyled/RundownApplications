@@ -1,10 +1,6 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Data.SqlClient;
 using System.Windows;
-using System.Windows.Media.Animation;
-using System.Windows.Media;
-using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace TeleprompterSimulator
@@ -44,6 +40,8 @@ namespace TeleprompterSimulator
             StartAutoScrolling();
         }
 
+        // autoscroll er bare en pseudo funktion, for at få det til at se sjovt ud, at teksten flytter sig.
+        // Teleprompteren styres af studievært og/eller producer i et rigtigt TV-studie.
         private void StartAutoScrolling()
         {
             scrollTimer = new DispatcherTimer

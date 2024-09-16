@@ -1,0 +1,10 @@
+﻿<Window x:Class="TeleprompterSimulator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Teleprompter Simulator" Height="450" Width="800">
+    <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+        <Grid Background="Black" ClipToBounds="True">
+            <TextBlock Name="TeleprompterText" TextWrapping="Wrap" FontSize="48" Foreground="White" VerticalAlignment="Top" Margin="10,300,10,300"/>
+        </Grid>
+    </ScrollViewer>
+</Window>

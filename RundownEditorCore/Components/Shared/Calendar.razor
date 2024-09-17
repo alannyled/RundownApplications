@@ -1,0 +1,48 @@
+﻿
+<div class="container text-center my-4">
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-danger px-4" @onclick="GoToPreviousMonth"><i class="bi bi-caret-left-fill"></i></button>
+        <h3>@DisplayDate.ToString("MMMM yyyy")</h3>
+        <button class="btn btn-danger px-4" @onclick="GoToNextMonth"><i class="bi bi-caret-right-fill"></i></button>
+    </div>
+
+    <div class="calendar-grid mt-3">
+        <div class="day-header">Mandag</div>
+        <div class="day-header">Tirsdag</div>
+        <div class="day-header">Onsdag</div>
+        <div class="day-header">Torsdag</div>
+        <div class="day-header">Fredag</div>
+        <div class="day-header">Lørdag</div>
+        <div class="day-header">Søndag</div>
+
+        @for (int i = 0; i < StartDayOfWeek; i++)
+        {
+            <div class="empty"></div>
+        }
+
+        @for (int day = 1; day <= DaysInMonth; day++)
+        {
+            <div class="day @(CurrentDate.Day == day && CurrentDate.Month == DisplayDate.Month && CurrentDate.Year == DisplayDate.Year ? "current-day" : "")">
+                @day
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime CurrentDate = DateTime.Now;  // Fastlåst til dagens dato
+    private DateTime DisplayDate = DateTime.Now;  // Viser den valgte måned/år
+    private int DaysInMonth => DateTime.DaysInMonth(DisplayDate.Year, DisplayDate.Month);
+    private int StartDayOfWeek => (int)new DateTime(DisplayDate.Year, DisplayDate.Month, 1).DayOfWeek;
+
+    private void GoToPreviousMonth()
+    {
+        DisplayDate = DisplayDate.AddMonths(-1);
+    }
+
+    private void GoToNextMonth()
+    {
+        DisplayDate = DisplayDate.AddMonths(1);
+    }
+}
+

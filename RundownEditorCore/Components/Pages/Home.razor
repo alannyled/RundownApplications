@@ -1,18 +1,94 @@
 ﻿@page "/"
 @using System.Text.Json;
+@using RundownEditorCore.Components.Shared
 @inject IHttpClientFactory ClientFactory
 
 <PageTitle>Home</PageTitle>
+   
 
-<h1>Hello, world!</h1>
+<div class="container-fluid">
+    <div class="row h-100">
+        <div class="col-lg-3">
 
-<p>Indsæt tekst til teleprompter</p>
-<textarea @bind="teleprompterText"></textarea>
 
-<button role="button" @onclick="SaveText">Gem</button>
+
+            <ul class="nav nav-tabs mb-2">
+                <li class="nav-item">
+                    <a role="button" class="nav-link @(activeTab == "rundowns" ? "active" : "")" @onclick='() => SelectTab("rundowns")'>Aktive rækkefølger</a>
+                </li>
+                <li class="nav-item">
+                    <a role="button" class="nav-link @(activeTab == "media" ? "active" : "")" @onclick='() => SelectTab("media")'>Media</a>
+                </li>
+                <li class="nav-item">
+                    <a role="button" class="nav-link @(activeTab == "calendar" ? "active" : "")" @onclick='() => SelectTab("calendar")'>Kalender</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane @(activeTab == "rundowns" ? "show active" : "fade")">
+                    <div class="card mb-2">
+                      
+                        <div class="card-body">
+                            <h5 class="card-title">Aktive Rækkefølger</h5>
+                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane @(activeTab == "media" ? "show active" : "fade")">
+                    <div class="card mb-2">
+                     
+                        <div class="card-body">
+                            <h5 class="card-title">Media browser</h5>
+                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane @(activeTab == "calendar" ? "show active" : "fade")">
+                    <div class="card mb-2">                     
+                        <div class="card-body">
+                            <Calendar />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+           
+            
+        </div>
+        <div class="col-lg-9">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Rundown @name</h5>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Special title treatment</h5>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <p>Indsæt tekst til teleprompter</p>
+                    <textarea @bind="teleprompterText"></textarea>
+
+                    <button role="button" @onclick="SaveText">Gem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 @code {
     private string teleprompterText { get; set; }
+    private string name = "TVA 1830";
+    private string activeTab = "rundowns";
+
+    private void SelectTab(string tabName)
+    {
+        activeTab = tabName;
+    }
 
     private async Task SaveText()
     {

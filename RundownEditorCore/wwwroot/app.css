@@ -1,8 +1,8 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-.bi::before { /* Imødekommer bootstrap Icons i navmenuen */  
-    position: relative;
+/*.bi::before {*/ /* Imødekommer bootstrap Icons i navmenuen */  
+    /*position: relative;
     width: 1.25rem;
     height: 1.25rem;
     margin-right: 0.75rem;
@@ -10,6 +10,12 @@ html, body {
     background-size: cover;
     font-size: 20px !important;
     vertical-align: 0.36em;
+}*/
+.sidebar{
+    width:500px !important;
+}
+.top-row {
+    justify-content: flex-start !important;
 }
 
 a, .btn-link {
@@ -59,3 +65,41 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* til kalender */
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-gap: 5px;
+}
+
+.day-header {
+    font-size: 12px;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden; 
+   
+}
+
+.day {
+    font-size: 12px;
+    padding-top: 15px;
+    padding-bottom:15px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.empty {
+    border: 1px solid transparent;
+}
+
+.current-day {
+    background-color: rgb(220, 53, 69);
+    color: white;
+    font-weight: bold;
+}
+

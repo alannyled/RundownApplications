@@ -1,9 +1,9 @@
 ﻿
-<div class="container text-center my-4">
+<div class="container text-center my-2">
     <div class="d-flex justify-content-between">
-        <button class="btn btn-danger px-4" @onclick="GoToPreviousMonth"><i class="bi bi-caret-left-fill"></i></button>
-        <h3>@DisplayDate.ToString("MMMM yyyy")</h3>
-        <button class="btn btn-danger px-4" @onclick="GoToNextMonth"><i class="bi bi-caret-right-fill"></i></button>
+        <button class="btn btn-outline-danger btn-sm px-4" @onclick="GoToPreviousMonth"><i class="bi bi-caret-left-fill"></i></button>
+        <h5 class="text-muted mb-0">@DisplayDate.ToString("MMMM yyyy")</h5>
+        <button class="btn btn-outline-danger btn-sm px-4" @onclick="GoToNextMonth"><i class="bi bi-caret-right-fill"></i></button>
     </div>
 
     <div class="calendar-grid mt-3">
@@ -27,11 +27,14 @@
             </div>
         }
     </div>
+    <div class="mt-1">
+        <button class="btn btn-outline-danger btn-sm px-4" @onclick="GoToToday">I dag</button>
+    </div>
 </div>
 
 @code {
-    private DateTime CurrentDate = DateTime.Now;  // Fastlåst til dagens dato
-    private DateTime DisplayDate = DateTime.Now;  // Viser den valgte måned/år
+    private DateTime CurrentDate = DateTime.Now;  
+    private DateTime DisplayDate = DateTime.Now; 
     private int DaysInMonth => DateTime.DaysInMonth(DisplayDate.Year, DisplayDate.Month);
     private int StartDayOfWeek => (int)new DateTime(DisplayDate.Year, DisplayDate.Month, 1).DayOfWeek;
 
@@ -43,6 +46,10 @@
     private void GoToNextMonth()
     {
         DisplayDate = DisplayDate.AddMonths(1);
+    }
+    private void GoToToday()
+    {
+        DisplayDate = DateTime.Now;
     }
 }
 

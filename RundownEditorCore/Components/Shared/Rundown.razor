@@ -86,8 +86,6 @@
 
     private async Task OnDrop(DragEventArgs e, string targetChildId)
     {
-        Console.WriteLine($"OnDrop: {draggedChildId} dropped on {targetChildId}");
-
         if (draggedChildId != null)
         {
             var draggedChild = RundownChildContents.FirstOrDefault(x => x.Id == draggedChildId);

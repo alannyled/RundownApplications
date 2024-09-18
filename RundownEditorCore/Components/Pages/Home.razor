@@ -6,35 +6,26 @@
 <PageTitle>Home</PageTitle>
    
 
-<div class="container-fluid">
+<div class="container-fluid full-height">
     <div class="row h-100">
-        <div class="col-lg-3">
-
-
-
+        <div class="col-xl-3 h-100">
             <ul class="nav nav-tabs mb-2">
-                <li class="nav-item">
-                    <a role="button" class="nav-link @(activeTab == "rundowns" ? "active" : "")" @onclick='() => SelectTab("rundowns")'>Aktive rækkefølger</a>
-                </li>
-                <li class="nav-item">
-                    <a role="button" class="nav-link @(activeTab == "media" ? "active" : "")" @onclick='() => SelectTab("media")'>Media</a>
-                </li>
-                <li class="nav-item">
-                    <a role="button" class="nav-link @(activeTab == "calendar" ? "active" : "")" @onclick='() => SelectTab("calendar")'>Kalender</a>
-                </li>
+                <TabItem MenuItem="Rundowns" ActiveTab="@activeTab" SelectTab="SelectTab" />
+                <TabItem MenuItem="Media" ActiveTab="@activeTab" SelectTab="SelectTab" />
+                <TabItem MenuItem="Templates" ActiveTab="@activeTab" SelectTab="SelectTab" />               
             </ul>
             <div class="tab-content">
-                <div class="tab-pane @(activeTab == "rundowns" ? "show active" : "fade")">
-                    <div class="card mb-2">
+                <div class="tab-pane @(activeTab == "Rundowns" ? "show active" : "fade")">
+                    <div class="card card-height-100 mb-2">
                       
                         <div class="card-body">
                             <h5 class="card-title">Aktive Rækkefølger</h5>
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            <TemplatesTable />
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane @(activeTab == "media" ? "show active" : "fade")">
-                    <div class="card mb-2">
+                <div class="tab-pane @(activeTab == "Media" ? "show active" : "fade")">
+                    <div class="card card-height-100 mb-2">
                      
                         <div class="card-body">
                             <h5 class="card-title">Media browser</h5>
@@ -42,32 +33,24 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane @(activeTab == "calendar" ? "show active" : "fade")">
-                    <div class="card mb-2">                     
+                <div class="tab-pane @(activeTab == "Templates" ? "show active" : "fade")">
+                    <div class="card card-height-100 mb-2">
                         <div class="card-body">
                             <Calendar />
+                            <hr />
+                            <h5 class="card-title text-muted">Templates</h5>
+                            <TemplatesTable />
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-
-
-
-
-
-           
-            
+            </div>            
         </div>
-        <div class="col-lg-9">
-            <div class="card h-100">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0">Rundown @name</h5>
-                </div>
+        @* rundown card *@
+        <div class="col-xl-9">
+            <Rundown />
+            <div class="card full-height">
                 <div class="card-body">
-                    <h5 class="card-title">Special title treatment</h5>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          
                     <p>Indsæt tekst til teleprompter</p>
                     <textarea @bind="teleprompterText"></textarea>
 
@@ -83,7 +66,7 @@
 @code {
     private string teleprompterText { get; set; }
     private string name = "TVA 1830";
-    private string activeTab = "rundowns";
+    private string activeTab = "Templates";
 
     private void SelectTab(string tabName)
     {

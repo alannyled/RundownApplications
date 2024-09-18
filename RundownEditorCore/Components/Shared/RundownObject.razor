@@ -1,0 +1,27 @@
+﻿<ul class="list-group list-group-horizontal">
+    @foreach (var child in childContents)
+    {
+        @child
+    }
+    <li class="list-group-item" role="button" @onclick="AddChild"><i class="bi bi-plus"></i></li>
+</ul>
+
+
+
+@code {
+    private List<RenderFragment> childContents = new();
+
+    private void AddChild()
+    {
+        // Tilføjer et nyt li-element dynamisk
+        var newChild = (RenderFragment)(builder =>
+        {
+            builder.OpenElement(0, "li");
+            builder.AddAttribute(1, "class", "list-group-item");
+            builder.AddContent(2, $"Dynamisk element {childContents.Count + 1}");
+            builder.CloseElement();
+        });
+
+        childContents.Add(newChild);
+    }
+}

@@ -1,0 +1,27 @@
+﻿<div class="@ClassList">
+    @currentTime.ToString("dd. MMMM HH:mm:ss")
+</div>
+
+@code {
+    [Parameter]
+    public string ClassList { get; set; }
+    private DateTime currentTime;
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        currentTime = DateTime.Now;
+        timer = new Timer(UpdateClock, null, 0, 1000); 
+    }
+
+    private void UpdateClock(object? state)
+    {
+        currentTime = currentTime.AddSeconds(1);
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

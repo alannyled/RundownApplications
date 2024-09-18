@@ -1,0 +1,116 @@
+﻿@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<ul class="nav nav-tabs mb-2">
+    <TabItem MenuItem="Rundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
+</ul>
+<div class="tab-content">
+    <div class="tab-pane @(activeTab == "Rundown" ? "show active" : "fade")">
+        <div class="card card-height-100 mb-2">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Rundown @name</h5>
+            </div>
+
+            <div class="card-header">
+                <div class="d-flex">
+                    <div class="col-auto me-3">
+                        <select class="form-select form-select-sm">
+                            <option>Kontrolrum</option>
+                            <option value="1">PK1</option>
+                            <option value="2">PK5</option>
+                            <option value="3">PK6</option>
+                            <option value="4">PK13</option>
+                            <option value="5">PK14</option>
+                        </select>
+                    </div>
+                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="AddRunddownObject"><i class="bi bi-plus"></i></button>
+                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-palette"></i></button>
+                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-camera-video"></i></button>
+                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-badge-vo"></i></button>
+                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-card-text"></i></button>
+
+                </div>
+            </div>
+
+
+            <div class="card-body">
+                @foreach (var child in RundownChildContents)
+                {
+                    <div draggable="true"
+                         @key="child.Id"
+                         @ondragstart="(e) => OnDragStart(e, child.Id)"
+                         @ondrop="(e) => OnDrop(e, child.Id)"
+                         ondragover="allowDrop(event)"
+                         class="drag-item">
+                        @child.Content
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private string name = "TVA 1830";
+    private string activeTab = "Rundown";
+    private List<RundownChild> RundownChildContents = new();
+    private string? draggedChildId;
+
+    private void SelectTab(string tabName)
+    {
+        activeTab = tabName;
+    }
+
+    private void AddRunddownObject()
+    {
+        // Tilføjer et nyt RundownObject komponent dynamisk
+        var newChild = new RundownChild
+            {
+                Id = Guid.NewGuid().ToString(),
+                Content = (RenderFragment)(builder =>
+                {
+                    builder.OpenComponent(0, typeof(RundownObject));
+                    builder.CloseComponent();
+                })
+            };
+
+        RundownChildContents.Add(newChild);
+    }
+
+    private void OnDragStart(DragEventArgs e, string childId)
+    {
+        draggedChildId = childId;
+    }
+
+    private async Task OnDrop(DragEventArgs e, string targetChildId)
+    {
+        Console.WriteLine($"OnDrop: {draggedChildId} dropped on {targetChildId}");
+
+        if (draggedChildId != null)
+        {
+            var draggedChild = RundownChildContents.FirstOrDefault(x => x.Id == draggedChildId);
+            var targetChild = RundownChildContents.FirstOrDefault(x => x.Id == targetChildId);
+
+            if (draggedChild != null && targetChild != null)
+            {
+                RundownChildContents.Remove(draggedChild);
+                var targetIndex = RundownChildContents.IndexOf(targetChild);
+             
+                if (targetIndex >= 0)
+                {
+                    RundownChildContents.Insert(targetIndex, draggedChild);
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+            draggedChildId = null;
+        }
+    }
+
+    public class RundownChild
+    {
+        public string Id { get; set; }
+        public RenderFragment Content { get; set; }
+    }
+}

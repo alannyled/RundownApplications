@@ -1,0 +1,14 @@
+﻿<li class="nav-item">
+    <a role="button" class="nav-link @(ActiveTab == MenuItem ? "active" : "")" @onclick='() => SelectTab.InvokeAsync(MenuItem)'>@MenuItem</a>
+</li>
+
+@code {
+    [Parameter]
+    public string MenuItem { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ActiveTab { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> SelectTab { get; set; }
+}

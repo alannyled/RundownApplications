@@ -1,4 +1,6 @@
-﻿<div class="tab-pane @(ActiveTab == "Rundown" ? "show active" : "fade")">
+﻿@using RundownEditorCore.DTO
+
+<div class="tab-pane @(ActiveTab == "Rundown" ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
         <div class="card-header bg-danger text-white">
             <h5 class="mb-0">Rundown @Name</h5>
@@ -16,24 +18,39 @@
                         <option value="5">PK14</option>
                     </select>
                 </div>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="() => CallBack.InvokeAsync()"><i class="bi bi-plus"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="() => ShowDialog.InvokeAsync()"><i class="bi bi-plus"></i></button>
+              
 
             </div>
         </div>
 
 
         <div class="card-body">
-            @foreach (var child in Content)
-            {
-                <div draggable="true"
-                     @key="child.Id"
-                     @ondragstart="(e) => OnDragStart(e, child.Id)"
-                     @ondrop="(e) => OnDrop(e, child.Id)"
-                     ondragover="allowDrop(event)"
-                     class="drag-item">
-                    @child.Content
-                </div>
-            }
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Duration</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var child in CurrentObjects)
+                {
+                    <tr draggable="true"
+                        @onclick="() => OpenTabPane.InvokeAsync(child.Name)"
+                        @key="child.Id"
+                        @ondragstart="(e) => OnDragStart(e, child.Id)"
+                        @ondrop="(e) => OnDrop(e, child.Id)"
+                        ondragover="allowDrop(event)"
+                        class="drag-item">
+                        <td>@child.Name</td>
+                        <td>@child.Duration</td>
+                        <td>@child.Category</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
         </div>
 
     </div>
@@ -42,17 +59,18 @@
 @code {
 
     [Parameter]
-    public EventCallback CallBack { get; set; }
+    public EventCallback ShowDialog { get; set; }
+    [Parameter]
+    public EventCallback<string> OpenTabPane { get; set; }
     [Parameter]
     public string ActiveTab { get; set; } = "Rundown";
     [Parameter]
     public string Name { get; set; } = "Unknown";
-
-    public List<RundownChild> Content = [];
+    [Parameter]
+    public List<RundownObjects> CurrentObjects { get; set; } = [];
 
     private string? draggedChildId;
 
-    
 
     private void OnDragStart(DragEventArgs e, string childId)
     {
@@ -61,30 +79,26 @@
 
     private async Task OnDrop(DragEventArgs e, string targetChildId)
     {
-        if (draggedChildId != null)
+        if (draggedChildId != null && draggedChildId != targetChildId) // Tjek at det ikke er droppet på sig selv
         {
-            var draggedChild = Content.FirstOrDefault(x => x.Id == draggedChildId);
-            var targetChild = Content.FirstOrDefault(x => x.Id == targetChildId);
+            var draggedChild = CurrentObjects.FirstOrDefault(x => x.Id == draggedChildId);
+            var targetChild = CurrentObjects.FirstOrDefault(x => x.Id == targetChildId);
 
             if (draggedChild != null && targetChild != null)
             {
-                Content.Remove(draggedChild);
-                var targetIndex = Content.IndexOf(targetChild);
+                CurrentObjects.Remove(draggedChild);
+                var targetIndex = CurrentObjects.IndexOf(targetChild);
 
                 if (targetIndex >= 0)
                 {
-                    Content.Insert(targetIndex, draggedChild);
+                    CurrentObjects.Insert(targetIndex, draggedChild);
                 }
                 await InvokeAsync(StateHasChanged);
             }
-            draggedChildId = null;
         }
+
+        draggedChildId = null;
     }
 
-    public class RundownChild
-    {
-        public string Id { get; set; }
-        public RenderFragment Content { get; set; }
-    }
 
 }

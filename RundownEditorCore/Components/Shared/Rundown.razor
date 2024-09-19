@@ -1,4 +1,5 @@
 ﻿@using RundownEditorCore.Components.Shared
+@using RundownEditorCore.DTO
 
 <div class="modal fade show" style='display:@(showDialog ? "block" : "none")' tabindex="-1">
     <div class="modal-dialog">
@@ -39,7 +40,7 @@
     }
 </ul>
 <div class="tab-content">
-    <TabPaneRundown Name="FakeNews" ActiveTab="@activeTab" CallBack="OpenRundownObject" />
+    <TabPaneRundown Name="FakeNews" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects"/>
     @foreach (var tab in tabPanes)
     {
         @tab.Content
@@ -48,7 +49,7 @@
 
 @code {
 
-    private string ObjectName { get; set; } = "Unknown";
+    private string ObjectName { get; set; } = string.Empty;
     private string Duration { get; set; } = "00:00:00";
     private string Category { get; set; } = string.Empty;
 
@@ -58,6 +59,13 @@
     private List<TabFragment> menuTabs = new();
     private List<TabFragment> tabPanes = new();
 
+    public List<RundownObjects> RundownObjects { get; set; } = new List<RundownObjects>();
+
+    private Task<int> RandomNumber()
+    {
+        return Task.FromResult(new Random().Next(10000000, 100000000));
+    }
+
     private void SelectTab(string tabName)
     {
         activeTab = tabName;
@@ -65,7 +73,6 @@
 
     private void OpenRundownObject()
     {
-        Console.WriteLine("INVOKED");
         showDialog = true;
     }
 
@@ -74,20 +81,49 @@
         showDialog = false;
     }
 
+    private void OpenTabPane(string tabName)
+    {
+        activeTab = tabName;
+
+        if (!menuTabs.Any(tab => tab.Name == tabName)) 
+        {
+            ObjectName = tabName;
+            AddMenuTab();
+        }
+    }
+
+
     private void SaveNewObject()
     {
         showDialog = false;
+        if (string.IsNullOrEmpty(ObjectName))
+        {
+            int random = RandomNumber().Result;
+            ObjectName = $"Unknown-{random}";
+        }
         activeTab = ObjectName;
+        AddObjectToRundown();
         AddMenuTab();
-        
+
+    }
+
+    private void AddObjectToRundown()
+    {
+        RundownObjects.Add(new RundownObjects
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = ObjectName,
+            Duration = Duration,
+            Category = Category
+        });
     }
 
     private void AddMenuTab()
-    {
+    {        
         string tabName = ObjectName;
         var newChild = new RenderFragment(builder =>
         {
-            builder.OpenComponent<TabItem>(0); // Opretter TabItem-komponent
+            builder.OpenComponent<TabItem>(0);
             builder.AddAttribute(1, "MenuItem", tabName);
             builder.AddAttribute(2, "ActiveTab", activeTab);
             builder.AddAttribute(3, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
@@ -105,6 +141,7 @@
     private void AddTabPane()
     {
         string tabName = ObjectName;
+        
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabPaneRundownObject>(0);
@@ -114,21 +151,19 @@
             builder.CloseComponent();
         });
 
-        //tabPanes.Add(newChild);
         tabPanes.Add(new TabFragment
             {
                 Name = tabName,
                 Content = newChild
             });
         
-        ObjectName = "Unknown";
+        ObjectName = string.Empty;
         Duration = "00:00:00";
         Category = string.Empty;
     }
 
     private void RemoveTabPane(string tabName)
     {
-        // Find og fjern fanen baseret på dens navn
         var tabToRemove = tabPanes.FirstOrDefault(tab => tab.Name == tabName);
         if (tabToRemove != null)
         {
@@ -139,7 +174,6 @@
 
     private void RemoveTab(string tabName)
     {
-        // Find og fjern fanen baseret på dens navn
         var tabToRemove = menuTabs.FirstOrDefault(tab => tab.Name == tabName);
         if (tabToRemove != null)
         {
@@ -152,8 +186,8 @@
 
     public class TabFragment
     {
-        public string Name { get; set; } // Fanens navn
-        public RenderFragment Content { get; set; } // Fanens indhold (RenderFragment)
+        public string? Name { get; set; } 
+        public RenderFragment? Content { get; set; }
     }
 
 

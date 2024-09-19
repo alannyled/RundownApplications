@@ -1,0 +1,90 @@
+﻿<div class="tab-pane @(ActiveTab == "Rundown" ? "show active" : "fade")">
+    <div class="card card-height-100 mb-2">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Rundown @Name</h5>
+        </div>
+
+        <div class="card-header">
+            <div class="d-flex">
+                <div class="col-auto me-3">
+                    <select class="form-select form-select-sm">
+                        <option>Kontrolrum</option>
+                        <option value="1">PK1</option>
+                        <option value="2">PK5</option>
+                        <option value="3">PK6</option>
+                        <option value="4">PK13</option>
+                        <option value="5">PK14</option>
+                    </select>
+                </div>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="() => CallBack.InvokeAsync()"><i class="bi bi-plus"></i></button>
+
+            </div>
+        </div>
+
+
+        <div class="card-body">
+            @foreach (var child in Content)
+            {
+                <div draggable="true"
+                     @key="child.Id"
+                     @ondragstart="(e) => OnDragStart(e, child.Id)"
+                     @ondrop="(e) => OnDrop(e, child.Id)"
+                     ondragover="allowDrop(event)"
+                     class="drag-item">
+                    @child.Content
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback CallBack { get; set; }
+    [Parameter]
+    public string ActiveTab { get; set; } = "Rundown";
+    [Parameter]
+    public string Name { get; set; } = "Unknown";
+
+    public List<RundownChild> Content = [];
+
+    private string? draggedChildId;
+
+    
+
+    private void OnDragStart(DragEventArgs e, string childId)
+    {
+        draggedChildId = childId;
+    }
+
+    private async Task OnDrop(DragEventArgs e, string targetChildId)
+    {
+        if (draggedChildId != null)
+        {
+            var draggedChild = Content.FirstOrDefault(x => x.Id == draggedChildId);
+            var targetChild = Content.FirstOrDefault(x => x.Id == targetChildId);
+
+            if (draggedChild != null && targetChild != null)
+            {
+                Content.Remove(draggedChild);
+                var targetIndex = Content.IndexOf(targetChild);
+
+                if (targetIndex >= 0)
+                {
+                    Content.Insert(targetIndex, draggedChild);
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+            draggedChildId = null;
+        }
+    }
+
+    public class RundownChild
+    {
+        public string Id { get; set; }
+        public RenderFragment Content { get; set; }
+    }
+
+}

@@ -1,5 +1,5 @@
 ﻿<li class="nav-item">
-    <a role="button" class="nav-link @(ActiveTab == MenuItem ? "active" : "")" @onclick='() => SelectTab.InvokeAsync(MenuItem)'>@MenuItem</a>
+    <a role="button" class="nav-link  @(ActiveTab == MenuItem ? "active" : "")" @onclick='() => SelectTab.InvokeAsync(MenuItem)'>@MenuItem</a>
 </li>
 
 @code {

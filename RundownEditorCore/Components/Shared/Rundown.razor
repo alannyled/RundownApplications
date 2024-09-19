@@ -1,114 +1,160 @@
-﻿@inject IJSRuntime JS
-@rendermode InteractiveServer
+﻿@using RundownEditorCore.Components.Shared
 
-<ul class="nav nav-tabs mb-2">
-    <TabItem MenuItem="Rundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
-</ul>
-<div class="tab-content">
-    <div class="tab-pane @(activeTab == "Rundown" ? "show active" : "fade")">
-        <div class="card card-height-100 mb-2">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">Rundown @name</h5>
+<div class="modal fade show" style='display:@(showDialog ? "block" : "none")' tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nyt rækkefølge objekt</h5>
+                <button type="button" class="btn-close" @onclick="CloseDialog"></button>
             </div>
-
-            <div class="card-header">
-                <div class="d-flex">
-                    <div class="col-auto me-3">
-                        <select class="form-select form-select-sm">
-                            <option>Kontrolrum</option>
-                            <option value="1">PK1</option>
-                            <option value="2">PK5</option>
-                            <option value="3">PK6</option>
-                            <option value="4">PK13</option>
-                            <option value="5">PK14</option>
-                        </select>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="objectname" class="form-label">Navn</label>
+                        <input type="text" class="form-control form-control-sm" id="objectname" @bind="ObjectName">
                     </div>
-                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="AddRunddownObject"><i class="bi bi-plus"></i></button>
-                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-palette"></i></button>
-                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-camera-video"></i></button>
-                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-badge-vo"></i></button>
-                    <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-card-text"></i></button>
-
-                </div>
-            </div>
-
-
-            <div class="card-body">
-                @foreach (var child in RundownChildContents)
-                {
-                    <div draggable="true"
-                         @key="child.Id"
-                         @ondragstart="(e) => OnDragStart(e, child.Id)"
-                         @ondrop="(e) => OnDrop(e, child.Id)"
-                         ondragover="allowDrop(event)"
-                         class="drag-item">
-                        @child.Content
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Planlagt længde</label>
+                        <input type="text" class="form-control form-control-sm" id="duration" @bind="Duration">
                     </div>
-                }
+                    <div class="mb-3">
+                        <label for="categori" class="form-label">Kategori</label>
+                        <input type="text" class="form-control form-control-sm" id="categori" @bind="Category">
+                    </div>
+                </form>
             </div>
-
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-primary" @onclick="CloseDialog">Fortryd</button>
+                <button class="btn btn-sm btn-success" @onclick="SaveNewObject">Gem</button>
+            </div>
         </div>
     </div>
 </div>
 
+<ul class="nav nav-tabs mb-2">
+    <TabItem MenuItem="Rundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
+    @foreach (var item in menuTabs)
+    {
+        @item.Content
+    }
+</ul>
+<div class="tab-content">
+    <TabPaneRundown Name="FakeNews" ActiveTab="@activeTab" CallBack="OpenRundownObject" />
+    @foreach (var tab in tabPanes)
+    {
+        @tab.Content
+    }
+</div>
 
 @code {
-    private string name = "TVA 1830";
+
+    private string ObjectName { get; set; } = "Unknown";
+    private string Duration { get; set; } = "00:00:00";
+    private string Category { get; set; } = string.Empty;
+
+    private bool showDialog = false;
     private string activeTab = "Rundown";
-    private List<RundownChild> RundownChildContents = new();
-    private string? draggedChildId;
+
+    private List<TabFragment> menuTabs = new();
+    private List<TabFragment> tabPanes = new();
 
     private void SelectTab(string tabName)
     {
         activeTab = tabName;
     }
 
-    private void AddRunddownObject()
+    private void OpenRundownObject()
     {
-        // Tilføjer et nyt RundownObject komponent dynamisk
-        var newChild = new RundownChild
-            {
-                Id = Guid.NewGuid().ToString(),
-                Content = (RenderFragment)(builder =>
-                {
-                    builder.OpenComponent(0, typeof(RundownObject));
-                    builder.CloseComponent();
-                })
-            };
-
-        RundownChildContents.Add(newChild);
+        Console.WriteLine("INVOKED");
+        showDialog = true;
     }
 
-    private void OnDragStart(DragEventArgs e, string childId)
+    private void CloseDialog()
     {
-        draggedChildId = childId;
+        showDialog = false;
     }
 
-    private async Task OnDrop(DragEventArgs e, string targetChildId)
+    private void SaveNewObject()
     {
-        if (draggedChildId != null)
+        showDialog = false;
+        activeTab = ObjectName;
+        AddMenuTab();
+        
+    }
+
+    private void AddMenuTab()
+    {
+        string tabName = ObjectName;
+        var newChild = new RenderFragment(builder =>
         {
-            var draggedChild = RundownChildContents.FirstOrDefault(x => x.Id == draggedChildId);
-            var targetChild = RundownChildContents.FirstOrDefault(x => x.Id == targetChildId);
+            builder.OpenComponent<TabItem>(0); // Opretter TabItem-komponent
+            builder.AddAttribute(1, "MenuItem", tabName);
+            builder.AddAttribute(2, "ActiveTab", activeTab);
+            builder.AddAttribute(3, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
+            builder.CloseComponent();
+        });
 
-            if (draggedChild != null && targetChild != null)
+        menuTabs.Add(new TabFragment
             {
-                RundownChildContents.Remove(draggedChild);
-                var targetIndex = RundownChildContents.IndexOf(targetChild);
-             
-                if (targetIndex >= 0)
-                {
-                    RundownChildContents.Insert(targetIndex, draggedChild);
-                }
-                await InvokeAsync(StateHasChanged);
-            }
-            draggedChildId = null;
+                Name = tabName,
+                Content = newChild
+            });
+
+        AddTabPane();
+    }
+    private void AddTabPane()
+    {
+        string tabName = ObjectName;
+        var newChild = new RenderFragment(builder =>
+        {
+            builder.OpenComponent<TabPaneRundownObject>(0);
+            builder.AddAttribute(1, "Name", tabName);
+            builder.AddAttribute(2, "ActiveTab", activeTab);
+            builder.AddAttribute(3, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));
+            builder.CloseComponent();
+        });
+
+        //tabPanes.Add(newChild);
+        tabPanes.Add(new TabFragment
+            {
+                Name = tabName,
+                Content = newChild
+            });
+        
+        ObjectName = "Unknown";
+        Duration = "00:00:00";
+        Category = string.Empty;
+    }
+
+    private void RemoveTabPane(string tabName)
+    {
+        // Find og fjern fanen baseret på dens navn
+        var tabToRemove = tabPanes.FirstOrDefault(tab => tab.Name == tabName);
+        if (tabToRemove != null)
+        {
+            tabPanes.Remove(tabToRemove);
+            RemoveTab(tabName);
         }
     }
 
-    public class RundownChild
+    private void RemoveTab(string tabName)
     {
-        public string Id { get; set; }
-        public RenderFragment Content { get; set; }
+        // Find og fjern fanen baseret på dens navn
+        var tabToRemove = menuTabs.FirstOrDefault(tab => tab.Name == tabName);
+        if (tabToRemove != null)
+        {
+            menuTabs.Remove(tabToRemove);
+            activeTab = "Rundown";
+            StateHasChanged(); 
+        }
     }
+
+
+    public class TabFragment
+    {
+        public string Name { get; set; } // Fanens navn
+        public RenderFragment Content { get; set; } // Fanens indhold (RenderFragment)
+    }
+
+
 }

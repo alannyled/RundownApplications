@@ -43,6 +43,8 @@
                         @ondragstart="(e) => OnDragStart(e, child.Id)"
                         @ondrop="(e) => OnDrop(e, child.Id)"
                         ondragover="allowDrop(event)"
+                        ondragleave="leaveDrop(event)"
+                        ondragend="endDrop(event)"
                         class="drag-item">
                         <td>@child.Name</td>
                         <td>@child.Duration</td>

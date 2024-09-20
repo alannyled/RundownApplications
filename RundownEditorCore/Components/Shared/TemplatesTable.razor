@@ -109,7 +109,7 @@ else
             await retryPolicy.ExecuteAsync(async () =>
             {
                 Console.WriteLine("Calling API...");
-                templates = await client.GetFromJsonAsync<List<Template>>("Template");
+                templates = await client.GetFromJsonAsync<List<Template>>("TemplateApi");
 
                 if (templates == null || templates.Count == 0)
                 {

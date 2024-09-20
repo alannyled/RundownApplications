@@ -9,12 +9,12 @@ using RundownDbService.Data;
 namespace RundownDbService.Controllers
 {
     [ApiController]
-    [Route("api/teleprompter/[controller]")]
-    public class TeleprompterTestsController : Controller
+    [Route("api/[controller]")]
+    public class TeleprompterTestsApiController : Controller
     {
         private readonly RundownDbContext _context;
 
-        public TeleprompterTestsController(RundownDbContext context)
+        public TeleprompterTestsApiController(RundownDbContext context)
         {
             _context = context;
         }

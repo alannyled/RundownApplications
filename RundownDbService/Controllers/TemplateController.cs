@@ -9,11 +9,11 @@ namespace RundownDbService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TemplateController : ControllerBase 
+    public class TemplateApiController : ControllerBase 
     {
         private readonly RundownDbContext _context;
 
-        public TemplateController(RundownDbContext context)
+        public TemplateApiController(RundownDbContext context)
         {
             _context = context;
         }

@@ -12,6 +12,8 @@ namespace RundownDbService.Data
         public DbSet<Video> Videos { get; set; }
         public DbSet<Rundown> Rundowns { get; set; }
         public DbSet<TeleprompterTest> TeleprompterTests { get; set; }
+        public DbSet<ControlRoom> ControlRooms { get; set; }
+        public DbSet<Hardware> Hardwares { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +22,11 @@ namespace RundownDbService.Data
                 .HasMany(t => t.VideoObjects)
                 .WithMany(v => v.Rundowns)
                 .UsingEntity(j => j.ToTable("RundownVideos"));
+
+            modelBuilder.Entity<ControlRoom>()
+                .HasMany(t => t.Hardwares)
+                .WithMany(v => v.ControlRooms)
+                .UsingEntity(j => j.ToTable("ControlRoomHardwares"));
         }
     }
 }

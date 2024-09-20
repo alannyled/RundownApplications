@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RundownDbService.Data;
 
@@ -11,9 +12,11 @@ using RundownDbService.Data;
 namespace RundownDbService.Migrations
 {
     [DbContext(typeof(RundownDbContext))]
-    partial class RundownDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240920134728_AddRundownControlRoomRelation")]
+    partial class AddRundownControlRoomRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,7 +205,7 @@ namespace RundownDbService.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeSpan>("Duration")
+                    b.Property<TimeOnly>("Duration")
                         .HasColumnType("time");
 
                     b.Property<TimeOnly>("StartTime")

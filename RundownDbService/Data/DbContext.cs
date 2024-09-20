@@ -17,16 +17,23 @@ namespace RundownDbService.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Many-to-many relation mellem Rundowns og Video
+           
             modelBuilder.Entity<Rundown>()
                 .HasMany(t => t.VideoObjects)
                 .WithMany(v => v.Rundowns)
                 .UsingEntity(j => j.ToTable("RundownVideos"));
 
+            modelBuilder.Entity<Rundown>()
+                .HasOne(r => r.ControlRoom)
+                .WithMany(c => c.Rundowns)
+                .HasForeignKey(r => r.ControlRoomId);
+
             modelBuilder.Entity<ControlRoom>()
                 .HasMany(t => t.Hardwares)
                 .WithMany(v => v.ControlRooms)
                 .UsingEntity(j => j.ToTable("ControlRoomHardwares"));
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

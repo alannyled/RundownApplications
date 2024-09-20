@@ -20,7 +20,7 @@
                       
                         <div class="card-body">
                             <h5 class="card-title">Aktive Rækkefølger</h5>
-                            <TemplatesTable />
+                            <TemplatesTable OpenRundown="OpenRundown" />
                         </div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                             <Calendar />
                             <hr />
                             <h5 class="card-title text-muted">Templates</h5>
-                            <TemplatesTable />
+                            <TemplatesTable OpenRundown="OpenRundown"/>
                         </div>
                     </div>
                 </div>
@@ -47,8 +47,8 @@
         </div>
         @* rundown card *@
         <div class="col-xl-9">
-            <Rundown />
-            <div class="card full-height">
+            <Rundown CurrentRundown="@currentRundown" />
+            @* <div class="card full-height">
                 <div class="card-body">
           
                     <p>Indsæt tekst til teleprompter</p>
@@ -56,7 +56,7 @@
 
                     <button role="button" @onclick="SaveText">Gem</button>
                 </div>
-            </div>
+            </div> *@
         </div>
     </div>
 </div>
@@ -64,10 +64,15 @@
 
 
 @code {
-    private string teleprompterText { get; set; }
-    private string name = "TVA 1830";
+    private string? teleprompterText { get; set; }
+    //private string name = "TVA 1830";
     private string activeTab = "Templates";
+    private string currentRundown = string.Empty;
 
+    private void OpenRundown(string rundown)
+    {
+        currentRundown = rundown;
+    }
     private void SelectTab(string tabName)
     {
         activeTab = tabName;

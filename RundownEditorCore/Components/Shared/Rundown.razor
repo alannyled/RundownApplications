@@ -33,14 +33,14 @@
 </div>
 
 <ul class="nav nav-tabs mb-2">
-    <TabItem MenuItem="Rundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
+    <TabItem MenuItem="@CurrentRundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
     @foreach (var item in menuTabs)
     {
         @item.Content
     }
 </ul>
 <div class="tab-content">
-    <TabPaneRundown Name="FakeNews" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects"/>
+    <TabPaneRundown Name="@CurrentRundown" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects" />
     @foreach (var tab in tabPanes)
     {
         @tab.Content
@@ -48,18 +48,31 @@
 </div>
 
 @code {
+    [Parameter]
+    public string CurrentRundown { get; set; } = string.Empty;
 
     private string ObjectName { get; set; } = string.Empty;
     private string Duration { get; set; } = "00:00:00";
     private string Category { get; set; } = string.Empty;
 
     private bool showDialog = false;
-    private string activeTab = "Rundown";
+    private string activeTab = string.Empty;
 
     private List<TabFragment> menuTabs = new();
     private List<TabFragment> tabPanes = new();
 
     public List<RundownObjects> RundownObjects { get; set; } = new List<RundownObjects>();
+
+    protected override void OnParametersSet()
+    {
+        if (activeTab != CurrentRundown && !string.IsNullOrEmpty(CurrentRundown))
+        {
+            activeTab = CurrentRundown;
+            RundownObjects = []; // det her skal så være den reelle liste af objects og ikke en tom liste
+            menuTabs = [];
+            tabPanes = [];
+        }
+    }
 
     private Task<int> RandomNumber()
     {
@@ -178,7 +191,7 @@
         if (tabToRemove != null)
         {
             menuTabs.Remove(tabToRemove);
-            activeTab = "Rundown";
+            activeTab = CurrentRundown;
             StateHasChanged(); 
         }
     }

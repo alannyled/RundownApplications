@@ -1,9 +1,9 @@
 ﻿@using RundownEditorCore.DTO
 
-<div class="tab-pane @(ActiveTab == "Rundown" ? "show active" : "fade")">
+<div class="tab-pane @(ActiveTab == Name && !string.IsNullOrEmpty(ActiveTab) && !string.IsNullOrEmpty(Name) ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
         <div class="card-header bg-danger text-white">
-            <h5 class="mb-0">Rundown @Name</h5>
+            <h5 class="mb-0">@Name</h5>
         </div>
 
         <div class="card-header">
@@ -63,9 +63,9 @@
     [Parameter]
     public EventCallback<string> OpenTabPane { get; set; }
     [Parameter]
-    public string ActiveTab { get; set; } = "Rundown";
+    public string ActiveTab { get; set; } = string.Empty;
     [Parameter]
-    public string Name { get; set; } = "Unknown";
+    public string Name { get; set; } = string.Empty;
     [Parameter]
     public List<RundownObjects> CurrentObjects { get; set; } = [];
 

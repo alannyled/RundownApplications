@@ -22,7 +22,10 @@
 
         @for (int day = 1; day <= DaysInMonth; day++)
         {
-            <div class="day @(CurrentDate.Day == day && CurrentDate.Month == DisplayDate.Month && CurrentDate.Year == DisplayDate.Year ? "current-day" : "")">
+            int capturedDay = day;
+            <div role="button"
+                 class="day @(CurrentDate.Day == day && CurrentDate.Month == DisplayDate.Month && CurrentDate.Year == DisplayDate.Year ? "current-day" : "")"
+                 @onclick="() => SetSelectedDate(capturedDay)">
                 @day
             </div>
         }
@@ -33,10 +36,13 @@
 </div>
 
 @code {
-    private DateTime CurrentDate = DateTime.Now;  
-    private DateTime DisplayDate = DateTime.Now; 
+    [Parameter]
+    public EventCallback<DateTime> ReturnSelectedDate { get; set; }
+    private DateTime CurrentDate = DateTime.Now;
+    private DateTime DisplayDate = DateTime.Now;
     private int DaysInMonth => DateTime.DaysInMonth(DisplayDate.Year, DisplayDate.Month);
-    private int StartDayOfWeek => (int)new DateTime(DisplayDate.Year, DisplayDate.Month, 1).DayOfWeek;
+    // fordi ugen starter med søndag, rykker jeg det hele en dag herunder
+    private int StartDayOfWeek => ((int)new DateTime(DisplayDate.Year, DisplayDate.Month, 1).DayOfWeek + 6) % 7;
 
     private void GoToPreviousMonth()
     {
@@ -50,6 +56,16 @@
     private void GoToToday()
     {
         DisplayDate = DateTime.Now;
+        CurrentDate = DateTime.Now;
+        ReturnSelectedDate.InvokeAsync(CurrentDate);
     }
+
+    private void SetSelectedDate(int day)
+    {
+        CurrentDate = new DateTime(DisplayDate.Year, DisplayDate.Month, day);
+        ReturnSelectedDate.InvokeAsync(CurrentDate);
+    }
+
+
 }
 

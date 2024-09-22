@@ -36,10 +36,10 @@
                 <div class="tab-pane @(activeTab == "Templates" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
                         <div class="card-body">
-                            <Calendar />
+                            <Calendar ReturnSelectedDate="SetSelectedDate"/>
                             <hr />
                             <h5 class="card-title text-muted">Templates</h5>
-                            <TemplatesTable OpenRundown="OpenRundown"/>
+                            <TemplatesTable OpenRundown="OpenRundown"  />
                         </div>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
         </div>
         @* rundown card *@
         <div class="col-xl-9">
-            <Rundown CurrentRundown="@currentRundown" />
+            <Rundown CurrentRundown="@currentRundown" SelectedDate="@SelectedDate" />
             @* <div class="card full-height">
                 <div class="card-body">
           
@@ -65,17 +65,25 @@
 
 @code {
     private string? teleprompterText { get; set; }
-    //private string name = "TVA 1830";
+    private DateTime SelectedDate { get; set; } = DateTime.Now;
     private string activeTab = "Templates";
     private string currentRundown = string.Empty;
 
     private void OpenRundown(string rundown)
     {
         currentRundown = rundown;
+        activeTab = "Rundowns";
+        // Create rundown on selected date if not exists
+        Console.WriteLine($"Create rundown = {rundown} on {SelectedDate} if not exists");
     }
     private void SelectTab(string tabName)
     {
         activeTab = tabName;
+    }
+
+    private void SetSelectedDate(DateTime date)
+    {
+        SelectedDate = date;        
     }
 
     private async Task SaveText()

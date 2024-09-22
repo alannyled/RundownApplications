@@ -40,7 +40,7 @@
     }
 </ul>
 <div class="tab-content">
-    <TabPaneRundown Name="@CurrentRundown" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects" />
+    <TabPaneRundown Name="@CurrentRundown" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects" SelectedDate="SelectedDate"/>
     @foreach (var tab in tabPanes)
     {
         @tab.Content
@@ -50,6 +50,8 @@
 @code {
     [Parameter]
     public string CurrentRundown { get; set; } = string.Empty;
+    [Parameter]
+    public DateTime SelectedDate { get; set; } 
 
     private string ObjectName { get; set; } = string.Empty;
     private string Duration { get; set; } = "00:00:00";

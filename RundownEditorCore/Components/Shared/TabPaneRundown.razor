@@ -2,8 +2,9 @@
 
 <div class="tab-pane @(ActiveTab == Name && !string.IsNullOrEmpty(ActiveTab) && !string.IsNullOrEmpty(Name) ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
-        <div class="card-header bg-danger text-white">
+        <div class="card-header d-flex justify-content-between bg-danger text-white">
             <h5 class="mb-0">@Name</h5>
+            <h5 class="mb-0">@FormatDateWithCapitalDay(SelectedDate)</h5>
         </div>
 
         <div class="card-header">
@@ -70,9 +71,16 @@
     public string Name { get; set; } = string.Empty;
     [Parameter]
     public List<RundownObjects> CurrentObjects { get; set; } = [];
+    [Parameter]
+    public DateTime SelectedDate { get; set; } = DateTime.Now;
 
     private string? draggedChildId;
 
+    private string FormatDateWithCapitalDay(DateTime date)
+    {
+        var formattedDate = date.ToString("dddd d. MMMM yyyy", new System.Globalization.CultureInfo("da-DK"));
+        return char.ToUpper(formattedDate[0]) + formattedDate.Substring(1);
+    }
 
     private void OnDragStart(DragEventArgs e, string childId)
     {

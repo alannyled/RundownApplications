@@ -31,7 +31,7 @@
         </div>
     </div>
 </div>
-
+@if(CurrentRundown != string.Empty){
 <ul class="nav nav-tabs mb-2">
     <TabItem MenuItem="@CurrentRundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
     @foreach (var item in menuTabs)
@@ -39,6 +39,7 @@
         @item.Content
     }
 </ul>
+}
 <div class="tab-content">
     <TabPaneRundown Name="@CurrentRundown" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects" SelectedDate="SelectedDate"/>
     @foreach (var tab in tabPanes)

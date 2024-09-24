@@ -4,7 +4,7 @@
 @inject IHttpClientFactory ClientFactory
 
 <PageTitle>Home</PageTitle>
-   
+
 
 <div class="container-fluid full-height">
     <div class="row h-100">
@@ -12,21 +12,22 @@
             <ul class="nav nav-tabs mb-2">
                 <TabItem MenuItem="Rundowns" ActiveTab="@activeTab" SelectTab="SelectTab" />
                 <TabItem MenuItem="Media" ActiveTab="@activeTab" SelectTab="SelectTab" />
-                <TabItem MenuItem="Templates" ActiveTab="@activeTab" SelectTab="SelectTab" />               
+                <TabItem MenuItem="Templates" ActiveTab="@activeTab" SelectTab="SelectTab" />
             </ul>
             <div class="tab-content">
                 <div class="tab-pane @(activeTab == "Rundowns" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
-                      
+
                         <div class="card-body">
                             <h5 class="card-title">Aktive Rækkefølger</h5>
+
                             <TemplatesTable OpenRundown="OpenRundown" />
                         </div>
                     </div>
                 </div>
                 <div class="tab-pane @(activeTab == "Media" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
-                     
+
                         <div class="card-body">
                             <h5 class="card-title">Media browser</h5>
                             <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -36,27 +37,37 @@
                 <div class="tab-pane @(activeTab == "Templates" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
                         <div class="card-body">
-                            <Calendar ReturnSelectedDate="SetSelectedDate"/>
+                            <Calendar ReturnSelectedDate="SetSelectedDate" />
                             <hr />
                             <h5 class="card-title text-muted">Templates</h5>
-                            <TemplatesTable OpenRundown="OpenRundown"  />
+                            <TemplatesTable OpenRundown="OpenRundown" />
                         </div>
                     </div>
                 </div>
-            </div>            
+            </div>
         </div>
         @* rundown card *@
-        <div class="col-xl-9">
+        <div class="col-xl-8">
             <Rundown CurrentRundown="@currentRundown" SelectedDate="@SelectedDate" />
             @* <div class="card full-height">
-                <div class="card-body">
-          
-                    <p>Indsæt tekst til teleprompter</p>
-                    <textarea @bind="teleprompterText"></textarea>
+            <div class="card-body">
 
-                    <button role="button" @onclick="SaveText">Gem</button>
-                </div>
+            <p>Indsæt tekst til teleprompter</p>
+            <textarea @bind="teleprompterText"></textarea>
+
+            <button role="button" @onclick="SaveText">Gem</button>
+            </div>
             </div> *@
+        </div>
+
+        <div class="col-xl-1 pt-1">
+            <div class="card card-height-100 mt-5">
+                <AdvancedClock />
+                <div class="card-body">
+                    
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -83,7 +94,7 @@
 
     private void SetSelectedDate(DateTime date)
     {
-        SelectedDate = date;        
+        SelectedDate = date;
     }
 
     private async Task SaveText()

@@ -1,0 +1,68 @@
+﻿<form>
+    <div class="mb-3">
+        <label for="objectname" class="form-label">Navn</label>
+        <input type="text" class="form-control form-control-sm" id="objectname" value="@ObjectName"
+               @oninput="HandleObjectNameChange" />
+    </div>
+    <div class="mb-3">
+        <label for="duration" class="form-label">Planlagt længde</label>
+        <input type="time" step="1" class="form-control form-control-sm" id="duration" value="@Duration.ToString("HH:mm:ss")"
+               @onchange="HandleDurationChange" />
+    </div>
+    <div class="mb-3">
+        <label for="category" class="form-label">Skabelon</label>
+        <select class="form-control form-control-sm" id="category" value="@Category"
+                @onchange="HandleCategoryChange">
+            <option value="">Vælg en Skabelon</option>
+            @foreach (var category in Categories)
+            {
+                <option value="@category">@category</option>
+            }
+        </select>
+    </div>
+</form>
+
+@code {
+    [Parameter]
+    public string ObjectName { get; set; } = string.Empty;
+
+    [Parameter]
+    public TimeOnly Duration { get; set; }
+
+    [Parameter]
+    public string Category { get; set; } = string.Empty;
+
+    [Parameter]
+    public List<string> Categories { get; set; } = new List<string>();
+
+    [Parameter]
+    public EventCallback<string> ObjectNameChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<TimeOnly> DurationChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> CategoryChanged { get; set; }
+
+    private async Task HandleObjectNameChange(ChangeEventArgs e)
+    {
+        ObjectName = e.Value?.ToString();
+        await ObjectNameChanged.InvokeAsync(ObjectName);
+    }
+
+    private async Task HandleDurationChange(ChangeEventArgs e)
+    {
+       
+        if (TimeOnly.TryParseExact(e.Value?.ToString(), "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var parsedDuration))
+        {
+            Duration = parsedDuration;
+            await DurationChanged.InvokeAsync(Duration);
+        }
+    }
+
+    private async Task HandleCategoryChange(ChangeEventArgs e)
+    {
+        Category = e.Value?.ToString();
+        await CategoryChanged.InvokeAsync(Category);
+    }
+}

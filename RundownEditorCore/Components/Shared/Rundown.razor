@@ -1,36 +1,18 @@
 ﻿@using RundownEditorCore.Components.Shared
 @using RundownEditorCore.DTO
 
-<div class="modal fade show" style='display:@(showDialog ? "block" : "none")' tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Nyt rækkefølge objekt</h5>
-                <button type="button" class="btn-close" @onclick="CloseDialog"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="objectname" class="form-label">Navn</label>
-                        <input type="text" class="form-control form-control-sm" id="objectname" @bind="ObjectName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="duration" class="form-label">Planlagt længde</label>
-                        <input type="text" class="form-control form-control-sm" id="duration" @bind="Duration">
-                    </div>
-                    <div class="mb-3">
-                        <label for="categori" class="form-label">Kategori</label>
-                        <input type="text" class="form-control form-control-sm" id="categori" @bind="Category">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-sm btn-primary" @onclick="CloseDialog">Fortryd</button>
-                <button class="btn btn-sm btn-success" @onclick="SaveNewObject">Gem</button>
-            </div>
-        </div>
-    </div>
-</div>
+<Modal ShowDialog="@showDialog" SaveChanges="SaveNewObject" ShowDialogChanged="@((value) => showDialog = value)" Title="Nyt rækkefølge objekt">
+    <RundownObjectForm ObjectName="@ObjectName"
+                       Duration="@Duration"
+                       Category="@Category"
+                       Categories="@Categories"
+                       ObjectNameChanged="@(value => ObjectName = value)"
+                       DurationChanged="@(value => Duration = value)"
+                       CategoryChanged="@(value => Category = value)">
+    </RundownObjectForm>
+</Modal>
+
+
 @if(CurrentRundown != string.Empty){
 <ul class="nav nav-tabs mb-2">
     <TabItem MenuItem="@CurrentRundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
@@ -55,8 +37,10 @@
     public DateTime SelectedDate { get; set; } 
 
     private string ObjectName { get; set; } = string.Empty;
-    private string Duration { get; set; } = "00:00:00";
+    private TimeOnly Duration { get; set; } = TimeOnly.Parse("00:00:00");
     private string Category { get; set; } = string.Empty;
+
+    private List<string> Categories = new List<string> { "TVA Intro", "Indslag", "Indslag VO", "Kamera Tekst" };
 
     private bool showDialog = false;
     private string activeTab = string.Empty;
@@ -174,7 +158,7 @@
             });
         
         ObjectName = string.Empty;
-        Duration = "00:00:00";
+        Duration = TimeOnly.Parse("00:00:00");
         Category = string.Empty;
     }
 
@@ -208,3 +192,44 @@
 
 
 }
+
+
+@*
+    <div class="modal fade show" style='display:@(showDialog ? "block" : "none")' tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nyt rækkefølge objekt</h5>
+                <button type="button" class="btn-close" @onclick="CloseDialog"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="objectname" class="form-label">Navn</label>
+                        <input type="text" class="form-control form-control-sm" id="objectname" @bind="ObjectName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Planlagt længde</label>
+                        <input type="time" step="1" class="form-control form-control-sm" id="duration" @bind="Duration">
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Skabelon</label>
+                        <select class="form-control form-control-sm" id="category" @bind="Category">
+                            <option value="">Vælg en Skabelon</option>
+                            @foreach (var category in Categories)
+                            {
+                                <option value="@category">@category</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-primary" @onclick="CloseDialog">Fortryd</button>
+                <button class="btn btn-sm btn-success" @onclick="SaveNewObject">Gem</button>
+            </div>
+        </div>
+    </div>
+</div>
+*@

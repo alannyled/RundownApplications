@@ -1,0 +1,48 @@
+﻿<MOS>
+	<mosID>Newsroom1</mosID>
+	<ncsID>NRCS1</ncsID>
+	<messageID>123456</messageID>
+	<command>ROElementAction</command>
+	<roID>RO1234</roID>
+	<roElementAction>
+		<action>TRIGGER</action>
+		<elementID>MixEffect1</elementID>
+		<operation>TAKE</operation>
+		<mixEffect>
+			<effectName>Camera 1 to Camera 2</effectName>
+			<fromSource>Camera1</fromSource>
+			<toSource>Camera2</toSource>
+			<duration>500</duration>
+			<transitionType>MIX</transitionType>
+		</mixEffect>
+	</roElementAction>
+</MOS>
+
+
+
+<!--<mosID>
+	: Unikt ID for det MOS-udstyr, der sender beskeden (f.eks. en newsroom-computer).
+	<ncsID>
+		: ID for Newsroom Control System (NRCS), der er tilsluttet MOS-enheden.
+		<messageID>
+			: Unikt ID for selve beskeden.
+			<command>
+				: Angiver, hvilken type MOS-kommando dette er. I dette tilfælde ROElementAction (Running Order Element Action).
+				<roID>
+					: ID for Running Order, der indeholder elementerne til afvikling.
+					<roElementAction>
+						: Detaljer om handlingen på elementet.
+						<action>
+							: Den handling, der skal udføres, her TRIGGER.
+							<elementID>
+								: ID for det specifikke element i running orderen (i dette tilfælde mixeren).
+								<operation>
+									: Typen af operation – i dette eksempel TAKE.
+									<mixEffect>
+										: Parametre, der fortæller videomixeren, hvad den skal gøre.
+										<effectName>
+											: Navnet på effekten.
+											<duration>
+												: Varigheden af overgangen i millisekunder.
+												<transitionType>: Overgangstypen, her en MIX.-->
+

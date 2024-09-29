@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownEditorCore", "Rundow
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeleprompterSimulator", "TeleprompterSimulator\TeleprompterSimulator.csproj", "{CF13503B-A63D-41B1-BFFC-197D95E8E294}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaFactoryTestApp", "KafkaFactoryTestApp\KafkaFactoryTestApp.csproj", "{D2429722-1EDF-4382-82F4-6AE00A892F71}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaFactoryLibrary", "KafkaFactoryLibrary\KafkaFactoryLibrary.csproj", "{6DCCEC9F-D12E-45AA-8325-992EF87A3961}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{CF13503B-A63D-41B1-BFFC-197D95E8E294}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF13503B-A63D-41B1-BFFC-197D95E8E294}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF13503B-A63D-41B1-BFFC-197D95E8E294}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2429722-1EDF-4382-82F4-6AE00A892F71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2429722-1EDF-4382-82F4-6AE00A892F71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2429722-1EDF-4382-82F4-6AE00A892F71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2429722-1EDF-4382-82F4-6AE00A892F71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DCCEC9F-D12E-45AA-8325-992EF87A3961}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DCCEC9F-D12E-45AA-8325-992EF87A3961}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DCCEC9F-D12E-45AA-8325-992EF87A3961}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DCCEC9F-D12E-45AA-8325-992EF87A3961}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

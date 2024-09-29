@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace KafkaFactoryLibrary
 {
@@ -7,36 +8,33 @@ namespace KafkaFactoryLibrary
     {
         private readonly ProducerConfig _producerConfig;
         private readonly ConsumerConfig _consumerConfig;
-        private static string _bootstrapServers;
 
-        // Vigtigt tilføj boostrap servers til appsettings.json i den applikation der bruger KafkaFactory
         public KafkaFactory(IConfiguration configuration)
         {
-            _bootstrapServers = configuration.GetValue<string>("Kafka:BootstrapServers");
+            var bootstrapServers = configuration.GetValue<string>("Kafka:BootstrapServers");
 
-            _producerConfig = new ProducerConfig { BootstrapServers = _bootstrapServers };
-
+            _producerConfig = new ProducerConfig { BootstrapServers = bootstrapServers };
             _consumerConfig = new ConsumerConfig
             {
-                BootstrapServers = _bootstrapServers,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
+                BootstrapServers = bootstrapServers,
+                AutoOffsetReset = AutoOffsetReset.Latest,
                 EnableAutoCommit = true
             };
         }
 
-        // Opret producer
-        public IProducer<string, string> CreateProducer()
+        public IKafkaClient CreateKafkaClient(string type, string groupId = null, IEnumerable<string> topics = null)
         {
-            return new ProducerBuilder<string, string>(_producerConfig).Build();
-        }
+            if (type.Equals("producer", StringComparison.OrdinalIgnoreCase))
+            {
+                return new KafkaProducerClient(_producerConfig);
+            }
+            else if (type.Equals("consumer", StringComparison.OrdinalIgnoreCase) && groupId != null && topics != null)
+            {
+                _consumerConfig.GroupId = groupId;
+                return new KafkaConsumerClient(_consumerConfig, topics);
+            }
 
-        // Opret consumer
-        public IConsumer<string, string> CreateConsumer(string groupId, IEnumerable<string> topics)
-        {
-            _consumerConfig.GroupId = groupId;
-            var consumer = new ConsumerBuilder<string, string>(_consumerConfig).Build();
-            consumer.Subscribe(topics);
-            return consumer;
+            throw new ArgumentException("Invalid type or missing parameters for Kafka client creation.");
         }
     }
 }

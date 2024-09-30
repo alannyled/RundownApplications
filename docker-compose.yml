@@ -1,7 +1,7 @@
 services:
   controlroom-mongo:
     image: mongo
-    container_name: controlroom-mongo
+    container_name: controlroom-database
     restart: always
     ports:
       - "27017:27017"
@@ -13,6 +13,8 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
 
   kafka:
     image: bitnami/kafka:latest 

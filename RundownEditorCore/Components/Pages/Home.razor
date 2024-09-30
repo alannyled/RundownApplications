@@ -1,8 +1,17 @@
 ﻿@page "/"
 @using System.Text.Json;
 @using RundownEditorCore.Components.Shared
+@using RundownEditorCore.Data
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @inject IHttpClientFactory ClientFactory
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @attribute [Authorize(Roles = "User")]
 <PageTitle>Home</PageTitle>
 
@@ -80,6 +89,25 @@
     private DateTime SelectedDate { get; set; } = DateTime.Now;
     private string activeTab = "Templates";
     private string currentRundown = string.Empty;
+
+    private ClaimsPrincipal user;
+    private ApplicationUser currentUser;
+    private List<string> userRoles = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            currentUser = await UserManager.GetUserAsync(user);
+
+            // Hent rollerne for den aktuelle bruger
+            userRoles = (await UserManager.GetRolesAsync(currentUser)).ToList();
+        }
+    }
+
 
     private void OpenRundown(string rundown)
     {

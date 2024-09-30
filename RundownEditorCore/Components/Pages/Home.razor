@@ -1,8 +1,9 @@
 ﻿@page "/"
 @using System.Text.Json;
 @using RundownEditorCore.Components.Shared
+@using Microsoft.AspNetCore.Authorization
 @inject IHttpClientFactory ClientFactory
-
+@attribute [Authorize(Roles = "User")]
 <PageTitle>Home</PageTitle>
 
 

@@ -1,5 +1,5 @@
 services:
-  controlroom-mongo:
+  controlroom-database:
     image: mongo
     container_name: controlroom-database
     restart: always

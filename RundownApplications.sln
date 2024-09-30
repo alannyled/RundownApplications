@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaFactoryTestApp", "Kafk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaFactoryLibrary", "KafkaFactoryLibrary\KafkaFactoryLibrary.csproj", "{6DCCEC9F-D12E-45AA-8325-992EF87A3961}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlroomService", "ControlroomService\ControlroomService.csproj", "{429CF27F-E57A-4764-B55D-A3DA6EB0497D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{6DCCEC9F-D12E-45AA-8325-992EF87A3961}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DCCEC9F-D12E-45AA-8325-992EF87A3961}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DCCEC9F-D12E-45AA-8325-992EF87A3961}.Release|Any CPU.Build.0 = Release|Any CPU
+		{429CF27F-E57A-4764-B55D-A3DA6EB0497D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{429CF27F-E57A-4764-B55D-A3DA6EB0497D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{429CF27F-E57A-4764-B55D-A3DA6EB0497D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{429CF27F-E57A-4764-B55D-A3DA6EB0497D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

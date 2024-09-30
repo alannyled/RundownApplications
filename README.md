@@ -24,7 +24,7 @@ docker run -d --name kafka --network kafka-net `
   bitnami/kafka:latest
 
 ```
-Ved brug af MSSQL Server og EF Core
+Ved brug af MSSQL Server og EF Core \n
 DB connection
 ```
 Microsoft SQL Server (User = SA):

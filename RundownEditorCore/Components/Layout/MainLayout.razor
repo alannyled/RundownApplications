@@ -1,7 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @using RundownEditorCore.Components.Shared
 @implements IDisposable
-
 @inject NavigationManager NavigationManager
 
 <div class="page">
@@ -33,7 +32,7 @@
                         <form action="Account/Logout" method="post">
                             <AntiforgeryToken />
                             <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                            <button type="submit" class="nav-link btn btn-sm btn-outline-secondary text-white">
+                            <button type="submit" class="nav-link btn btn-sm btn-outline-danger text-white">
                                 <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
                             </button>
                         </form>
@@ -77,13 +76,14 @@
 
     protected override void OnInitialized()
     {
-        currentUrl = NavigationManager.Uri; // Brug den fulde URL
+       
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        currentUrl = e.Location; // Opdater til den fulde URL
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
         StateHasChanged();
     }
 

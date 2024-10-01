@@ -29,31 +29,6 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
-//});
-
-//builder.Services.AddAuthentication(options =>
-//    {
-//        options.DefaultScheme = IdentityConstants.ApplicationScheme;
-//        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-//    })
-//    .AddIdentityCookies();
-
-//builder.Services.AddAntiforgery(options =>
-//{
-//    options.HeaderName = "X-CSRF-TOKEN";
-//});
-
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Identity/Account/Login";
-    options.LogoutPath = "/Identity/Account/Logout";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-});
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
@@ -97,31 +72,19 @@ else
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseAntiforgery();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 
 app.MapRazorPages();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
 app.Run();
 
-// Define retry policy
-//static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-//{
-//    return HttpPolicyExtensions
-//        .HandleTransientHttpError()
-//        .WaitAndRetryAsync(
-//            3, // Number of retries
-//            retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), // Exponential backoff
-//            onRetry: (outcome, timespan, retryAttempt, context) =>
-//            {
-//                Console.WriteLine($"Retry attempt {retryAttempt}");
-//            });
-//}
+

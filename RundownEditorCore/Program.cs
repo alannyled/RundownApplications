@@ -9,6 +9,7 @@ using RundownEditorCore.Components;
 using RundownEditorCore.Components.Account;
 using RundownEditorCore.Data;
 using Microsoft.Extensions.Options;
+using RundownEditorCore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,11 @@ builder.Services.AddHttpClient("TemplatesAPI", client =>
 });
 
 // Add services to the container.
+builder.Services.AddHttpClient<ControlRoomService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7244/api/Aggregator/");
+
+});
 builder.Services.AddRazorPages();
 
 builder.Services.AddRazorComponents()

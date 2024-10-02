@@ -2,16 +2,18 @@
 @using System.Text.Json;
 @using RundownEditorCore.Components.Shared
 @using RundownEditorCore.Data
+@inject IHttpClientFactory ClientFactory
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
+@* @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IHttpClientFactory ClientFactory
-@inject UserManager<ApplicationUser> UserManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
-@attribute [Authorize(Roles = "User")]
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider *@
+
+@attribute [Authorize(Roles = "User,Administrator")]
+
 <PageTitle>Home</PageTitle>
 
 
@@ -89,23 +91,23 @@
     private string activeTab = "Templates";
     private string currentRundown = string.Empty;
 
-    private ClaimsPrincipal user;
-    private ApplicationUser currentUser;
-    private List<string> userRoles = new List<string>();
+    // private ClaimsPrincipal user;
+    // private ApplicationUser currentUser;
+    // private List<string> userRoles = new List<string>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        user = authState.User;
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    //     user = authState.User;
 
-        if (user.Identity != null && user.Identity.IsAuthenticated)
-        {
-            currentUser = await UserManager.GetUserAsync(user);
+    //     if (user.Identity != null && user.Identity.IsAuthenticated)
+    //     {
+    //         currentUser = await UserManager.GetUserAsync(user);
 
-            // Hent rollerne for den aktuelle bruger
-            userRoles = (await UserManager.GetRolesAsync(currentUser)).ToList();
-        }
-    }
+    //         // Hent rollerne for den aktuelle bruger
+    //         userRoles = (await UserManager.GetRolesAsync(currentUser)).ToList();
+    //     }
+    // }
 
 
     private void OpenRundown(string rundown)

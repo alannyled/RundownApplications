@@ -1,0 +1,53 @@
+﻿@page "/controlrooms"
+@using Microsoft.AspNetCore.Authorization
+@using RundownEditorCore.DTO
+@using RundownEditorCore.Services
+@inject ControlRoomService ControlRoomService
+
+@attribute [Authorize(Roles = "Administrator")]
+<PageTitle>Kontrolrum</PageTitle>
+
+<h3>Kontrolrum og Hardware</h3>
+
+@if (controlRooms == null)
+{
+    <p><em>Indlæser kontrolrum...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Navn</th>
+                <th>Lokation</th>
+                <th>Hardware</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var room in controlRooms)
+            {
+                <tr>
+                    <td>@room.Name</td>
+                    <td>@room.Location</td>
+                    <td>
+                        <ul>
+                            @foreach (var hardware in room.HardwareItems)
+                            {
+                                <li>@hardware.Name (@hardware.Model)</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ControlRoomDTO> controlRooms;
+
+    protected override async Task OnInitializedAsync()
+    {
+        controlRooms = await ControlRoomService.GetControlRoomsAsync();
+    }
+}

@@ -1,20 +1,22 @@
-﻿using AggregatorService.Models;
+﻿using AggregatorService.Factories;
+using AggregatorService.Models;
+using AggregatorService.Services;
 using System.Text.Json;
-namespace AggregatorService.Services
+namespace AggregatorService.Managers
 {
     public class AggregatorManager
     {
-        private readonly IEnumerable<Aggregator> _services;
+        private readonly ServiceFactory _serviceFactory;
 
-        public AggregatorManager(IEnumerable<Aggregator> services)
+        public AggregatorManager(ServiceFactory serviceFactory)
         {
-            _services = services;
+            _serviceFactory = serviceFactory;
         }
 
         public async Task<List<ControlRoom>> FetchControlRoomWithHardwareData()
         {
-            var controlRoomService = _services.First(s => s is ControlRoomService);
-            var hardwareService = _services.First(s => s is HardwareService);
+            var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
+            var hardwareService = _serviceFactory.GetService<HardwareService>();
 
             var controlRoomData = await controlRoomService.FetchData();
 

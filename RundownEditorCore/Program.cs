@@ -22,7 +22,7 @@ builder.Services.AddHttpClient("TemplatesAPI", client =>
 // Add services to the container.
 builder.Services.AddHttpClient<ControlRoomService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7244/api/Aggregator/");
+    client.BaseAddress = new Uri("https://localhost:3010/api/Aggregator/");
 
 });
 builder.Services.AddRazorPages();

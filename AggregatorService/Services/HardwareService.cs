@@ -1,4 +1,6 @@
-﻿namespace AggregatorService.Services
+﻿using AggregatorService.Abstractions;
+
+namespace AggregatorService.Services
 {
     public class HardwareService : Aggregator
     {
@@ -12,7 +14,7 @@
         public override async Task<string> FetchData()
         {
             // Call the HardwareServiceAPI to fetch data
-            var response = await _httpClient.GetStringAsync("https://localhost:7100/api/Hardware");
+            var response = await _httpClient.GetStringAsync("https://localhost:3020/api/Hardware");
             return response;
         }
     }

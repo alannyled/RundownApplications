@@ -1,3 +1,11 @@
+///<summary>
+/// Dette er en meget simpel API Gateway.
+/// Den lytter på port 3010 og videresender alle anmodninger til Aggregator.
+/// Den bruger JWT-godkendelse og autorisation til at beskytte adgangen til gatewayen.
+/// Den er tænkt som et Proof of Concept og bør ikke bruges i produktion.
+/// Her forventer jeg at anvende Kong, som er den API Gateway, der anvendes i produktion.
+/// </summary>
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -14,9 +22,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Pa55w0rd")) 
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Pa55w0rd")) // vi elsker hardkodning af passwords
         };
     });
+
 // Tilføj autorisation
 builder.Services.AddAuthorization();
 
@@ -39,10 +48,10 @@ app.Map("/{**path}", async (HttpContext context, IHttpClientFactory httpClientFa
         return;
     }
 
-    // Opbyg den nye URL til backend-tjenesten
+    // Den nye URL der skal sendes til Aggragator
     var path = context.Request.Path.ToString();
     var queryString = context.Request.QueryString.Value;
-    var targetUrl = $"http://localhost:5001{path}{queryString}"; // Skift til din backend-tjenestes URL
+    var targetUrl = $"https://localhost:3010{path}{queryString}"; // aggregator URL
 
     var client = httpClientFactory.CreateClient();
     var requestMessage = new HttpRequestMessage(new HttpMethod(context.Request.Method), targetUrl);
@@ -62,7 +71,7 @@ app.Map("/{**path}", async (HttpContext context, IHttpClientFactory httpClientFa
         requestMessage.Content = new StreamContent(context.Request.Body);
     }
 
-    // Send forespørgslen til backend-tjenesten
+    // Send forespørgslen til aggregator
     var response = await client.SendAsync(requestMessage);
 
     // Returner svaret til klienten

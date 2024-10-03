@@ -1,3 +1,6 @@
+using AggregatorService.Abstractions;
+using AggregatorService.Factories;
+using AggregatorService.Managers;
 using AggregatorService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +16,7 @@ builder.Services.AddHttpClient<ControlRoomService>()
 builder.Services.AddHttpClient<HardwareService>()
     .AddTypedClient<Aggregator>(client => new HardwareService(client));
 
+builder.Services.AddSingleton<ServiceFactory>();
 
 builder.Services.AddSingleton<AggregatorManager>();
 

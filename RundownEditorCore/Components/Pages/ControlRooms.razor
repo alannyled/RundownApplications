@@ -8,10 +8,10 @@
 
 @attribute [Authorize(Roles = "Administrator")]
 <PageTitle>Kontrolrum</PageTitle>
-<div class="container">
+<div class="container-fluid" style="max-width:1600px">
     <h3>Kontrolrum og Hardware</h3>
     <div class="row mt-2">
-        <div class="col-4">
+        <div class="col-xl-4">
 
             <CreateControlRoomForm ControlRoom="newControlRoom" OnValidSubmit="CreateControlRoomAsync" />
 
@@ -44,7 +44,7 @@
             }
 
         </div>
-        <div class="col-8">
+        <div class="col-xl-8">
             <div class="card mb-2">
                 <div class="card-body">
 

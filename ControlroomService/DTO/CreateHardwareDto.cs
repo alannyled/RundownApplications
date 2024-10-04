@@ -1,4 +1,4 @@
-﻿namespace ControlRoomService.Dtos
+﻿namespace ControlRoomService.DTO
 {
     public class CreateHardwareDto
     {
@@ -8,5 +8,6 @@
         public string MacAddress { get; set; }
         public string IpAddress { get; set; }
         public int Port { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

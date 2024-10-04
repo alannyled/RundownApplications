@@ -2,22 +2,30 @@ using AggregatorService.Abstractions;
 using AggregatorService.Factories;
 using AggregatorService.Managers;
 using AggregatorService.Services;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-
+builder.Services.Configure<ApiUrls>(builder.Configuration.GetSection("ApiUrls"));
 builder.Services.AddControllers();
 
-
 builder.Services.AddHttpClient<ControlRoomService>()
-    .AddTypedClient<Aggregator>(client => new ControlRoomService(client));
+    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    {
+        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
+        return new ControlRoomService(httpClient, serviceProvider.GetRequiredService<IOptions<ApiUrls>>());
+    });
 
 builder.Services.AddHttpClient<HardwareService>()
-    .AddTypedClient<Aggregator>(client => new HardwareService(client));
+    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    {
+        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
+        return new HardwareService(httpClient, serviceProvider.GetRequiredService<IOptions<ApiUrls>>());
+    });
+
 
 builder.Services.AddSingleton<ServiceFactory>();
-
 builder.Services.AddSingleton<ControlRoomManager>();
 
 builder.Services.AddEndpointsApiExplorer();

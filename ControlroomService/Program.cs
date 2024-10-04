@@ -1,4 +1,4 @@
-using ControlRoomService.Data;
+using ControlRoomService.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +9,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
 
-builder.Services.AddSingleton<ControlRoomService.Data.ControlRoomService>();
-builder.Services.AddSingleton<HardwareService>();
+builder.Services.AddSingleton<ControlRoomRepository>();
+builder.Services.AddSingleton<HardwareRepository>();
 
 builder.Services.AddControllers();
 

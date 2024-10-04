@@ -61,6 +61,7 @@
                                     <th>Navn</th>
                                     <th>Lokation</th>
                                     <th>Hardware</th>
+                                    <th>Oprettet</th>
                                     <th>Handlinger</th>
                                 </tr>
                             </thead>
@@ -78,6 +79,7 @@
                                                 }
                                             </ul>
                                         </td>
+                                        <td>@room.CreatedDate.ToShortDateString()</td>
                                         <td>
                                             <button class="btn btn-sm btn-primary" @onclick="() => EditControlRoom(room.Uuid)">Rediger</button>
                                             <button class="btn btn-sm btn-primary" @onclick="() => AddHardware(room.Uuid)">Tilføj Hardware</button>

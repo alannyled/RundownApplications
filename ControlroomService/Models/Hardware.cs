@@ -26,5 +26,14 @@ namespace ControlRoomService.Models
 
         [BsonElement("port")]
         public int Port { get; set; }
+
+        [BsonElement("createddate")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        [BsonElement("archiveddate")]
+        public DateTime? ArchivedDate { get; set; }
+
+        [BsonElement("archivedby")]
+        public string? ArchivedBy { get; set; }
     }
 }

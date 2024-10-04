@@ -1,5 +1,5 @@
-﻿using ControlRoomService.Data;
-using ControlRoomService.Dtos;
+﻿using ControlRoomService.DAL;
+using ControlRoomService.DTO;
 using ControlRoomService.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +9,9 @@ namespace ControlRoomService.Controllers
     [Route("api/[controller]")]
     public class ControlRoomController : ControllerBase
     {
-        private readonly ControlRoomService.Data.ControlRoomService _controlRoomService;
+        private readonly ControlRoomRepository _controlRoomService;
 
-        public ControlRoomController(ControlRoomService.Data.ControlRoomService controlRoomService)
+        public ControlRoomController(ControlRoomRepository controlRoomService)
         {
             _controlRoomService = controlRoomService;
         }
@@ -38,7 +38,8 @@ namespace ControlRoomService.Controllers
             var newControlRoom = new ControlRoom
             {
                 Name = newControlRoomDto.Name,
-                Location = newControlRoomDto.Location
+                Location = newControlRoomDto.Location,
+                CreatedDate = DateTime.Now
             };
 
             await _controlRoomService.CreateAsync(newControlRoom);

@@ -1,5 +1,5 @@
-﻿using ControlRoomService.Data;
-using ControlRoomService.Dtos;
+﻿using ControlRoomService.DAL;
+using ControlRoomService.DTO;
 using ControlRoomService.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +9,9 @@ namespace ControlRoomService.Controllers
     [Route("api/[controller]")]
     public class HardwareController : ControllerBase
     {
-        private readonly HardwareService _hardwareService;
+        private readonly HardwareRepository _hardwareService;
 
-        public HardwareController(HardwareService hardwareService)
+        public HardwareController(HardwareRepository hardwareService)
         {
             _hardwareService = hardwareService;
         }
@@ -42,7 +42,8 @@ namespace ControlRoomService.Controllers
                 Model = newHardwareDto.Model,
                 MacAddress = newHardwareDto.MacAddress,
                 IpAddress = newHardwareDto.IpAddress,
-                Port = newHardwareDto.Port
+                Port = newHardwareDto.Port,
+                CreatedDate = DateTime.Now
             };
 
             await _hardwareService.CreateAsync(newHardware);

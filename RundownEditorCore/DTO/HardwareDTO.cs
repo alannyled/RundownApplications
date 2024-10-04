@@ -9,5 +9,8 @@
         public string MacAddress { get; set; }
         public string IpAddress { get; set; }
         public int Port { get; set; }
+        public DateTime CreatedDate { get; set; } 
+        public DateTime? ArchivedDate { get; set; }
+        public string? ArchivedBy { get; set; }
     }
 }

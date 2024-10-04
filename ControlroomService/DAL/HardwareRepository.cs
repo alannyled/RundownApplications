@@ -3,13 +3,13 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System;
 
-namespace ControlRoomService.Data
+namespace ControlRoomService.DAL
 {
-    public class HardwareService
+    public class HardwareRepository
     {
         private readonly IMongoCollection<Hardware> _hardwareCollection;
 
-        public HardwareService(IOptions<MongoDBSettings> mongoDBSettings)
+        public HardwareRepository(IOptions<MongoDBSettings> mongoDBSettings)
         {
             var mongoClient = new MongoClient(mongoDBSettings.Value.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(mongoDBSettings.Value.DatabaseName);

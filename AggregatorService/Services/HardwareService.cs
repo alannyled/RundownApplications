@@ -1,20 +1,16 @@
 ﻿using AggregatorService.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace AggregatorService.Services
 {
-    public class HardwareService : Aggregator
+    public class HardwareService(HttpClient httpClient, IOptions<ApiUrls> apiUrls) : Aggregator
     {
-        private readonly HttpClient _httpClient;
-
-        public HardwareService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+        private readonly HttpClient _httpClient = httpClient;
+        private readonly ApiUrls _apiUrls = apiUrls.Value;
 
         public override async Task<string> FetchData()
-        {
-            // Call the HardwareServiceAPI to fetch data
-            var response = await _httpClient.GetStringAsync("https://localhost:3020/api/Hardware");
+        {            
+            var response = await _httpClient.GetStringAsync(_apiUrls.HardwareApi);
             return response;
         }
 

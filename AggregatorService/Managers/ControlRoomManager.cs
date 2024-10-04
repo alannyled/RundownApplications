@@ -1,17 +1,14 @@
 ﻿using AggregatorService.Factories;
 using AggregatorService.Models;
 using AggregatorService.Services;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 namespace AggregatorService.Managers
 {
-    public class ControlRoomManager
+    public class ControlRoomManager(ServiceFactory serviceFactory, IOptions<ApiUrls> apiUrls)
     {
-        private readonly ServiceFactory _serviceFactory;
-
-        public ControlRoomManager(ServiceFactory serviceFactory)
-        {
-            _serviceFactory = serviceFactory;
-        }
+        private readonly ServiceFactory _serviceFactory = serviceFactory;
+        private readonly ApiUrls _apiUrls = apiUrls.Value;
 
         public async Task<List<ControlRoom>> FetchControlRoomWithHardwareData()
         {
@@ -39,7 +36,7 @@ namespace AggregatorService.Managers
         {
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
-            var response = await controlRoomService.PostAsJsonAsync("https://localhost:3020/api/ControlRoom", newControlRoom);
+            var response = await controlRoomService.PostAsJsonAsync(_apiUrls.ControlRoomApi, newControlRoom);
 
             if (response.IsSuccessStatusCode)
             {

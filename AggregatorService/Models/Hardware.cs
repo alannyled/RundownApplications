@@ -24,6 +24,15 @@ namespace AggregatorService.Models
 
         [JsonPropertyName("port")]
         public int Port { get; set; }
+
+        [JsonPropertyName("createddate")]
+        public DateTime CreatedDate { get; set; }
+
+        [JsonPropertyName("archiveddate")]
+        public DateTime? ArchivedDate { get; set; }
+
+        [JsonPropertyName("archivedby")]
+        public string? ArchivedBy { get; set; }
     }
 
 }

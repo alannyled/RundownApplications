@@ -7,14 +7,9 @@ namespace AggregatorService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AggregatorController : ControllerBase
+    public class AggregatorController(ControlRoomManager aggregatorManager) : ControllerBase
     {
-        private readonly ControlRoomManager _aggregatorManager;
-
-        public AggregatorController(ControlRoomManager aggregatorManager)
-        {
-            _aggregatorManager = aggregatorManager;
-        }
+        private readonly ControlRoomManager _aggregatorManager = aggregatorManager;
 
         [HttpGet("fetch-controlroom-with-hardware")]
         public async Task<IActionResult> FetchControlRoomWithHardware()

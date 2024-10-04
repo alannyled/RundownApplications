@@ -17,6 +17,11 @@ namespace AggregatorService.Services
             var response = await _httpClient.GetStringAsync("https://localhost:3020/api/Hardware");
             return response;
         }
+
+        public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

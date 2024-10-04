@@ -1,0 +1,65 @@
+﻿@using RundownEditorCore.DTO
+
+<div class="card mb-2">
+    <div class="card-body">
+
+        <h5 class="card-title">Tilføj Hardware til @RoomName</h5>
+
+        <EditForm Model="Hardware" OnValidSubmit="OnSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="alert alert-danger" />
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Hardware Navn:</label>
+                <InputText id="name" @bind-Value="Hardware.Name" class="form-control" placeholder="Indtast navn" />
+            </div>
+
+            <div class="mb-3">
+                <label for="model" class="form-label">Model:</label>
+                <InputText id="model" @bind-Value="Hardware.Model" class="form-control" placeholder="Indtast model" />
+            </div>
+
+            <div class="mb-3">
+                <label for="macAddress" class="form-label">MAC-adresse:</label>
+                <InputText id="macAddress" @bind-Value="Hardware.MacAddress" class="form-control" placeholder="Indtast MAC-adresse" />
+            </div>
+
+            <div class="mb-3">
+                <label for="ipAddress" class="form-label">IP-adresse:</label>
+                <InputText id="ipAddress" @bind-Value="Hardware.IpAddress" class="form-control" placeholder="Indtast IP-adresse" />
+            </div>
+
+            <div class="mb-3">
+                <label for="port" class="form-label">Port:</label>
+                <InputNumber id="port" @bind-Value="Hardware.Port" class="form-control" placeholder="Indtast Port-nummer" />
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-secondary ms-2" @onclick="OnCancel">Annuller</button>
+                <button type="submit" class="btn btn-sm btn-primary ms-2">Tilføj Hardware</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public HardwareDTO Hardware { get; set; } = new HardwareDTO();
+
+    [Parameter]
+    public string RoomName { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private async Task OnSubmit()
+    {
+        if (OnValidSubmit.HasDelegate)
+        {
+            await OnValidSubmit.InvokeAsync();
+        }
+    }
+}

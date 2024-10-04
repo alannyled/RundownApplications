@@ -5,22 +5,22 @@ namespace AggregatorService.Models
     public class Hardware
     {
         [JsonPropertyName("uuid")]
-        public string Uuid { get; set; }
+        public string? Uuid { get; set; }
 
         [JsonPropertyName("controlRoomId")]
-        public string ControlRoomId { get; set; }
+        public string? ControlRoomId { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonPropertyName("model")]
-        public string Model { get; set; }
+        public string? Model { get; set; }
 
         [JsonPropertyName("macAddress")]
-        public string MacAddress { get; set; }
+        public string? MacAddress { get; set; }
 
         [JsonPropertyName("ipAddress")]
-        public string IpAddress { get; set; }
+        public string? IpAddress { get; set; }
 
         [JsonPropertyName("port")]
         public int Port { get; set; }

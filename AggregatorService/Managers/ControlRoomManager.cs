@@ -35,6 +35,22 @@ namespace AggregatorService.Managers
             return controlRooms;
         }
 
+        public async Task<ControlRoom> CreateControlRoomAsync(ControlRoom newControlRoom)
+        {
+            var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
+
+            var response = await controlRoomService.PostAsJsonAsync("https://localhost:3020/api/ControlRoom", newControlRoom);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ControlRoom>();
+            }
+            else
+            {
+                throw new Exception("Failed to create control room in the database API.");
+            }
+        }
+
     }
 
 }

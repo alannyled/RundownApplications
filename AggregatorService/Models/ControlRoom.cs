@@ -5,15 +5,15 @@ namespace AggregatorService.Models
     public class ControlRoom
     {
         [JsonPropertyName("uuid")]
-        public string Uuid { get; set; }
+        public string? Uuid { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonPropertyName("location")]
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
-        public List<Hardware> HardwareItems { get; set; }
+        public List<Hardware>? HardwareItems { get; set; }
     }
 
 }

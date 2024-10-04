@@ -18,7 +18,7 @@ builder.Services.AddHttpClient<HardwareService>()
 
 builder.Services.AddSingleton<ServiceFactory>();
 
-builder.Services.AddSingleton<AggregatorManager>();
+builder.Services.AddSingleton<ControlRoomManager>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

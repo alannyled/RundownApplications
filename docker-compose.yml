@@ -1,12 +1,27 @@
 services:
-  controlroom-database:
+  controlroom-primary-database:
     image: mongo
-    container_name: controlroom-database
+    container_name: controlroom-primary-database
     restart: always
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - controlroom-mongo-data:/data/db
+    #command: mongod --replSet controlroom-replica-set --bind_ip_all
+    networks:
+      - controlroom-net
+
+  controlroom-secondary-database:
+    image: mongo
+    container_name: controlroom-secondary-database
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - controlroom-mongo-data-secondary:/data/db
+    #command: mongod --replSet controlroom-replica-set --bind_ip_all
+    networks:
+      - controlroom-net
 
   zookeeper:
     image: bitnami/zookeeper:latest 
@@ -27,6 +42,12 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+networks:
+  controlroom-net:
+    driver: bridge
+
 volumes:
-  mongo-data:
+  controlroom-mongo-data:
+    driver: local
+  controlroom-mongo-data-secondary:
     driver: local

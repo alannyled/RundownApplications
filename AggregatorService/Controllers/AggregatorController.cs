@@ -7,9 +7,9 @@ namespace AggregatorService.Controllers
     [Route("api/[controller]")]
     public class AggregatorController : ControllerBase
     {
-        private readonly AggregatorManager _aggregatorManager;
+        private readonly ControlRoomManager _aggregatorManager;
 
-        public AggregatorController(AggregatorManager aggregatorManager)
+        public AggregatorController(ControlRoomManager aggregatorManager)
         {
             _aggregatorManager = aggregatorManager;
         }

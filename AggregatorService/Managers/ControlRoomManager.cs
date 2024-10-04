@@ -4,11 +4,11 @@ using AggregatorService.Services;
 using System.Text.Json;
 namespace AggregatorService.Managers
 {
-    public class AggregatorManager
+    public class ControlRoomManager
     {
         private readonly ServiceFactory _serviceFactory;
 
-        public AggregatorManager(ServiceFactory serviceFactory)
+        public ControlRoomManager(ServiceFactory serviceFactory)
         {
             _serviceFactory = serviceFactory;
         }

@@ -1,4 +1,4 @@
-﻿namespace ControlroomService.DTO
+﻿namespace ControlRoomDbService.DTO
 {
     public class CreateHardwareDto
     {

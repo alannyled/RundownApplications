@@ -1,9 +1,9 @@
-﻿using ControlroomService.BLL.Interfaces;
-using ControlroomService.DTO;
-using ControlroomService.Models;
+﻿using ControlRoomDbService.BLL.Interfaces;
+using ControlRoomDbService.DTO;
+using ControlRoomDbService.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ControlroomService.Controllers
+namespace ControlRoomDbService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -1,10 +1,10 @@
 
 
-using ControlroomService.DAL;
-using ControlroomService.DAL.Interfaces;
-using ControlroomService.DAL.Repositories;
-using ControlroomService.BLL.Interfaces;
-using ControlroomService.BLL.Services;
+using ControlRoomDbService.DAL;
+using ControlRoomDbService.DAL.Interfaces;
+using ControlRoomDbService.DAL.Repositories;
+using ControlRoomDbService.BLL.Interfaces;
+using ControlRoomDbService.BLL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

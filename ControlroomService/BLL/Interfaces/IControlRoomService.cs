@@ -1,6 +1,6 @@
-﻿using ControlroomService.Models;
+﻿using ControlRoomDbService.Models;
 
-namespace ControlroomService.BLL.Interfaces
+namespace ControlRoomDbService.BLL.Interfaces
 {
     public interface IControlRoomService
     {

@@ -1,11 +1,11 @@
-﻿using ControlroomService.DAL.Interfaces;
-using ControlroomService.DAL;
-using ControlroomService.Models;
+﻿using ControlRoomDbService.DAL.Interfaces;
+using ControlRoomDbService.DAL;
+using ControlRoomDbService.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System;
 
-namespace ControlroomService.DAL.Repositories
+namespace ControlRoomDbService.DAL.Repositories
 {
     public class HardwareRepository : IHardwareRepository
     {

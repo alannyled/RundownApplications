@@ -1,6 +1,6 @@
-﻿using ControlroomService.Models;
+﻿using ControlRoomDbService.Models;
 
-namespace ControlroomService.DAL.Interfaces
+namespace ControlRoomDbService.DAL.Interfaces
 {
     public interface IControlRoomRepository
     {

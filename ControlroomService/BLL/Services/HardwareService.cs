@@ -1,8 +1,8 @@
-﻿using ControlroomService.BLL.Interfaces;
-using ControlroomService.DAL.Interfaces;
-using ControlroomService.Models;
+﻿using ControlRoomDbService.BLL.Interfaces;
+using ControlRoomDbService.DAL.Interfaces;
+using ControlRoomDbService.Models;
 
-namespace ControlroomService.BLL.Services
+namespace ControlRoomDbService.BLL.Services
 {
     public class HardwareService : IHardwareService
     {

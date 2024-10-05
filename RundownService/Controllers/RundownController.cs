@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace RundownService.Controllers
+namespace RundownDbService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ControlroomService.Models
+namespace ControlRoomDbService.Models
 {
     public class Hardware
     {

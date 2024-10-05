@@ -9,7 +9,7 @@ services:
       - controlroom-mongo-data:/data/db
     #command: mongod --replSet controlroom-replica-set --bind_ip_all
     networks:
-      - controlroom-net
+      - shared-mongo-net
 
   controlroom-secondary-database:
     image: mongo
@@ -21,7 +21,31 @@ services:
       - controlroom-mongo-data-secondary:/data/db
     #command: mongod --replSet controlroom-replica-set --bind_ip_all
     networks:
-      - controlroom-net
+      - shared-mongo-net
+
+  rundown-primary-database:
+    image: mongo
+    container_name: rundown-primary-database
+    restart: always
+    ports:
+      - "27027:27027"
+    volumes:
+      - rundown-mongo-data:/data/db
+    #command: mongod --replSet rundown-replica-set --bind_ip_all
+    networks:
+      - shared-mongo-net
+
+  rundown-secondary-database:
+    image: mongo
+    container_name: rundown-secondary-database
+    restart: always
+    ports:
+      - "27028:27027"
+    volumes:
+      - rundown-mongo-data-secondary:/data/db
+    #command: mongod --replSet rundown-replica-set --bind_ip_all
+    networks:
+      - shared-mongo-net
 
   zookeeper:
     image: bitnami/zookeeper:latest 
@@ -43,11 +67,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
-  controlroom-net:
+  shared-mongo-net:
     driver: bridge
 
 volumes:
   controlroom-mongo-data:
     driver: local
   controlroom-mongo-data-secondary:
+    driver: local
+  rundown-mongo-data:
+    driver: local
+  rundown-mongo-data-secondary:
     driver: local

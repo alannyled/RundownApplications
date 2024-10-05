@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ControlRoomService.Models
+namespace ControlroomService.Models
 {
     public class Hardware
     {
@@ -14,6 +14,9 @@ namespace ControlRoomService.Models
 
         [BsonElement("name")]
         public string Name { get; set; }
+
+        [BsonElement("vendor")]
+        public string Vendor { get; set; }
 
         [BsonElement("model")]
         public string Model { get; set; }

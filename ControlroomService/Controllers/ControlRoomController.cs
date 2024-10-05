@@ -1,28 +1,28 @@
-﻿using ControlRoomService.DAL;
-using ControlRoomService.DTO;
-using ControlRoomService.Models;
+﻿using ControlroomService.BLL.Interfaces;
+using ControlroomService.DTO;
+using ControlroomService.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ControlRoomService.Controllers
+namespace ControlroomService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class ControlRoomController : ControllerBase
     {
-        private readonly ControlRoomRepository _controlRoomService;
+        private readonly IControlRoomService _controlRoomService;
 
-        public ControlRoomController(ControlRoomRepository controlRoomService)
+        public ControlRoomController(IControlRoomService controlRoomService)
         {
             _controlRoomService = controlRoomService;
         }
 
         [HttpGet]
-        public async Task<List<ControlRoom>> Get() => await _controlRoomService.GetAsync();
+        public async Task<List<ControlRoom>> Get() => await _controlRoomService.GetControlRoomsAsync();
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ControlRoom>> Get(string id)
         {
-            var controlRoom = await _controlRoomService.GetByIdAsync(id);
+            var controlRoom = await _controlRoomService.GetControlRoomByIdAsync(id);
 
             if (controlRoom == null)
             {
@@ -42,7 +42,7 @@ namespace ControlRoomService.Controllers
                 CreatedDate = DateTime.Now
             };
 
-            await _controlRoomService.CreateAsync(newControlRoom);
+            await _controlRoomService.CreateControlRoomAsync(newControlRoom);
             return CreatedAtAction(nameof(Get), new { id = newControlRoom.UUID }, newControlRoom);
         }
 
@@ -50,7 +50,7 @@ namespace ControlRoomService.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, ControlRoom updatedControlRoom)
         {
-            var existingControlRoom = await _controlRoomService.GetByIdAsync(id);
+            var existingControlRoom = await _controlRoomService.GetControlRoomByIdAsync(id);
 
             if (existingControlRoom == null)
             {
@@ -58,7 +58,7 @@ namespace ControlRoomService.Controllers
             }
 
             updatedControlRoom.UUID = existingControlRoom.UUID;
-            await _controlRoomService.UpdateAsync(id, updatedControlRoom);
+            await _controlRoomService.UpdateControlRoomAsync(id, updatedControlRoom);
 
             return NoContent();
         }
@@ -66,21 +66,21 @@ namespace ControlRoomService.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var controlRoom = await _controlRoomService.GetByIdAsync(id);
+            var controlRoom = await _controlRoomService.GetControlRoomByIdAsync(id);
 
             if (controlRoom == null)
             {
                 return NotFound();
             }
 
-            await _controlRoomService.RemoveAsync(id);
+            await _controlRoomService.DeleteControlRoomAsync(id);
             return NoContent();
         }
 
         [HttpDelete("all")]
         public async Task<IActionResult> DeleteAll()
         {
-            await _controlRoomService.RemoveAllAsync();
+            await _controlRoomService.DeleteAllControlRoomsAsync();
             return NoContent();
         }
     }

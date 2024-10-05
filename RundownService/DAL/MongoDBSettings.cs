@@ -1,4 +1,4 @@
-﻿namespace ControlroomService.DAL
+﻿namespace ControlRoomService.DAL
 {
     public class MongoDBSettings
     {

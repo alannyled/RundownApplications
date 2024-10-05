@@ -1,4 +1,4 @@
-﻿namespace ControlRoomService.DTO
+﻿namespace ControlroomService.DTO
 {
     public class CreateControlRoomDto
     {

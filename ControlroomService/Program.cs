@@ -1,4 +1,10 @@
-using ControlRoomService.DAL;
+
+
+using ControlroomService.DAL;
+using ControlroomService.DAL.Interfaces;
+using ControlroomService.DAL.Repositories;
+using ControlroomService.BLL.Interfaces;
+using ControlroomService.BLL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +15,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
 
-builder.Services.AddSingleton<ControlRoomRepository>();
-builder.Services.AddSingleton<HardwareRepository>();
+builder.Services.AddScoped<IControlRoomRepository, ControlRoomRepository>();
+builder.Services.AddScoped<IHardwareRepository, HardwareRepository>();
+
+builder.Services.AddScoped<IControlRoomService, ControlRoomService>();
+builder.Services.AddScoped<IHardwareService, HardwareService>();
 
 builder.Services.AddControllers();
 

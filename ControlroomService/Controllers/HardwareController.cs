@@ -39,7 +39,7 @@ namespace ControlroomService.Controllers
             {
                 ControlRoomId = newHardwareDto.ControlRoomId,
                 Name = newHardwareDto.Name,
-                //Vendor = newHardwareDto.Vendor,  
+                Vendor = newHardwareDto.Vendor,  
                 Model = newHardwareDto.Model,
                 MacAddress = newHardwareDto.MacAddress,
                 IpAddress = newHardwareDto.IpAddress,

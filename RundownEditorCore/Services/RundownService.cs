@@ -15,5 +15,3 @@ namespace RundownEditorCore.Services
     }
 }
 
-// skal hente rundows fra rundownsdb
-// der ligger pt noget i shared templatestable.

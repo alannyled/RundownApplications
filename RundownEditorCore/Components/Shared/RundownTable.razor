@@ -1,4 +1,4 @@
-﻿@using Polly
+﻿@* @using Polly
 @using Polly.Extensions.Http
 @using Polly.Retry
 @using RundownEditorCore.DTO
@@ -111,9 +111,9 @@ else
             await retryPolicy.ExecuteAsync(async () =>
             {
                 Console.WriteLine("Calling API...");
-                templates = await client.GetFromJsonAsync<List<Template>>("TemplateApi");
+                rundowns = await client.GetFromJsonAsync<List<RundownDTO>>("TemplateApi");
 
-                if (templates == null || templates.Count == 0)
+                if (rundowns == null || rundowns.Count == 0)
                 {
                     errorMessage = "Ingen templates fundet.";
                     hasError = true;
@@ -131,11 +131,5 @@ else
         }
     }
 
-    public class Template
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Type { get; set; }
-    }
 }
+ *@

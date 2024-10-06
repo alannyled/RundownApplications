@@ -42,16 +42,18 @@ app.UseAuthorization();
 app.Map("/{**path}", async (HttpContext context, IHttpClientFactory httpClientFactory) =>
 {
     // Check om brugeren er godkendt
-    if (!context.User.Identity?.IsAuthenticated ?? true)
-    {
-        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        return;
-    }
+    //if (!context.User.Identity?.IsAuthenticated ?? true)
+    //{
+    //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+    //    return;
+    //}
 
-    // Den nye URL der skal sendes til Aggragator
+    // Den nye URL der skal sendes til Aggregator
     var path = context.Request.Path.ToString();
     var queryString = context.Request.QueryString.Value;
     var targetUrl = $"https://localhost:3010{path}{queryString}"; // aggregator URL
+
+    Console.WriteLine($"Forwarding request to {targetUrl}");
 
     var client = httpClientFactory.CreateClient();
     var requestMessage = new HttpRequestMessage(new HttpMethod(context.Request.Method), targetUrl);
@@ -68,23 +70,44 @@ app.Map("/{**path}", async (HttpContext context, IHttpClientFactory httpClientFa
     // Kopier body (hvis der er nogen)
     if (context.Request.ContentLength > 0)
     {
+        // Hvis der er indhold i body, kopier det
         requestMessage.Content = new StreamContent(context.Request.Body);
+        if (!requestMessage.Content.Headers.Contains("Content-Type"))
+        {
+            requestMessage.Content.Headers.Add("Content-Type", "application/json");
+        }
+    }
+    else
+    {
+        // Hvis der ikke er indhold, fjern Transfer-Encoding: chunked
+        requestMessage.Headers.TransferEncodingChunked = false; // Dette sikrer, at chunking ikke bruges, når der ikke er indhold
     }
 
-    // Send forespørgslen til aggregator
     var response = await client.SendAsync(requestMessage);
 
     // Returner svaret til klienten
     context.Response.StatusCode = (int)response.StatusCode;
+
+    // Kopier HTTP-headere fra svaret til klienten
     foreach (var header in response.Headers)
     {
         context.Response.Headers[header.Key] = header.Value.ToArray();
     }
 
+    // Kopier Content-Headers (som Content-Type) korrekt
+    foreach (var contentHeader in response.Content.Headers)
+    {
+        context.Response.Headers[contentHeader.Key] = contentHeader.Value.ToArray();
+    }
+
+    // Fjern Transfer-Encoding header, hvis det ikke er nødvendigt
+    context.Response.Headers.Remove("Transfer-Encoding");
+
     if (response.Content != null)
     {
         await response.Content.CopyToAsync(context.Response.Body);
     }
+
 });
 
 app.Run();

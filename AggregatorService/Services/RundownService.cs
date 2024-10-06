@@ -10,7 +10,7 @@ namespace AggregatorService.Services
 
         public override async Task<string> FetchData()
         {
-            var response = await _httpClient.GetAsync(_apiUrls.ControlRoomApi);
+            var response = await _httpClient.GetAsync(_apiUrls.RundownApi);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();

@@ -8,21 +8,45 @@ namespace RundownEditorCore.Services
 
         public async Task<List<ControlRoomDTO>> GetControlRoomsAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<List<ControlRoomDTO>>("fetch-controlroom-with-hardware");
-            return response;
+            try
+            {
+                var response = await _httpClient.GetFromJsonAsync<List<ControlRoomDTO>>("fetch-controlroom-with-hardware");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching control rooms: {ex.Message}");
+                return null;
+            }
         }
         public async Task<ControlRoomDTO> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
         {
-            var response = await _httpClient.PostAsJsonAsync("create-controlroom", newControlRoom);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return await response.Content.ReadFromJsonAsync<ControlRoomDTO>();
+                Console.WriteLine($"Creating control room: {newControlRoom.Name}");
+
+                var response = await _httpClient.PostAsJsonAsync("create-controlroom", newControlRoom);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var createdControlRoom = await response.Content.ReadFromJsonAsync<ControlRoomDTO>();
+                    Console.WriteLine($"Control room created successfully: {createdControlRoom.Name}");
+                    return createdControlRoom;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error creating control room: {response.StatusCode}, {errorContent}");
+                    throw new Exception($"Error creating control room: {response.StatusCode}, {errorContent}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("Error creating control room");
+                Console.WriteLine($"Exception during control room creation: {ex.Message}");
+                throw;
             }
         }
+
         public async Task<ControlRoomDTO> UpdateControlRoomAsync(string controlRoomId, ControlRoomDTO updatedControlRoom)
         {
             throw new NotImplementedException();

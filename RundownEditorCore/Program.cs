@@ -22,18 +22,18 @@ builder.Services.AddHttpClient("TemplatesAPI", client =>
 // Add services to the container.
 builder.Services.AddHttpClient<HardwareService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Aggregator/");
+    client.BaseAddress = new Uri("https://localhost:3010/api/Hardware/"); // ikke APIGateway adresse
 
 });
 builder.Services.AddHttpClient<ControlRoomService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Aggregator/");
+    client.BaseAddress = new Uri("https://localhost:3010/api/ControlRoom/"); // ikke APIGateway adresse
 
 });
 
 builder.Services.AddHttpClient<RundownService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Aggregator/");
+    client.BaseAddress = new Uri("https://localhost:3010/api/Rundown/"); // ikke APIGateway adresse
 
 });
 builder.Services.AddRazorPages();

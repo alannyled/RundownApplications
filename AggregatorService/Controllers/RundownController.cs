@@ -16,3 +16,4 @@ namespace AggregatorService.Controllers
             return Ok(data);
         }
     }
+}

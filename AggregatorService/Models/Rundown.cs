@@ -30,5 +30,8 @@ namespace AggregatorService.Models
 
         [JsonPropertyName("controlRoomName")]
         public string ControlRoomName { get; set; }
+
+        [JsonPropertyName("items")]
+        public List<RundownItem> Items { get; set; } = new List<RundownItem>();
     }
 }

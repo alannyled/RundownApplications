@@ -18,6 +18,11 @@ namespace RundownDbService.BLL.Services
             return await _rundownItemRepository.GetAllAsync();
         }
 
+        public async Task<List<RundownItem>> GetRundownItemsAsync(Guid rundownUuid)
+        {
+            return await _rundownItemRepository.GetByRundownUuidAsync(rundownUuid);
+        }
+
         public async Task<RundownItem> GetRundownItemByIdAsync(Guid uuid)
         {
             return await _rundownItemRepository.GetByIdAsync(uuid);

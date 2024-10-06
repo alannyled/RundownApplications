@@ -5,6 +5,7 @@ namespace RundownDbService.DAL.Interfaces
     public interface IRundownItemRepository
     {
         Task<List<RundownItem>> GetAllAsync();
+        Task<List<RundownItem>> GetByRundownUuidAsync(Guid uuid);
         Task<RundownItem> GetByIdAsync(Guid uuid);
         Task CreateAsync(RundownItem item);
         Task UpdateAsync(Guid uuid, RundownItem item);

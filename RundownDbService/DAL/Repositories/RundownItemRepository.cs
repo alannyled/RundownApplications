@@ -21,6 +21,11 @@ namespace RundownDbService.DAL.Repositories
             return await _rundownItemCollection.Find(item => true).ToListAsync();
         }
 
+        public async Task<List<RundownItem>> GetByRundownUuidAsync(Guid uuid)
+        {
+            return await _rundownItemCollection.Find(item => item.UUID == uuid).ToListAsync();
+        }
+
         public async Task<RundownItem> GetByIdAsync(Guid uuid)
         {
             return await _rundownItemCollection.Find(item => item.UUID == uuid).FirstOrDefaultAsync();

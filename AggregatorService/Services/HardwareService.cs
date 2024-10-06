@@ -3,14 +3,13 @@ using Microsoft.Extensions.Options;
 
 namespace AggregatorService.Services
 {
-    public class HardwareService(HttpClient httpClient, IOptions<ApiUrls> apiUrls) : Aggregator
+    public class HardwareService(HttpClient httpClient) : Aggregator
     {
         private readonly HttpClient _httpClient = httpClient;
-        private readonly ApiUrls _apiUrls = apiUrls.Value;
 
-        public override async Task<string> FetchData()
+        public override async Task<string> FetchData(string api)
         {            
-            var response = await _httpClient.GetStringAsync(_apiUrls.HardwareApi);
+            var response = await _httpClient.GetStringAsync(api);
             return response;
         }
 

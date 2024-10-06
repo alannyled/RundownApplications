@@ -3,14 +3,13 @@ using Microsoft.Extensions.Options;
 
 namespace AggregatorService.Services
 {
-    public class RundownService(HttpClient httpClient, IOptions<ApiUrls> apiUrls) : Aggregator
+    public class RundownService(HttpClient httpClient) : Aggregator
     {
-        private readonly HttpClient _httpClient = httpClient;
-        private readonly ApiUrls _apiUrls = apiUrls.Value;
+        private readonly HttpClient _httpClient = httpClient;    
 
-        public override async Task<string> FetchData()
+        public override async Task<string> FetchData(string api)
         {
-            var response = await _httpClient.GetAsync(_apiUrls.RundownApi);
+            var response = await _httpClient.GetAsync(api);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();

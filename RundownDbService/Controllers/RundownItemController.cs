@@ -22,6 +22,13 @@ namespace RundownDbService.Controllers
             return Ok(items);
         }
 
+        [HttpGet("/rundown/{id:guid}")]
+        public async Task<ActionResult<List<RundownItem>>> GetRundownItems(Guid id)
+        {
+            var items = await _rundownItemService.GetRundownItemsAsync(id);
+            return Ok(items);
+        }
+
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<RundownItem>> GetById(Guid id)
         {

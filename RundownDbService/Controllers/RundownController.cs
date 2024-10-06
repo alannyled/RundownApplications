@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RundownDbService.BLL.Interfaces;
-using RundownDbService.BLL.Services;
 using RundownDbService.Models;
 
 namespace RundownDbService.Controllers

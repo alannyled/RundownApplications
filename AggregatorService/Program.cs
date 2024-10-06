@@ -11,24 +11,24 @@ builder.Services.Configure<ApiUrls>(builder.Configuration.GetSection("ApiUrls"))
 builder.Services.AddControllers();
 
 builder.Services.AddHttpClient<ControlRoomService>()
-    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    .AddTypedClient<Aggregator>((httpClient) =>
     {
-        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
-        return new ControlRoomService(httpClient, serviceProvider.GetRequiredService<IOptions<ApiUrls>>());
+       // var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
+        return new ControlRoomService(httpClient);
     });
 
 builder.Services.AddHttpClient<HardwareService>()
-    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    .AddTypedClient<Aggregator>((httpClient) =>
     {
-        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
-        return new HardwareService(httpClient, serviceProvider.GetRequiredService<IOptions<ApiUrls>>());
+        //var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
+        return new HardwareService(httpClient);
     });
 
 builder.Services.AddHttpClient<RundownService>()
-    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    .AddTypedClient<Aggregator>((httpClient) =>
     {
-        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
-        return new RundownService(httpClient, serviceProvider.GetRequiredService<IOptions<ApiUrls>>());
+            //var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
+            return new RundownService(httpClient);
     });
 
 

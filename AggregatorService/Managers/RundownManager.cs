@@ -16,9 +16,9 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
             var rundownService = _serviceFactory.GetService<RundownService>();
 
-            var controlRoomData = await controlRoomService.FetchData();
+            var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi);
 
-            var rundownData = await rundownService.FetchData();
+            var rundownData = await rundownService.FetchData(_apiUrls.RundownApi);
 
             var controlRooms = JsonSerializer.Deserialize<List<ControlRoom>>(controlRoomData);
             var rundowns = JsonSerializer.Deserialize<List<Rundown>>(rundownData);
@@ -34,6 +34,29 @@ namespace AggregatorService.Managers
             }
 
             return rundowns;
+        }
+
+        public async Task<Rundown> FetchRundownWithItemsAndControlRoom(string rundownId)
+        {
+            var rundownService = _serviceFactory.GetService<RundownService>();
+            var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
+
+            var rundownData = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
+            var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
+
+            var rundownItemsData = await rundownService.FetchData($"{_apiUrls.RundownItemApi}/rundown/{rundownId}");
+            var rundownItems = JsonSerializer.Deserialize<List<RundownItem>>(rundownItemsData);
+
+            // Add the items to the rundown
+            rundown.Items = rundownItems;
+
+            var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.ControlRoomApi}/{rundown.ControlRoomId}");
+            var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
+            
+            rundown.ControlRoomName = controlRoom.Name;
+            
+
+            return rundown;
         }
     }
 }

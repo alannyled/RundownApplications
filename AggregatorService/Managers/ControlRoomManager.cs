@@ -15,9 +15,9 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
             var hardwareService = _serviceFactory.GetService<HardwareService>();
 
-            var controlRoomData = await controlRoomService.FetchData();
+            var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi);
 
-            var hardwareData = await hardwareService.FetchData();
+            var hardwareData = await hardwareService.FetchData(_apiUrls.HardwareApi);
 
             var controlRooms = JsonSerializer.Deserialize<List<ControlRoom>>(controlRoomData);
             var hardwareItems = JsonSerializer.Deserialize<List<Hardware>>(hardwareData);

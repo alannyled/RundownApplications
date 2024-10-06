@@ -28,7 +28,7 @@ services:
     container_name: rundown-primary-database
     restart: always
     ports:
-      - "27027:27027"
+      - "27027:27017"
     volumes:
       - rundown-mongo-data:/data/db
     #command: mongod --replSet rundown-replica-set --bind_ip_all
@@ -40,7 +40,7 @@ services:
     container_name: rundown-secondary-database
     restart: always
     ports:
-      - "27028:27027"
+      - "27028:27017"
     volumes:
       - rundown-mongo-data-secondary:/data/db
     #command: mongod --replSet rundown-replica-set --bind_ip_all

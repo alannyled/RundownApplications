@@ -7,14 +7,14 @@ namespace AggregatorService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AggregatorController(ControlRoomManager aggregatorManager) : ControllerBase
+    public class ControlRoomController(ControlRoomManager controlroomManager) : ControllerBase
     {
-        private readonly ControlRoomManager _aggregatorManager = aggregatorManager;
+        private readonly ControlRoomManager _controlroomManager = controlroomManager;
 
         [HttpGet("fetch-controlroom-with-hardware")]
         public async Task<IActionResult> FetchControlRoomWithHardware()
         {
-            var data = await _aggregatorManager.FetchControlRoomWithHardwareData();
+            var data = await _controlroomManager.FetchControlRoomWithHardwareData();
             return Ok(data);
         }
 
@@ -26,7 +26,7 @@ namespace AggregatorService.Controllers
                 return BadRequest("Invalid control room data.");
             }
 
-            var createdControlRoom = await _aggregatorManager.CreateControlRoomAsync(newControlRoom);
+            var createdControlRoom = await _controlroomManager.CreateControlRoomAsync(newControlRoom);
             return CreatedAtAction(nameof(FetchControlRoomWithHardware), new { id = createdControlRoom.Uuid }, createdControlRoom);
         }
     }

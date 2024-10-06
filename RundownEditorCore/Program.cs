@@ -30,6 +30,12 @@ builder.Services.AddHttpClient<ControlRoomService>(client =>
     client.BaseAddress = new Uri("https://localhost:3010/api/Aggregator/");
 
 });
+
+builder.Services.AddHttpClient<RundownService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:3010/api/Aggregator/");
+
+});
 builder.Services.AddRazorPages();
 
 builder.Services.AddRazorComponents()

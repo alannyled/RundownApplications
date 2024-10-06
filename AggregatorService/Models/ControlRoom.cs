@@ -5,7 +5,7 @@ namespace AggregatorService.Models
     public class ControlRoom
     {
         [JsonPropertyName("uuid")]
-        public string? Uuid { get; set; }
+        public Guid? Uuid { get; set; }
 
         [JsonPropertyName("name")]
         public string? Name { get; set; }

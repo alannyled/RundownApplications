@@ -1,13 +1,13 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace RundownService.Models
+namespace RundownDbService.Models
 {
     public class RundownItem
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
-        public Guid UUID { get; set; } = Guid.NewGuid();
+        public Guid UUID { get; set; }
 
         [BsonElement("rundownId")]
         public Guid RundownId { get; set; }

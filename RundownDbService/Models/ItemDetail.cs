@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace RundownService.Models
+namespace RundownDbService.Models
 {
     [BsonDiscriminator(Required = true)]
     [BsonKnownTypes(typeof(ItemDetailTeleprompter), typeof(ItemDetailComment), typeof(ItemDetailVideo), typeof(ItemDetailGraphic))]
@@ -9,7 +9,7 @@ namespace RundownService.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
-        public Guid UUID { get; set; } = Guid.NewGuid();
+        public Guid UUID { get; set; }
 
         [BsonElement("itemId")]
         public Guid ItemId { get; set; }
@@ -27,8 +27,8 @@ namespace RundownService.Models
         [BsonElement("prompterText")]
         public string PrompterText { get; set; }
 
-        [BsonElement("type")]
-        public string Type { get; set; }
+        [BsonElement("detailType")]
+        public string DetailType { get; set; } = "ItemDetailTeleprompter";
     }
 
     [BsonDiscriminator("ItemDetailVideo")]
@@ -42,6 +42,9 @@ namespace RundownService.Models
 
         [BsonElement("duration")]
         public TimeSpan Duration { get; set; }
+
+        [BsonElement("detailType")]
+        public string DetailType { get; set; } = "ItemDetailVideo";
     }
 
     [BsonDiscriminator("ItemDetailGraphic")]
@@ -50,11 +53,11 @@ namespace RundownService.Models
         [BsonElement("graphicId")]
         public string GraphicId { get; set; }
 
-        [BsonElement("type")]
-        public string Type { get; set; }
-
         [BsonElement("duration")]
         public TimeSpan Duration { get; set; }
+
+        [BsonElement("detailType")]
+        public string DetailType { get; set; } = "ItemDetailGraphic";
     }
 
     [BsonDiscriminator("ItemDetailComment")]
@@ -62,6 +65,9 @@ namespace RundownService.Models
     {
         [BsonElement("comment")]
         public string Comment { get; set; }
+
+        [BsonElement("detailType")]
+        public string DetailType { get; set; } = "ItemDetailComment";
 
     }
 }

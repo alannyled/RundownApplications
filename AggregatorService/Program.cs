@@ -24,9 +24,17 @@ builder.Services.AddHttpClient<HardwareService>()
         return new HardwareService(httpClient, serviceProvider.GetRequiredService<IOptions<ApiUrls>>());
     });
 
+builder.Services.AddHttpClient<RundownService>()
+    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    {
+        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
+        return new RundownService(httpClient, serviceProvider.GetRequiredService<IOptions<ApiUrls>>());
+    });
+
 
 builder.Services.AddSingleton<ServiceFactory>();
 builder.Services.AddSingleton<ControlRoomManager>();
+builder.Services.AddSingleton<RundownManager>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

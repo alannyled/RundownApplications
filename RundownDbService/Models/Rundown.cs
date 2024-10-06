@@ -1,15 +1,22 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-namespace RundownService.Models
+
+namespace RundownDbService.Models
 {
     public class Rundown
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
-        public Guid UUID { get; set; } = Guid.NewGuid();
+        public Guid UUID { get; set; } 
 
         [BsonElement("name")]
         public string Name { get; set; }
+
+        [BsonElement("description")]
+        public string Description { get; set; }
+
+        [BsonElement("type")]
+        public string Type { get; set; }
 
         [BsonElement("controlRoomId")]
         public Guid ControlRoomId { get; set; }
@@ -18,7 +25,7 @@ namespace RundownService.Models
         public DateTime BroadcastDate { get; set; }
 
         [BsonElement("archivedDate")]
-        public DateTime? ArchivedDate { get; set; }
+        public DateTime? ArchivedDate { get; set; } = null;
 
         [BsonElement("archivedBy")]
         public string? ArchivedBy { get; set; }

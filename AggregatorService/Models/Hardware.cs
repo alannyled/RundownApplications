@@ -5,10 +5,10 @@ namespace AggregatorService.Models
     public class Hardware
     {
         [JsonPropertyName("uuid")]
-        public string? Uuid { get; set; }
+        public Guid? Uuid { get; set; }
 
         [JsonPropertyName("controlRoomId")]
-        public string? ControlRoomId { get; set; }
+        public Guid? ControlRoomId { get; set; }
 
         [JsonPropertyName("name")]
         public string? Name { get; set; }

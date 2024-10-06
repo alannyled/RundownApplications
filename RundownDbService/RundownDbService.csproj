@@ -8,14 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Bson" Version="2.29.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.29.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BLL\Interfaces\" />
-    <Folder Include="DAL\Repositories\" />
     <Folder Include="DTO\" />
-    <Folder Include="DAL\Interfaces\" />
   </ItemGroup>
 
 </Project>

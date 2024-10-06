@@ -1,9 +1,10 @@
 ﻿@page "/controlrooms"
 @using Microsoft.AspNetCore.Authorization
 @using RundownEditorCore.DTO
-@using RundownEditorCore.Services
+@using RundownEditorCore.Interfaces
+@using RundownEditorCore.Services 
 @using RundownEditorCore.Components.Forms
-@inject ControlRoomService ControlRoomService
+@inject IControlRoomService ControlRoomService
 @inject HardwareService HardwareService
 
 @attribute [Authorize(Roles = "Administrator")]

@@ -1,8 +1,9 @@
 ﻿using RundownEditorCore.DTO;
+using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
 {
-    public class RundownService(HttpClient httpClient)
+    public class RundownService(HttpClient httpClient) : IRundownService
     {
         private readonly HttpClient _httpClient = httpClient;
 

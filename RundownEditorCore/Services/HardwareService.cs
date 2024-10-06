@@ -1,8 +1,9 @@
 ﻿using RundownEditorCore.DTO;
+using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
 {
-    public class HardwareService(HttpClient httpClient)
+    public class HardwareService(HttpClient httpClient) : IHardwareService
     {
         private readonly HttpClient _httpClient = httpClient;
 

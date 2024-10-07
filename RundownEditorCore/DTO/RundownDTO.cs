@@ -11,5 +11,6 @@
         public string? ArchivedBy { get; set; } = null;
         public Guid ControlRoomId { get; set; }
         public string ControlRoomName { get; set;}
+        public List<RundownItemDTO> Items { get; set; } = new List<RundownItemDTO>();
     }
 }

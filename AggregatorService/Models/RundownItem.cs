@@ -13,6 +13,9 @@ namespace AggregatorService.Models
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
+        [JsonPropertyName("order")]
+        public int Order { get; set; }
+
         [JsonPropertyName("itemDetail")]
         public List<ItemDetail> ItemDetails { get; set; } = new List<ItemDetail>();
 

@@ -44,12 +44,6 @@ namespace AggregatorService.Managers
             var rundownData = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
             var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
 
-            var rundownItemsData = await rundownService.FetchData($"{_apiUrls.RundownItemApi}/rundown/{rundownId}");
-            var rundownItems = JsonSerializer.Deserialize<List<RundownItem>>(rundownItemsData);
-
-            // Add the items to the rundown
-            rundown.Items = rundownItems;
-
             var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.ControlRoomApi}/{rundown.ControlRoomId}");
             var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
             

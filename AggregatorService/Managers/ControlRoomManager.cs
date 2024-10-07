@@ -19,6 +19,7 @@ namespace AggregatorService.Managers
 
             var hardwareData = await hardwareService.FetchData(_apiUrls.HardwareApi);
 
+
             var controlRooms = JsonSerializer.Deserialize<List<ControlRoom>>(controlRoomData);
             var hardwareItems = JsonSerializer.Deserialize<List<Hardware>>(hardwareData);
 

@@ -33,7 +33,7 @@ else
         <tbody>
             @foreach (var template in templates)
             {
-                <tr role="button" @onclick="() => OpenThisRundown(template.Name)">
+                <tr role="button" >
                     <td>@template.Id</td>
                     <td>@template.Name</td>
                     <td>@template.Description</td>
@@ -46,8 +46,8 @@ else
 }
 
 @code {
-    [Parameter]
-    public EventCallback<string> OpenRundown { get; set; }
+    // [Parameter]
+    // public EventCallback<string> OpenRundown { get; set; }
     
     private List<Template> templates;
     private bool isLoading = true;
@@ -82,7 +82,7 @@ else
     }
     public async Task OpenThisRundown(string name)
     {
-        await OpenRundown.InvokeAsync(name);
+        //await OpenRundown.InvokeAsync(name);
     }
 
     // Fetch templates with retry logic in component

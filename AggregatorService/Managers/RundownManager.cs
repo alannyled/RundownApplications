@@ -36,7 +36,7 @@ namespace AggregatorService.Managers
             return rundowns;
         }
 
-        public async Task<Rundown> FetchRundownWithItemsAndControlRoom(string rundownId)
+        public async Task<Rundown> FetchSelectedRundown(string rundownId)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
@@ -52,5 +52,22 @@ namespace AggregatorService.Managers
 
             return rundown;
         }
+
+        public async Task<Rundown> UpdateControlRoomAsync(string rundownId, string controlRoomId)
+        {
+            var rundownService = _serviceFactory.GetService<RundownService>();
+
+             var rundownData = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
+            if (rundownData == null)
+            {
+                return null;
+            }
+            var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
+            rundown.ControlRoomId = Guid.Parse(controlRoomId);
+            await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}?controlRoomId={controlRoomId}");
+
+            return rundown;
+        }
+
     }
 }

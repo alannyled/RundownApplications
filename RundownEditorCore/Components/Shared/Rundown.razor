@@ -13,9 +13,10 @@
 </Modal>
 
 
-@if(CurrentRundown != string.Empty){
+@if (SelectedRundown.Name != string.Empty)
+{
 <ul class="nav nav-tabs mb-2">
-    <TabItem MenuItem="@CurrentRundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
+        <TabItem MenuItem="@SelectedRundown.Name" ActiveTab="@activeTab" SelectTab="SelectTab" />
     @foreach (var item in menuTabs)
     {
         @item.Content
@@ -23,7 +24,16 @@
 </ul>
 }
 <div class="tab-content">
-    <TabPaneRundown Name="@CurrentRundown" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects" SelectedDate="SelectedDate"/>
+
+    <TabPaneRundown 
+        SelectedRundown="SelectedRundown" 
+        ControlRooms="ControlRooms" 
+        ActiveTab="@activeTab" 
+        UpdateRundownList="ControlRoomChange" 
+        ShowDialog="OpenRundownObject" 
+        OpenTabPane="OpenTabPane" 
+        CurrentObjects="RundownObjects" />
+
     @foreach (var tab in tabPanes)
     {
         @tab.Content
@@ -32,9 +42,11 @@
 
 @code {
     [Parameter]
-    public string CurrentRundown { get; set; } = string.Empty;
+    public RundownDTO SelectedRundown { get; set; }
     [Parameter]
-    public DateTime SelectedDate { get; set; } 
+    public List<ControlRoomDTO> ControlRooms { get; set; }
+    [Parameter]
+    public EventCallback UpdateRundownList { get; set; } 
 
     private string ObjectName { get; set; } = string.Empty;
     private TimeOnly Duration { get; set; } = TimeOnly.Parse("00:00:00");
@@ -52,13 +64,18 @@
 
     protected override void OnParametersSet()
     {
-        if (activeTab != CurrentRundown && !string.IsNullOrEmpty(CurrentRundown))
+        if (activeTab != SelectedRundown.Name && !string.IsNullOrEmpty(SelectedRundown.Name))
         {
-            activeTab = CurrentRundown;
+            activeTab = SelectedRundown.Name;
             RundownObjects = []; // det her skal så være den reelle liste af objects og ikke en tom liste
             menuTabs = [];
             tabPanes = [];
         }
+    }
+
+    private async Task ControlRoomChange()
+    {
+        await UpdateRundownList.InvokeAsync();
     }
 
     private Task<int> RandomNumber()
@@ -178,7 +195,7 @@
         if (tabToRemove != null)
         {
             menuTabs.Remove(tabToRemove);
-            activeTab = CurrentRundown;
+            activeTab = SelectedRundown.Name;
             StateHasChanged(); 
         }
     }

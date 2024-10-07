@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RundownDbService.BLL.Interfaces;
 using RundownDbService.Models;
+using System.Text.Json.Serialization;
 
 namespace RundownDbService.Controllers
 {
@@ -42,17 +43,28 @@ namespace RundownDbService.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult> Update(Guid id, Rundown updatedRundown)
+        public async Task<ActionResult> Update(Guid id, [FromQuery] string controlRoomId)
         {
+            if (string.IsNullOrEmpty(controlRoomId))
+            {
+                return BadRequest("controlRoomId is required.");
+            }
+
+            Console.WriteLine("Received PUT request for ID: " + id);
+            Console.WriteLine("ControlRoomId: " + controlRoomId);
+
             var rundown = await _rundownService.GetRundownByIdAsync(id);
             if (rundown == null)
             {
                 return NotFound();
             }
 
-            await _rundownService.UpdateRundownAsync(id, updatedRundown);
+            rundown.ControlRoomId = Guid.Parse(controlRoomId);
+            await _rundownService.UpdateRundownAsync(id, rundown);
             return NoContent();
         }
+
+
 
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
@@ -67,4 +79,10 @@ namespace RundownDbService.Controllers
             return NoContent();
         }
     }
+    //public class ControlRoomUpdateRequest
+    //{
+    //    [JsonPropertyName("controlRoomId")]
+    //    public string ControlRoomId { get; set; }
+    //}
+
 }

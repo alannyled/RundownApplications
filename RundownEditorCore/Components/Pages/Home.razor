@@ -1,7 +1,11 @@
 ﻿@page "/"
 @using System.Text.Json;
 @using RundownEditorCore.Components.Shared
+@using RundownEditorCore.DTO
+@using RundownEditorCore.Interfaces
 @using RundownEditorCore.Data
+@inject IRundownService RundownService
+@inject IControlRoomService ControlRoomService
 @inject IHttpClientFactory ClientFactory
 @using Microsoft.AspNetCore.Authorization
 @* @using Microsoft.AspNetCore.Identity
@@ -21,18 +25,19 @@
     <div class="row h-100">
         <div class="col-xl-3 h-100">
             <ul class="nav nav-tabs mb-2">
-                <TabItem MenuItem="Rundowns" ActiveTab="@activeTab" SelectTab="SelectTab" />
                 <TabItem MenuItem="Media" ActiveTab="@activeTab" SelectTab="SelectTab" />
+                <TabItem MenuItem="Rundowns" ActiveTab="@activeTab" SelectTab="SelectTab" />                
                 <TabItem MenuItem="Templates" ActiveTab="@activeTab" SelectTab="SelectTab" />
             </ul>
             <div class="tab-content">
-                <div class="tab-pane @(activeTab == "Rundowns" ? "show active" : "fade")">
+                <div class="tab-pane @(activeTab == "Templates" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
 
                         <div class="card-body">
-                            <h5 class="card-title">Aktive Rækkefølger</h5>
-
-                            <TemplatesTable OpenRundown="OpenRundown" />
+                            <h5 class="card-title">Templates</h5>
+                            <Calendar ReturnSelectedDate="SetSelectedDate" />
+                            <hr />
+                            <TemplatesTable />
                         </div>
                     </div>
                 </div>
@@ -41,17 +46,15 @@
 
                         <div class="card-body">
                             <h5 class="card-title">Media browser</h5>
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            <p class="card-text">Browser medier der er tilknyttet aktive rækkefølger</p>
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane @(activeTab == "Templates" ? "show active" : "fade")">
+                <div class="tab-pane @(activeTab == "Rundowns" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
-                        <div class="card-body">
-                            <Calendar ReturnSelectedDate="SetSelectedDate" />
-                            <hr />
-                            <h5 class="card-title text-muted">Templates</h5>
-                            <TemplatesTable OpenRundown="OpenRundown" />
+                        <div class="card-body">                           
+                            <h5 class="card-title text-muted">Aktive rækkefølger</h5>
+                            <RundownTable OpenRundown="OpenRundown" Rundowns="ActiveRundowns" />
                         </div>
                     </div>
                 </div>
@@ -59,7 +62,7 @@
         </div>
         @* rundown card *@
         <div class="col-xl-8">
-            <Rundown CurrentRundown="@currentRundown" SelectedDate="@SelectedDate" />
+            <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" UpdateRundownList="UpdateRundownListOnControlRoomChange" />
             @* <div class="card full-height">
             <div class="card-body">
 
@@ -87,35 +90,41 @@
 
 @code {
     private string? teleprompterText { get; set; }
-    private DateTime SelectedDate { get; set; } = DateTime.Now;
-    private string activeTab = "Templates";
-    private string currentRundown = string.Empty;
+    private DateTime SelectedDate = DateTime.Now;
+    private string activeTab = "Rundowns";
+    //private string currentRundown = string.Empty;
+    private RundownDTO selectedRundown = new();
+    private List<ControlRoomDTO> controlRooms = new ();
+    private List<RundownDTO> ActiveRundowns = new();
 
-    // private ClaimsPrincipal user;
-    // private ApplicationUser currentUser;
-    // private List<string> userRoles = new List<string>();
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-    //     user = authState.User;
-
-    //     if (user.Identity != null && user.Identity.IsAuthenticated)
-    //     {
-    //         currentUser = await UserManager.GetUserAsync(user);
-
-    //         // Hent rollerne for den aktuelle bruger
-    //         userRoles = (await UserManager.GetRolesAsync(currentUser)).ToList();
-    //     }
-    // }
-
-
-    private void OpenRundown(string rundown)
+    protected override async Task OnInitializedAsync()
     {
-        currentRundown = rundown;
+        controlRooms = await ControlRoomService.GetControlRoomsAsync();
+        ActiveRundowns = await RundownService.GetActiveRundowsAsync();
+    }
+
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     ActiveRundowns = await RundownService.GetActiveRundowsAsync();
+    // }
+   
+
+    private async Task UpdateRundownListOnControlRoomChange()
+    {
+        ActiveRundowns = await RundownService.GetActiveRundowsAsync();
+        StateHasChanged();
+    }
+    private async Task OpenRundown(string uuid)
+    {
+        try
+        {
+            selectedRundown = await RundownService.GetRundownAsync(uuid);
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"Error fetching rundown: {e.Message}");
+        }
         activeTab = "Rundowns";
-        // Create rundown on selected date if not exists
-        Console.WriteLine($"Create rundown = {rundown} on {SelectedDate} if not exists");
     }
     private void SelectTab(string tabName)
     {
@@ -127,6 +136,8 @@
         SelectedDate = date;
     }
 
+
+    // ikke den rigtige
     private async Task SaveText()
     {
         var client = ClientFactory.CreateClient("TemplatesAPI");
@@ -157,4 +168,27 @@
         }
     }
 
+
+
+    // private ClaimsPrincipal user;
+    // private ApplicationUser currentUser;
+    // private List<string> userRoles = new List<string>();
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    //     user = authState.User;
+
+    //     if (user.Identity != null && user.Identity.IsAuthenticated)
+    //     {
+    //         currentUser = await UserManager.GetUserAsync(user);
+
+    //         // Hent rollerne for den aktuelle bruger
+    //         userRoles = (await UserManager.GetRolesAsync(currentUser)).ToList();
+    //     }
+    // }
+
 }
+
+
+

@@ -1,22 +1,22 @@
 ﻿@using RundownEditorCore.DTO
+@using RundownEditorCore.Interfaces
+@inject IRundownService RundownService
 
-<div class="tab-pane @(ActiveTab == Name && !string.IsNullOrEmpty(ActiveTab) && !string.IsNullOrEmpty(Name) ? "show active" : "fade")">
+<div class="tab-pane @(ActiveTab == SelectedRundown.Name && !string.IsNullOrEmpty(ActiveTab) && !string.IsNullOrEmpty(SelectedRundown.Name) ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
         <div class="card-header d-flex justify-content-between bg-danger text-white">
-            <h5 class="mb-0">@Name</h5>
-            <h5 class="mb-0">@FormatDateWithCapitalDay(SelectedDate)</h5>
+            <h5 class="mb-0">@SelectedRundown.Name</h5>
+            <h5 class="mb-0">@FormatDateWithCapitalDay(SelectedRundown.BroadcastDate)</h5>
         </div>
 
         <div class="card-header">
             <div class="d-flex">
                 <div class="col-auto me-3">
-                    <select class="form-select form-select-sm">
-                        <option>Kontrolrum</option>
-                        <option value="1">PK1</option>
-                        <option value="2">PK5</option>
-                        <option value="3">PK6</option>
-                        <option value="4">PK13</option>
-                        <option value="5">PK14</option>
+                    <select class="form-select form-select-sm" @onchange="OnControlRoomChange">
+                        @foreach (var room in ControlRooms)
+                        {
+                            <option value="@room.Uuid" selected="@(SelectedRundown.ControlRoomName == room.Name)">@room.Name</option>
+                        }
                     </select>
                 </div>
                 <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="() => ShowDialog.InvokeAsync()"><i class="bi bi-plus"></i></button>
@@ -66,13 +66,17 @@
     [Parameter]
     public EventCallback<string> OpenTabPane { get; set; }
     [Parameter]
+    public EventCallback UpdateRundownList { get; set; }
+    [Parameter]
+    public RundownDTO SelectedRundown { get; set; } = new();
+    [Parameter]
+    public List<ControlRoomDTO> ControlRooms { get; set; }
+    [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
     [Parameter]
-    public string Name { get; set; } = string.Empty;
-    [Parameter]
     public List<RundownObjects> CurrentObjects { get; set; } = [];
-    [Parameter]
-    public DateTime SelectedDate { get; set; } = DateTime.Now;
+    // [Parameter]
+    // public DateTime SelectedDate { get; set; } = DateTime.Now;
 
     private string? draggedChildId;
 
@@ -80,6 +84,14 @@
     {
         var formattedDate = date.ToString("dddd d. MMMM yyyy", new System.Globalization.CultureInfo("da-DK"));
         return char.ToUpper(formattedDate[0]) + formattedDate.Substring(1);
+    }
+
+    private async Task OnControlRoomChange(ChangeEventArgs e)
+    {
+        var selectedControlRoomUuid = e.Value.ToString();
+        await RundownService.UpdateRundownControlRoomAsync(SelectedRundown.Uuid.ToString(), selectedControlRoomUuid);
+        await UpdateRundownList.InvokeAsync();
+       
     }
 
     private void OnDragStart(DragEventArgs e, string childId)

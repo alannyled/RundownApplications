@@ -13,6 +13,20 @@ namespace RundownEditorCore.Services
             return response;
         }
 
+        public async Task<RundownDTO> GetRundownAsync(string uuid)
+        {
+            var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
+            return response;
+        }
+
+        public async Task<RundownDTO> UpdateRundownControlRoomAsync(string uuid, string controlRoomId)
+        {
+           // test senere med send fra body og ikke params?
+            var response = await _httpClient.PutAsync($"update-rundown-controlroom/{uuid}?controlRoomId={controlRoomId}", null);
+            return await response.Content.ReadFromJsonAsync<RundownDTO>();
+        }
+
     }
+
 }
 

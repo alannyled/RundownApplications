@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 
 namespace RundownDbService.Models
 {
@@ -35,7 +36,7 @@ namespace RundownDbService.Models
     public class ItemDetailVideo : ItemDetail
     {
         [BsonElement("title")]
-        public string title { get; set; }
+        public string Title { get; set; }
 
         [BsonElement("videoPath")]
         public string VideoPath { get; set; }
@@ -68,6 +69,5 @@ namespace RundownDbService.Models
 
         [BsonElement("detailType")]
         public string DetailType { get; set; } = "ItemDetailComment";
-
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RundownDbService.BLL.Interfaces;
+using RundownDbService.DTO;
 using RundownDbService.Models;
+using System.Text.Json.Serialization;
 
 namespace RundownDbService.Controllers
 {
@@ -42,17 +44,67 @@ namespace RundownDbService.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult> Update(Guid id, Rundown updatedRundown)
+        public async Task<ActionResult> Update(Guid id, [FromBody] RundownDTO dto)
         {
+            // Valider at controlRoomId er til stede og er en gyldig GUID
+            if (dto == null || string.IsNullOrEmpty(dto.ControlRoomId) || !Guid.TryParse(dto.ControlRoomId, out var parsedControlRoomId))
+            {
+                return BadRequest("A valid controlRoomId is required.");
+            }
+
+            Console.WriteLine("Received PUT request for Rundown ID: " + id);
+            Console.WriteLine("ControlRoomId from DTO: " + dto.ControlRoomId);
+
+            // Hent den eksisterende rundown
             var rundown = await _rundownService.GetRundownByIdAsync(id);
             if (rundown == null)
             {
                 return NotFound();
             }
 
-            await _rundownService.UpdateRundownAsync(id, updatedRundown);
+            // Opdater controlRoomId i rundown objektet
+            rundown.ControlRoomId = parsedControlRoomId;
+            await _rundownService.UpdateRundownAsync(id, rundown);
+
             return NoContent();
         }
+
+
+        [HttpPut("add-item-to-rundown/{id:guid}")]
+        public async Task<ActionResult> AddItemToRundown(Guid id, [FromBody] RundownDTO rundownDto)
+        {
+            if (rundownDto == null)
+            {
+                return BadRequest("The RundownDTO field is required.");
+            }
+
+            // Hent eksisterende rundown baseret på ID
+            var existingRundown = await _rundownService.GetRundownByIdAsync(id);
+            if (existingRundown == null)
+            {
+                return NotFound();
+            }
+
+            // Tilføj alle nye items fra rundownDto til eksisterende rundown
+            existingRundown.Items.AddRange(rundownDto.Items.Select(item => new RundownItem
+            {
+                UUID = Guid.NewGuid(),
+                RundownId = id,
+                Name = item.Name,
+                Duration = TimeSpan.Parse(item.Duration),
+                Order = item.Order
+            }));
+
+            // Opdater rundown i databasen
+            await _rundownService.UpdateRundownAsync(id, existingRundown);
+
+            return NoContent();
+        }
+
+
+
+
+
 
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
@@ -67,4 +119,10 @@ namespace RundownDbService.Controllers
             return NoContent();
         }
     }
+    //public class ControlRoomUpdateRequest
+    //{
+    //    [JsonPropertyName("controlRoomId")]
+    //    public string ControlRoomId { get; set; }
+    //}
+
 }

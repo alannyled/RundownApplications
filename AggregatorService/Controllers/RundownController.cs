@@ -1,4 +1,5 @@
-﻿using AggregatorService.Managers;
+﻿using AggregatorService.DTO;
+using AggregatorService.Managers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AggregatorService.Controllers
@@ -15,5 +16,44 @@ namespace AggregatorService.Controllers
             var data = await _rundownManager.FetchRundownsWithControlRoomData();
             return Ok(data);
         }
+
+        [HttpGet("fetch-rundown/{rundownId}")]
+        public async Task<IActionResult> FetchSelectedRundown(string rundownId)
+        {
+            var data = await _rundownManager.FetchSelectedRundown(rundownId);
+            return Ok(data);
+        }
+
+        //[HttpPut("update-rundown-controlroom/{rundownId}")]
+        //public async Task<IActionResult> UpdateRundownControlRoom(string rundownId, string controlRoomId)
+        //{
+        //    var data = await _rundownManager.UpdateControlRoomAsync(rundownId, controlRoomId);
+        //    return Ok(data);
+        //}
+
+        [HttpPut("update-rundown-controlroom/{rundownId}")]
+        public async Task<IActionResult> UpdateRundownControlRoom(string rundownId, [FromBody] RundownDTO request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.ControlRoomId))
+            {
+                return BadRequest("Invalid request.");
+            }
+
+            // Kald DB-tjenesten og send request som JSON
+            var updatedRundown = await _rundownManager.UpdateControlRoomAsync(rundownId, request);
+
+            return Ok(updatedRundown);
+        }
+
+        [HttpPut("add-item-to-rundown/{rundownId}")]
+        public async Task<IActionResult> AddItemToRundown(string rundownId, [FromBody] RundownItemDTO itemDto)
+        {
+            await _rundownManager.AddItemToRundownAsync(Guid.Parse(rundownId), itemDto);
+            return Ok();
+        }
+
+
+
+
     }
 }

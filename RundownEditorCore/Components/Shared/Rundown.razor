@@ -1,5 +1,7 @@
 ﻿@using RundownEditorCore.Components.Shared
 @using RundownEditorCore.DTO
+@using RundownEditorCore.Interfaces
+@inject IRundownService RundownService
 
 <Modal ShowDialog="@showDialog" SaveChanges="SaveNewObject" ShowDialogChanged="@((value) => showDialog = value)" Title="Nyt rækkefølge objekt">
     <RundownObjectForm ObjectName="@ObjectName"
@@ -13,9 +15,10 @@
 </Modal>
 
 
-@if(CurrentRundown != string.Empty){
+@if (SelectedRundown.Name != string.Empty)
+{
 <ul class="nav nav-tabs mb-2">
-    <TabItem MenuItem="@CurrentRundown" ActiveTab="@activeTab" SelectTab="SelectTab" />
+        <TabItem MenuItem="@SelectedRundown.Name" ActiveTab="@activeTab" SelectTab="SelectTab" />
     @foreach (var item in menuTabs)
     {
         @item.Content
@@ -23,7 +26,16 @@
 </ul>
 }
 <div class="tab-content">
-    <TabPaneRundown Name="@CurrentRundown" ActiveTab="@activeTab" ShowDialog="OpenRundownObject" OpenTabPane="OpenTabPane" CurrentObjects="RundownObjects" SelectedDate="SelectedDate"/>
+
+    <TabPaneRundown 
+        SelectedRundown="SelectedRundown" 
+        ControlRooms="ControlRooms" 
+        ActiveTab="@activeTab" 
+        UpdateRundownList="ControlRoomChange" 
+        ShowDialog="OpenRundownObject" 
+        OpenTabPane="OpenTabPane" 
+        CurrentObjects="RundownObjects" />
+
     @foreach (var tab in tabPanes)
     {
         @tab.Content
@@ -32,12 +44,17 @@
 
 @code {
     [Parameter]
-    public string CurrentRundown { get; set; } = string.Empty;
+    public RundownDTO SelectedRundown { get; set; }
     [Parameter]
-    public DateTime SelectedDate { get; set; } 
+    public List<ControlRoomDTO> ControlRooms { get; set; }
+    [Parameter]
+    public EventCallback UpdateRundownList { get; set; } 
+
+    [Parameter]
+    public EventCallback UpdateSelectedRundown { get; set; }
 
     private string ObjectName { get; set; } = string.Empty;
-    private TimeOnly Duration { get; set; } = TimeOnly.Parse("00:00:00");
+    private string Duration { get; set; } = "00:00:00";
     private string Category { get; set; } = string.Empty;
 
     private List<string> Categories = new List<string> { "TVA Intro", "Indslag", "Indslag VO", "Kamera Tekst" };
@@ -52,13 +69,17 @@
 
     protected override void OnParametersSet()
     {
-        if (activeTab != CurrentRundown && !string.IsNullOrEmpty(CurrentRundown))
+        if (activeTab != SelectedRundown.Name && !string.IsNullOrEmpty(SelectedRundown.Name))
         {
-            activeTab = CurrentRundown;
-            RundownObjects = []; // det her skal så være den reelle liste af objects og ikke en tom liste
+            activeTab = SelectedRundown.Name;           
             menuTabs = [];
             tabPanes = [];
         }
+    }
+
+    private async Task ControlRoomChange()
+    {
+        await UpdateRundownList.InvokeAsync();
     }
 
     private Task<int> RandomNumber()
@@ -93,7 +114,7 @@
     }
 
 
-    private void SaveNewObject()
+    private async Task SaveNewObject()
     {
         showDialog = false;
         if (string.IsNullOrEmpty(ObjectName))
@@ -101,9 +122,30 @@
             int random = RandomNumber().Result;
             ObjectName = $"Unknown-{random}";
         }
+        
+        
+
+        var newRundownItem = new RundownItemDTO
+            {
+                UUID = Guid.NewGuid(),
+                RundownId = SelectedRundown.Uuid, 
+                Name = ObjectName,
+                Duration = Duration,
+                Order = SelectedRundown.Items.Count // + 1  eller *10?
+            };
+        
+        await RundownService.AddItemToRundownAsync(SelectedRundown.Uuid.ToString(), newRundownItem);
+        await UpdateSelectedRundown.InvokeAsync();
+        await UpdateSelectedRundown.InvokeAsync();
+        AddObjectToRundown(); // denne her skal laves om / fjernes og erstattes af det faktisk items array i rundown
         activeTab = ObjectName;
-        AddObjectToRundown();
         AddMenuTab();
+        
+        // nulstil alle felter
+        ObjectName = string.Empty;
+        Duration = "00:00:00";
+        Category = string.Empty;
+       
 
     }
 
@@ -157,9 +199,6 @@
                 Content = newChild
             });
         
-        ObjectName = string.Empty;
-        Duration = TimeOnly.Parse("00:00:00");
-        Category = string.Empty;
     }
 
     private void RemoveTabPane(string tabName)
@@ -178,7 +217,7 @@
         if (tabToRemove != null)
         {
             menuTabs.Remove(tabToRemove);
-            activeTab = CurrentRundown;
+            activeTab = SelectedRundown.Name;
             StateHasChanged(); 
         }
     }

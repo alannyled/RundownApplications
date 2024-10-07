@@ -10,48 +10,53 @@
 }
 else
 {
-    <table class="table table-sm">
+    <div class="table-responsive">
+    <table class="table table-sm table-striped">
         <thead>
             <tr>
-                <th>ID</th>
+                
                 <th>Navn</th>
                 <th>Udsendelses dato</th>
-                <th>Beskrivelse</th>
-                <th>Type</th>
                 <th>Kontrolrum</th>
-                <th>Arkiveret</th>
+                @* <th>Beskrivelse</th>
+                <th>Type</th>              
+                <th>ID</th> *@
 
             </tr>
         </thead>
         <tbody>
-            @foreach (var rundown in rundowns)
+            @foreach (var rundown in Rundowns)
             {
-                <tr role="button" @onclick="() => OpenThisRundown(rundown.Name)">
-                    <td>@rundown.Uuid</td>
-                    <td>@rundown.Name</td>
-                    <td>@rundown.BroadcastDate.ToString("dddd d. MMMM yyyy")</td>
-                    <td>@rundown.Description</td>
-                    <td>@rundown.Type</td>
-                    <td>@rundown.ControlRoomName</td>
-                    <td>@rundown.ArchivedDate</td>
+                <tr role="button" @onclick="() => OpenThisRundown(rundown.Uuid.ToString())">
+
+                        <td class="text-nowrap">@rundown.Name</td>
+                        <td class="text-nowrap">@rundown.BroadcastDate.ToString("dddd d. MMMM yyyy")</td>
+                        <td class="text-nowrap">@rundown.ControlRoomName</td>
+                    @* <td>@rundown.Description</td>
+                    <td>@rundown.Type</td>                   
+                    <td>@rundown.Uuid</td> *@
+                   
 
                 </tr>
             }
         </tbody>
     </table>
+    </div>
 }
 
 @code {
     [Parameter]
     public EventCallback<string> OpenRundown { get; set; }
+    [Parameter]
+    public List<RundownDTO>? Rundowns { get; set; }
 
-    private List<RundownDTO>? rundowns;
+   // private List<RundownDTO>? rundowns;
     private bool isLoading = true;
     private string? errorMessage;
 
-    public async Task OpenThisRundown(string name)
+    public async Task OpenThisRundown(string uuid)
     {
-        await OpenRundown.InvokeAsync(name);
+        await OpenRundown.InvokeAsync(uuid);
     }
 
     protected override async Task OnInitializedAsync()
@@ -60,7 +65,7 @@ else
 
         try
         {
-            rundowns = await RundownService.GetActiveRundowsAsync();
+            Rundowns = await RundownService.GetActiveRundowsAsync();
     
 
         }

@@ -1,8 +1,10 @@
-﻿using AggregatorService.Factories;
+﻿using AggregatorService.DTO;
+using AggregatorService.Factories;
 using AggregatorService.Models;
 using AggregatorService.Services;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using static AggregatorService.Controllers.RundownController;
 
 namespace AggregatorService.Managers
 {
@@ -36,19 +38,13 @@ namespace AggregatorService.Managers
             return rundowns;
         }
 
-        public async Task<Rundown> FetchRundownWithItemsAndControlRoom(string rundownId)
+        public async Task<Rundown> FetchSelectedRundown(string rundownId)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
             var rundownData = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
             var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
-
-            var rundownItemsData = await rundownService.FetchData($"{_apiUrls.RundownItemApi}/rundown/{rundownId}");
-            var rundownItems = JsonSerializer.Deserialize<List<RundownItem>>(rundownItemsData);
-
-            // Add the items to the rundown
-            rundown.Items = rundownItems;
 
             var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.ControlRoomApi}/{rundown.ControlRoomId}");
             var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
@@ -58,5 +54,48 @@ namespace AggregatorService.Managers
 
             return rundown;
         }
+
+        public async Task<Rundown> UpdateControlRoomAsync(string rundownId, RundownDTO controlRoom)
+        {
+            var rundownService = _serviceFactory.GetService<RundownService>();
+
+            // Konstruer DTO med både Uuid og ControlRoomId
+            var dto = new RundownDTO
+            {
+                Uuid = rundownId,
+                ControlRoomId = controlRoom.ControlRoomId
+            };
+
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}", dto);
+            response.EnsureSuccessStatusCode();
+
+            var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            return updatedRundown;
+        }
+
+        public async Task AddItemToRundownAsync(Guid rundownId, RundownItemDTO itemDto)
+        {
+            // Hent det eksisterende rundown
+            var rundownService = _serviceFactory.GetService<RundownService>();
+            var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
+            var rundown = JsonSerializer.Deserialize<RundownDTO>(existingRundownResponse);
+            
+            if (existingRundownResponse is null)
+            {
+                throw new Exception("Rundown not found.");
+            }
+
+            // Tilføj det nye item til eksisterende liste
+            rundown.Items.Add(itemDto);
+            Console.WriteLine(JsonSerializer.Serialize(rundown));
+
+
+            // Send opdateringen tilbage til service
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-to-rundown/{rundownId}", rundown);
+            response.EnsureSuccessStatusCode();
+        }
+
+
+
     }
 }

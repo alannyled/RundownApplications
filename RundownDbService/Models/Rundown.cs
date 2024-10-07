@@ -1,5 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
+using System.Collections.Generic;
 
 namespace RundownDbService.Models
 {
@@ -7,7 +9,7 @@ namespace RundownDbService.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
-        public Guid UUID { get; set; } 
+        public Guid UUID { get; set; }
 
         [BsonElement("name")]
         public string Name { get; set; }
@@ -29,5 +31,8 @@ namespace RundownDbService.Models
 
         [BsonElement("archivedBy")]
         public string? ArchivedBy { get; set; }
+
+        [BsonElement("items")]
+        public List<RundownItem> Items { get; set; } = new List<RundownItem>();
     }
 }

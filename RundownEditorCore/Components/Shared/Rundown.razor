@@ -15,7 +15,7 @@
 </Modal>
 
 
-@if (SelectedRundown.Name != string.Empty)
+@if (!string.IsNullOrEmpty(SelectedRundown.Name))
 {
 <ul class="nav nav-tabs mb-2">
         <TabItem MenuItem="@SelectedRundown.Name" ActiveTab="@activeTab" SelectTab="SelectTab" />

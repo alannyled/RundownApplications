@@ -62,7 +62,7 @@
         </div>
         @* rundown card *@
         <div class="col-xl-8">
-            <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" UpdateRundownList="UpdateRundownListOnControlRoomChange" />
+            <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" UpdateRundownList="UpdateRundownListOnControlRoomChange" UpdateSelectedRundown="UpdateSelectedRundown" />
 
         </div>
 
@@ -106,6 +106,13 @@
         ActiveRundowns = await RundownService.GetActiveRundowsAsync();
         StateHasChanged();
     }
+
+    private async Task UpdateSelectedRundown()
+    {
+        selectedRundown = await RundownService.GetRundownAsync(selectedRundown.Uuid.ToString());
+        StateHasChanged();
+    }
+
     private async Task OpenRundown(string uuid)
     {
         try

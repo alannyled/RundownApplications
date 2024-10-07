@@ -1,5 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
+using System.Collections.Generic;
 
 namespace RundownDbService.Models
 {
@@ -15,6 +17,7 @@ namespace RundownDbService.Models
         [BsonElement("name")]
         public string Name { get; set; }
 
-
+        [BsonElement("details")]
+        public List<ItemDetail> Details { get; set; } = new List<ItemDetail>();
     }
 }

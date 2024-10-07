@@ -1,6 +1,8 @@
 ﻿using AggregatorService.Abstractions;
+using AggregatorService.DTO;
 using AggregatorService.Models;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace AggregatorService.Services
 {
@@ -29,14 +31,17 @@ namespace AggregatorService.Services
             return content;
         }
 
-        public async Task<HttpResponseMessage> PutAsJsonAsync(string url)
+        public async Task<HttpResponseMessage> PutAsJsonAsync(string url, RundownDTO rundown)
         {
-            Console.WriteLine("Update: " + url);
-            var response = await _httpClient.PutAsync(url, null);
-            response.EnsureSuccessStatusCode();
+            var json = JsonSerializer.Serialize(rundown);
+            Console.WriteLine("JSON Payload: " + json);
 
+            var response = await _httpClient.PutAsJsonAsync(url, rundown);
+            response.EnsureSuccessStatusCode();
             return response;
         }
+
+
 
 
         public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)

@@ -6,6 +6,7 @@ namespace RundownEditorCore.Interfaces
     {
         Task<List<RundownDTO>> GetActiveRundowsAsync();
         Task<RundownDTO> GetRundownAsync(string uuid);
-        Task<RundownDTO> UpdateRundownControlRoomAsync(string uuid, string controlRoomId);
+        //Task<RundownDTO> UpdateRundownControlRoomAsync(string uuid, string controlRoomId);
+        Task UpdateRundownControlRoomAsync(string uuid, string controlRoomId);
     }
 }

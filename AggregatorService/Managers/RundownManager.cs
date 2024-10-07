@@ -1,8 +1,10 @@
-﻿using AggregatorService.Factories;
+﻿using AggregatorService.DTO;
+using AggregatorService.Factories;
 using AggregatorService.Models;
 using AggregatorService.Services;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using static AggregatorService.Controllers.RundownController;
 
 namespace AggregatorService.Managers
 {
@@ -53,21 +55,24 @@ namespace AggregatorService.Managers
             return rundown;
         }
 
-        public async Task<Rundown> UpdateControlRoomAsync(string rundownId, string controlRoomId)
+        public async Task<Rundown> UpdateControlRoomAsync(string rundownId, RundownDTO controlRoom)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
 
-             var rundownData = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
-            if (rundownData == null)
+            // Konstruer DTO med både Uuid og ControlRoomId
+            var dto = new RundownDTO
             {
-                return null;
-            }
-            var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
-            rundown.ControlRoomId = Guid.Parse(controlRoomId);
-            await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}?controlRoomId={controlRoomId}");
+                Uuid = rundownId,
+                ControlRoomId = controlRoom.ControlRoomId
+            };
 
-            return rundown;
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}", dto);
+            response.EnsureSuccessStatusCode();
+
+            var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            return updatedRundown;
         }
+
 
     }
 }

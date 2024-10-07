@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RundownDbService.BLL.Interfaces;
+using RundownDbService.DTO;
 using RundownDbService.Models;
 using System.Text.Json.Serialization;
 
@@ -43,26 +44,31 @@ namespace RundownDbService.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult> Update(Guid id, [FromQuery] string controlRoomId)
+        public async Task<ActionResult> Update(Guid id, [FromBody] RundownDTO dto)
         {
-            if (string.IsNullOrEmpty(controlRoomId))
+            // Valider at controlRoomId er til stede og er en gyldig GUID
+            if (dto == null || string.IsNullOrEmpty(dto.ControlRoomId) || !Guid.TryParse(dto.ControlRoomId, out var parsedControlRoomId))
             {
-                return BadRequest("controlRoomId is required.");
+                return BadRequest("A valid controlRoomId is required.");
             }
 
-            Console.WriteLine("Received PUT request for ID: " + id);
-            Console.WriteLine("ControlRoomId: " + controlRoomId);
+            Console.WriteLine("Received PUT request for Rundown ID: " + id);
+            Console.WriteLine("ControlRoomId from DTO: " + dto.ControlRoomId);
 
+            // Hent den eksisterende rundown
             var rundown = await _rundownService.GetRundownByIdAsync(id);
             if (rundown == null)
             {
                 return NotFound();
             }
 
-            rundown.ControlRoomId = Guid.Parse(controlRoomId);
+            // Opdater controlRoomId i rundown objektet
+            rundown.ControlRoomId = parsedControlRoomId;
             await _rundownService.UpdateRundownAsync(id, rundown);
+
             return NoContent();
         }
+
 
 
 

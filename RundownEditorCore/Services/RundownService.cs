@@ -1,4 +1,5 @@
-﻿using RundownEditorCore.DTO;
+﻿using Confluent.Kafka;
+using RundownEditorCore.DTO;
 using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
@@ -19,11 +20,30 @@ namespace RundownEditorCore.Services
             return response;
         }
 
-        public async Task<RundownDTO> UpdateRundownControlRoomAsync(string uuid, string controlRoomId)
+        //public async Task<RundownDTO> UpdateRundownControlRoomAsync(string uuid, string controlRoomId)
+        //{
+        //   // test senere med send fra body og ikke params?
+        //    var response = await _httpClient.PutAsync($"update-rundown-controlroom/{uuid}?controlRoomId={controlRoomId}", null);
+        //    return await response.Content.ReadFromJsonAsync<RundownDTO>();
+        //}
+
+        public async Task UpdateRundownControlRoomAsync(string rundownId, string controlRoomId)
         {
-           // test senere med send fra body og ikke params?
-            var response = await _httpClient.PutAsync($"update-rundown-controlroom/{uuid}?controlRoomId={controlRoomId}", null);
-            return await response.Content.ReadFromJsonAsync<RundownDTO>();
+            var updateRequest = new RundownDTO
+            {
+                ControlRoomId = Guid.Parse(controlRoomId)
+            };
+
+            var response = await _httpClient.PutAsJsonAsync($"update-rundown-controlroom/{rundownId}", updateRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Successfully updated control room.");
+            }
+            else
+            {
+                Console.WriteLine($"Error updating control room: {response.ReasonPhrase}");
+            }
         }
 
     }

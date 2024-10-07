@@ -1,4 +1,5 @@
-﻿using AggregatorService.Managers;
+﻿using AggregatorService.DTO;
+using AggregatorService.Managers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AggregatorService.Controllers
@@ -23,11 +24,28 @@ namespace AggregatorService.Controllers
             return Ok(data);
         }
 
+        //[HttpPut("update-rundown-controlroom/{rundownId}")]
+        //public async Task<IActionResult> UpdateRundownControlRoom(string rundownId, string controlRoomId)
+        //{
+        //    var data = await _rundownManager.UpdateControlRoomAsync(rundownId, controlRoomId);
+        //    return Ok(data);
+        //}
+
         [HttpPut("update-rundown-controlroom/{rundownId}")]
-        public async Task<IActionResult> UpdateRundownControlRoom(string rundownId, string controlRoomId)
+        public async Task<IActionResult> UpdateRundownControlRoom(string rundownId, [FromBody] RundownDTO request)
         {
-            var data = await _rundownManager.UpdateControlRoomAsync(rundownId, controlRoomId);
-            return Ok(data);
+            if (request == null || string.IsNullOrEmpty(request.ControlRoomId))
+            {
+                return BadRequest("Invalid request.");
+            }
+
+            // Kald DB-tjenesten og send request som JSON
+            var updatedRundown = await _rundownManager.UpdateControlRoomAsync(rundownId, request);
+
+            return Ok(updatedRundown);
         }
+
+       
+
     }
 }

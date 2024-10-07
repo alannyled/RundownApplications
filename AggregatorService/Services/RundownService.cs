@@ -21,9 +21,9 @@ namespace AggregatorService.Services
         }
 
         // skal den også være en abstract metode?
-        public async Task<string> GetByIdAsync(string uuid)
+        public async Task<string> GetByIdAsync(string api)
         {
-            var response = await _httpClient.GetAsync(uuid);
+            var response = await _httpClient.GetAsync(api);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();

@@ -20,13 +20,6 @@ namespace RundownEditorCore.Services
             return response;
         }
 
-        //public async Task<RundownDTO> UpdateRundownControlRoomAsync(string uuid, string controlRoomId)
-        //{
-        //   // test senere med send fra body og ikke params?
-        //    var response = await _httpClient.PutAsync($"update-rundown-controlroom/{uuid}?controlRoomId={controlRoomId}", null);
-        //    return await response.Content.ReadFromJsonAsync<RundownDTO>();
-        //}
-
         public async Task UpdateRundownControlRoomAsync(string rundownId, string controlRoomId)
         {
             var updateRequest = new RundownDTO
@@ -45,6 +38,21 @@ namespace RundownEditorCore.Services
                 Console.WriteLine($"Error updating control room: {response.ReasonPhrase}");
             }
         }
+
+        public async Task AddItemToRundownAsync(string rundownId, RundownItemDTO item)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Successfully added item to rundown.");
+            }
+            else
+            {
+                Console.WriteLine($"Error adding item to rundown: {response.ReasonPhrase}");
+            }
+        }
+
 
     }
 

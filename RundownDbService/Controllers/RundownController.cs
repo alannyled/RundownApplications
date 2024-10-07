@@ -70,6 +70,40 @@ namespace RundownDbService.Controllers
         }
 
 
+        [HttpPut("add-item-to-rundown/{id:guid}")]
+        public async Task<ActionResult> AddItemToRundown(Guid id, [FromBody] RundownDTO rundownDto)
+        {
+            if (rundownDto == null)
+            {
+                return BadRequest("The RundownDTO field is required.");
+            }
+
+            // Hent eksisterende rundown baseret på ID
+            var existingRundown = await _rundownService.GetRundownByIdAsync(id);
+            if (existingRundown == null)
+            {
+                return NotFound();
+            }
+
+            // Tilføj alle nye items fra rundownDto til eksisterende rundown
+            existingRundown.Items.AddRange(rundownDto.Items.Select(item => new RundownItem
+            {
+                UUID = Guid.NewGuid(),
+                RundownId = id,
+                Name = item.Name,
+                Duration = TimeSpan.Parse(item.Duration),
+                Order = item.Order
+            }));
+
+            // Opdater rundown i databasen
+            await _rundownService.UpdateRundownAsync(id, existingRundown);
+
+            return NoContent();
+        }
+
+
+
+
 
 
         [HttpDelete("{id:guid}")]

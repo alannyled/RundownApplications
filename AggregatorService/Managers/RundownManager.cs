@@ -73,6 +73,29 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
+        public async Task AddItemToRundownAsync(Guid rundownId, RundownItemDTO itemDto)
+        {
+            // Hent det eksisterende rundown
+            var rundownService = _serviceFactory.GetService<RundownService>();
+            var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
+            var rundown = JsonSerializer.Deserialize<RundownDTO>(existingRundownResponse);
+            
+            if (existingRundownResponse is null)
+            {
+                throw new Exception("Rundown not found.");
+            }
+
+            // Tilføj det nye item til eksisterende liste
+            rundown.Items.Add(itemDto);
+            Console.WriteLine(JsonSerializer.Serialize(rundown));
+
+
+            // Send opdateringen tilbage til service
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-to-rundown/{rundownId}", rundown);
+            response.EnsureSuccessStatusCode();
+        }
+
+
 
     }
 }

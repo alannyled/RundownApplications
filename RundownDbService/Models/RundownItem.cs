@@ -18,6 +18,9 @@ namespace RundownDbService.Models
         [BsonElement("name")]
         public string Name { get; set; }
 
+        [BsonElement("duration")]
+        public TimeSpan Duration { get; set; }
+
         [BsonElement("order")]
         public int Order { get; set; }
 

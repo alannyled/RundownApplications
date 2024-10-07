@@ -6,7 +6,7 @@
     </div>
     <div class="mb-3">
         <label for="duration" class="form-label">Planlagt længde</label>
-        <input type="time" step="1" class="form-control form-control-sm" id="duration" value="@Duration.ToString("HH:mm:ss")"
+        <input type="time" step="1" class="form-control form-control-sm" id="duration" value="@Duration"
                @onchange="HandleDurationChange" />
     </div>
     <div class="mb-3">
@@ -27,7 +27,7 @@
     public string ObjectName { get; set; } = string.Empty;
 
     [Parameter]
-    public TimeOnly Duration { get; set; }
+    public string Duration { get; set; }
 
     [Parameter]
     public string Category { get; set; } = string.Empty;
@@ -39,7 +39,7 @@
     public EventCallback<string> ObjectNameChanged { get; set; }
 
     [Parameter]
-    public EventCallback<TimeOnly> DurationChanged { get; set; }
+    public EventCallback<string> DurationChanged { get; set; }
 
     [Parameter]
     public EventCallback<string> CategoryChanged { get; set; }
@@ -52,12 +52,9 @@
 
     private async Task HandleDurationChange(ChangeEventArgs e)
     {
-       
-        if (TimeOnly.TryParseExact(e.Value?.ToString(), "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var parsedDuration))
-        {
-            Duration = parsedDuration;
+            Duration = e.Value?.ToString();
             await DurationChanged.InvokeAsync(Duration);
-        }
+      
     }
 
     private async Task HandleCategoryChange(ChangeEventArgs e)

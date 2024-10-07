@@ -45,7 +45,15 @@ namespace AggregatorService.Controllers
             return Ok(updatedRundown);
         }
 
-       
+        [HttpPut("add-item-to-rundown/{rundownId}")]
+        public async Task<IActionResult> AddItemToRundown(string rundownId, [FromBody] RundownItemDTO itemDto)
+        {
+            await _rundownManager.AddItemToRundownAsync(Guid.Parse(rundownId), itemDto);
+            return Ok();
+        }
+
+
+
 
     }
 }

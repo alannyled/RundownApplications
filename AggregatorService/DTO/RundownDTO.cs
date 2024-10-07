@@ -4,6 +4,6 @@
     {
         public string? Uuid { get; set; }
         public string? ControlRoomId { get; set; }
-        public string? ErIkkeIBrugTest { get; set; }
+        public List<RundownItemDTO> Items { get; set; } = new List<RundownItemDTO>();
     }
 }

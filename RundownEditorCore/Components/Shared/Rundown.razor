@@ -1,5 +1,7 @@
 ﻿@using RundownEditorCore.Components.Shared
 @using RundownEditorCore.DTO
+@using RundownEditorCore.Interfaces
+@inject IRundownService RundownService
 
 <Modal ShowDialog="@showDialog" SaveChanges="SaveNewObject" ShowDialogChanged="@((value) => showDialog = value)" Title="Nyt rækkefølge objekt">
     <RundownObjectForm ObjectName="@ObjectName"
@@ -49,7 +51,7 @@
     public EventCallback UpdateRundownList { get; set; } 
 
     private string ObjectName { get; set; } = string.Empty;
-    private TimeOnly Duration { get; set; } = TimeOnly.Parse("00:00:00");
+    private string Duration { get; set; } = "00:00:00";
     private string Category { get; set; } = string.Empty;
 
     private List<string> Categories = new List<string> { "TVA Intro", "Indslag", "Indslag VO", "Kamera Tekst" };
@@ -110,7 +112,7 @@
     }
 
 
-    private void SaveNewObject()
+    private async Task SaveNewObject()
     {
         showDialog = false;
         if (string.IsNullOrEmpty(ObjectName))
@@ -121,6 +123,22 @@
         activeTab = ObjectName;
         AddObjectToRundown();
         AddMenuTab();
+
+        var newRundownItem = new RundownItemDTO
+            {
+                UUID = Guid.NewGuid(),
+                RundownId = SelectedRundown.Uuid, 
+                Name = ObjectName,
+                Duration = Duration,
+                Order = RundownObjects.Count // Dette kan være den aktuelle rækkefølge?
+            };
+        
+        await RundownService.AddItemToRundownAsync(SelectedRundown.Uuid.ToString(), newRundownItem);
+
+        // nulstil alle felter
+        ObjectName = string.Empty;
+        Duration = "00:00:00";
+        Category = string.Empty;
 
     }
 
@@ -174,9 +192,6 @@
                 Content = newChild
             });
         
-        ObjectName = string.Empty;
-        Duration = TimeOnly.Parse("00:00:00");
-        Category = string.Empty;
     }
 
     private void RemoveTabPane(string tabName)

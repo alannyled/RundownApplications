@@ -63,15 +63,7 @@
         @* rundown card *@
         <div class="col-xl-8">
             <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" UpdateRundownList="UpdateRundownListOnControlRoomChange" />
-            @* <div class="card full-height">
-            <div class="card-body">
 
-            <p>Indsæt tekst til teleprompter</p>
-            <textarea @bind="teleprompterText"></textarea>
-
-            <button role="button" @onclick="SaveText">Gem</button>
-            </div>
-            </div> *@
         </div>
 
         <div class="col-xl-1 pt-1">
@@ -137,38 +129,7 @@
     }
 
 
-    // ikke den rigtige
-    private async Task SaveText()
-    {
-        var client = ClientFactory.CreateClient("TemplatesAPI");
-
-        // Opret et objekt med de data, der skal sendes
-        var teleprompterTest = new
-        {
-            teleprompterTestId = 0,
-            text = teleprompterText
-        };
-
-        // Serialiser objektet til JSON
-        var jsonContent = JsonSerializer.Serialize(teleprompterTest);
-
-        // Opret JSON-indholdet til HTTP POST-requesten
-        var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-
-        // Send POST-requesten til API'en
-        var response = await client.PostAsync("teleprompter/telepromptertests/create", content);
-
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine("Tekst gemt succesfuldt!");
-        }
-        else
-        {
-            Console.WriteLine($"Fejl ved gemning: {response.StatusCode}");
-        }
-    }
-
-
+    
 
     // private ClaimsPrincipal user;
     // private ApplicationUser currentUser;

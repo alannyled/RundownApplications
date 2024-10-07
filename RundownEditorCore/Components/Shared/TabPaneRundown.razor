@@ -32,27 +32,31 @@
                     <tr>
                         <th>Name</th>
                         <th>Duration</th>
-                        <th>Category</th>
+                        <th>Order</th>
                     </tr>
                 </thead>
                 <tbody>
-                @foreach (var child in CurrentObjects)
-                {
-                    <tr draggable="true"
-                        @onclick="() => OpenTabPane.InvokeAsync(child.Name)"
-                        @key="child.Id"
-                        @ondragstart="(e) => OnDragStart(e, child.Id)"
-                        @ondrop="(e) => OnDrop(e, child.Id)"
-                        ondragover="allowDrop(event)"
-                        ondragleave="leaveDrop(event)"
-                        ondragend="endDrop(event)"
-                        class="drag-item">
-                        <td>@child.Name</td>
-                            <td>@child.Duration</td>
-                        <td>@child.Category</td>
-                    </tr>
-                }
+               
+                        @foreach (var item in SelectedRundown.Items.OrderBy(i => i.Order))
+                        {
+                        <tr draggable="true"
+                            @onclick="() => OpenTabPane.InvokeAsync(item.Name)"
+                            @key="item.UUID"
+                            @ondragstart="(e) => OnDragStart(e, item.UUID.ToString())"
+                            @ondrop="(e) => OnDrop(e, item.UUID.ToString())"
+                            ondragover="allowDrop(event)"
+                            ondragleave="leaveDrop(event)"
+                            ondragend="endDrop(event)"
+                            class="drag-item">
+                            <td>@item.Name</td>
+                            <td>@item.Duration</td>
+
+                            <td>@item.Order</td>
+                        </tr>
+                        }
                 </tbody>
+
+              
             </table>
         </div>
 

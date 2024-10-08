@@ -1,8 +1,11 @@
 ﻿@using Polly
 @using Polly.Extensions.Http
 @using Polly.Retry
+@using RundownEditorCore.Interfaces
+@using RundownEditorCore.DTO
 
 @inject IHttpClientFactory ClientFactory
+@inject ITemplateService TemplateService
 
 
 
@@ -34,7 +37,7 @@ else
             @foreach (var template in templates)
             {
                 <tr role="button" >
-                    <td>@template.Id</td>
+                    <td>@template.Uuid</td>
                     <td>@template.Name</td>
                     <td>@template.Description</td>
                     <td>@template.Type</td>
@@ -49,92 +52,98 @@ else
     // [Parameter]
     // public EventCallback<string> OpenRundown { get; set; }
     
-    private List<Template> templates;
+    private List<RundownDTO> templates;
     private bool isLoading = true;
     private string errorMessage;
     private int retryCount = 0; // Track retry attempts
     private bool hasError = false; // Track if there is an error
 
-    protected override async Task OnInitializedAsync()
+
+     protected override async Task OnInitializedAsync()
     {
-        // Ensure this method is only called once
-        if (!isLoading) return;
-
-        try
-        {
-            var client = ClientFactory.CreateClient("TemplatesAPI");
-
-            // Fetch templates with retry logic directly in component
-            await FetchTemplatesWithRetryAsync(client);
-        }
-        catch (HttpRequestException httpEx)
-        {
-            errorMessage = $"Fejl ved hentning af data: {httpEx.Message}";
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"En uventet fejl opstod: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        templates = await TemplateService.GetAllTemplatesAsync();
+       
     }
+  //  protected override async Task OnInitializedAsync()
+    // {
+    //     // Ensure this method is only called once
+    //     if (!isLoading) return;
+
+    //     try
+    //     {
+    //         var client = ClientFactory.CreateClient("TemplatesAPI");
+
+    //         // Fetch templates with retry logic directly in component
+    //         await FetchTemplatesWithRetryAsync(client);
+    //     }
+    //     catch (HttpRequestException httpEx)
+    //     {
+    //         errorMessage = $"Fejl ved hentning af data: {httpEx.Message}";
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         errorMessage = $"En uventet fejl opstod: {ex.Message}";
+    //     }
+    //     finally
+    //     {
+    //         isLoading = false;
+    //     }
+    // }
     public async Task OpenThisRundown(string name)
     {
         //await OpenRundown.InvokeAsync(name);
     }
 
     // Fetch templates with retry logic in component
-    private async Task FetchTemplatesWithRetryAsync(HttpClient client)
-    {
-        // Define the retry policy
-        var retryPolicy = Polly.Policy
-            .Handle<HttpRequestException>()
-            .WaitAndRetryAsync(
-                3,  // Number of retries
-                retryAttempt => TimeSpan.FromSeconds(1),  // Fixed backoff (1 second)
-                onRetry: (exception, timespan, retryAttempt, context) =>
-                {
-                    retryCount = retryAttempt;
-                    Console.WriteLine($"Retry attempt {retryAttempt}. Waiting {timespan.Seconds} second.");
-                    InvokeAsync(StateHasChanged); // Ensure the UI is updated on each retry
-                });
+    // private async Task FetchTemplatesWithRetryAsync(HttpClient client)
+    // {
+    //     // Define the retry policy
+    //     var retryPolicy = Polly.Policy
+    //         .Handle<HttpRequestException>()
+    //         .WaitAndRetryAsync(
+    //             3,  // Number of retries
+    //             retryAttempt => TimeSpan.FromSeconds(1),  // Fixed backoff (1 second)
+    //             onRetry: (exception, timespan, retryAttempt, context) =>
+    //             {
+    //                 retryCount = retryAttempt;
+    //                 Console.WriteLine($"Retry attempt {retryAttempt}. Waiting {timespan.Seconds} second.");
+    //                 InvokeAsync(StateHasChanged); // Ensure the UI is updated on each retry
+    //             });
 
-        // Execute the retry policy and catch the exception after the last retry
-        try
-        {
-            Console.WriteLine("Executing policy...");
+    //     // Execute the retry policy and catch the exception after the last retry
+    //     try
+    //     {
+    //         Console.WriteLine("Executing policy...");
 
-            // Execute the retry policy
-            await retryPolicy.ExecuteAsync(async () =>
-            {
-                Console.WriteLine("Calling API...");
-                templates = await client.GetFromJsonAsync<List<Template>>("TemplateApi");
+    //         // Execute the retry policy
+    //         await retryPolicy.ExecuteAsync(async () =>
+    //         {
+    //             Console.WriteLine("Calling API...");
+    //             templates = await client.GetFromJsonAsync<List<Template>>("TemplateApi");
 
-                if (templates == null || templates.Count == 0)
-                {
-                    errorMessage = "Ingen templates fundet.";
-                    hasError = true;
-                    StateHasChanged(); // Update UI with the error message
-                }
-            });
-        }
-        catch (Exception ex)
-        {
-            // After the last retry, if still failing, show error message
-            errorMessage = $"Kunne ikke hente templates efter flere forsøg.<br><br><b>Error:</b> <em>Alle forsøg fejlede: {ex.Message}</em>";
-            hasError = true;
-            Console.WriteLine($"All retries failed: {ex.Message}");
-            InvokeAsync(StateHasChanged); // Update UI with the error message
-        }
-    }
+    //             if (templates == null || templates.Count == 0)
+    //             {
+    //                 errorMessage = "Ingen templates fundet.";
+    //                 hasError = true;
+    //                 StateHasChanged(); // Update UI with the error message
+    //             }
+    //         });
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         // After the last retry, if still failing, show error message
+    //         errorMessage = $"Kunne ikke hente templates efter flere forsøg.<br><br><b>Error:</b> <em>Alle forsøg fejlede: {ex.Message}</em>";
+    //         hasError = true;
+    //         Console.WriteLine($"All retries failed: {ex.Message}");
+    //         InvokeAsync(StateHasChanged); // Update UI with the error message
+    //     }
+    //}
 
     public class Template
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
-        public string Type { get; set; }
+        public string? Description { get; set; }
+        public string? Type { get; set; }
     }
 }

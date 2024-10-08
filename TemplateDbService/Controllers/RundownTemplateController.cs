@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TemplateDbService.Models;
 using TemplateDbService.BLL.Services;
+using TemplateDbService.BLL.Interfaces;
 
 namespace TemplateDbService.Controllers
 {
@@ -8,9 +9,9 @@ namespace TemplateDbService.Controllers
     [ApiController]
     public class RundownTemplateController : ControllerBase
     {
-        private readonly RundownTemplateService _service;
+        private readonly IRundownTemplateService _service;
 
-        public RundownTemplateController(RundownTemplateService service)
+        public RundownTemplateController(IRundownTemplateService service)
         {
             _service = service;
         }

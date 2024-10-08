@@ -1,31 +1,36 @@
-﻿using MongoDB.Driver;
+﻿using TemplateDbService.BLL.Interfaces;
+using TemplateDbService.DAL.Interfaces;
+using TemplateDbService.DAL.Repositories;
 using TemplateDbService.Models;
 
-namespace TemplateDbService.BLL.Services
+namespace TemplateDbService.Services
 {
-    public class ItemTemplateService
+    public class ItemTemplateService : IItemTemplateService
     {
-        private readonly IMongoCollection<ItemTemplate> _itemTemplates;
+        private readonly IItemTemplateRepository _repository;
 
-        public ItemTemplateService(IMongoDatabase mongoDatabase)
+        public ItemTemplateService(IItemTemplateRepository repository)
         {
-            _itemTemplates = mongoDatabase.GetCollection<ItemTemplate>("ItemTemplates");
+            _repository = repository;
         }
 
-        public async Task<List<ItemTemplate>> GetAllAsync() =>
-            await _itemTemplates.Find(_ => true).ToListAsync();
+        public async Task<List<ItemTemplate>> GetAllAsync() => await _repository.GetAllAsync();
 
-        public async Task<ItemTemplate> GetByIdAsync(Guid uuid) =>
-            await _itemTemplates.Find(x => x.UUID == uuid).FirstOrDefaultAsync();
+        public async Task<ItemTemplate> GetByIdAsync(Guid uuid) => await _repository.GetByIdAsync(uuid);
 
-        public async Task CreateAsync(ItemTemplate itemTemplate) =>
-            await _itemTemplates.InsertOneAsync(itemTemplate);
+        public async Task CreateAsync(ItemTemplate itemTemplate)
+        {
+            itemTemplate.UUID = Guid.NewGuid();
+            await _repository.CreateAsync(itemTemplate);
+        }
 
-        public async Task UpdateAsync(Guid uuid, ItemTemplate itemTemplate) =>
-            await _itemTemplates.ReplaceOneAsync(x => x.UUID == uuid, itemTemplate);
+        public async Task UpdateAsync(Guid uuid, ItemTemplate itemTemplate)
+        {
+            await _repository.UpdateAsync(uuid, itemTemplate);
+        }
 
-        public async Task DeleteAsync(Guid uuid) =>
-            await _itemTemplates.DeleteOneAsync(x => x.UUID == uuid);
+        public async Task DeleteAsync(Guid uuid) => await _repository.DeleteAsync(uuid);
     }
 }
+
 

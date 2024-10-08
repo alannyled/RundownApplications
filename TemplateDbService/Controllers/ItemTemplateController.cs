@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TemplateDbService.BLL.Services;
+using TemplateDbService.DAL.Interfaces;
+using TemplateDbService.DAL.Repositories;
 using TemplateDbService.Models;
 
 namespace TemplateDbService.Controllers
@@ -8,9 +10,9 @@ namespace TemplateDbService.Controllers
     [ApiController]
     public class ItemTemplateController : ControllerBase
     {
-        private readonly ItemTemplateService _service;
+        private readonly IItemTemplateRepository _service;
 
-        public ItemTemplateController(ItemTemplateService service)
+        public ItemTemplateController(IItemTemplateRepository service)
         {
             _service = service;
         }

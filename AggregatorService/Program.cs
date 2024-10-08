@@ -31,10 +31,18 @@ builder.Services.AddHttpClient<RundownService>()
             return new RundownService(httpClient);
     });
 
+builder.Services.AddHttpClient<TemplateService>()
+    .AddTypedClient<Aggregator>((httpClient) =>
+    {
+        //var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
+        return new TemplateService(httpClient);
+    });
+
 
 builder.Services.AddSingleton<ServiceFactory>();
 builder.Services.AddSingleton<ControlRoomManager>();
 builder.Services.AddSingleton<RundownManager>();
+builder.Services.AddSingleton<TemplateManager>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

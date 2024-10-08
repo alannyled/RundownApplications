@@ -18,7 +18,7 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
             var rundownService = _serviceFactory.GetService<RundownService>();
 
-            var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi);
+            var controlRoomData = await controlRoomService.FetchData(_apiUrls.RundownTemplateApi);
 
             var rundownData = await rundownService.FetchData(_apiUrls.RundownApi);
 
@@ -46,7 +46,7 @@ namespace AggregatorService.Managers
             var rundownData = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
             var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
 
-            var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.ControlRoomApi}/{rundown.ControlRoomId}");
+            var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.RundownTemplateApi}/{rundown.ControlRoomId}");
             var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
             
             rundown.ControlRoomName = controlRoom.Name;

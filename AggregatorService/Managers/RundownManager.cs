@@ -4,7 +4,6 @@ using AggregatorService.Models;
 using AggregatorService.Services;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
-using static AggregatorService.Controllers.RundownController;
 
 namespace AggregatorService.Managers
 {
@@ -18,7 +17,7 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
             var rundownService = _serviceFactory.GetService<RundownService>();
 
-            var controlRoomData = await controlRoomService.FetchData(_apiUrls.RundownTemplateApi);
+            var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi);
 
             var rundownData = await rundownService.FetchData(_apiUrls.RundownApi);
 
@@ -46,7 +45,7 @@ namespace AggregatorService.Managers
             var rundownData = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
             var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
 
-            var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.RundownTemplateApi}/{rundown.ControlRoomId}");
+            var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.ControlRoomApi}/{rundown.ControlRoomId}");
             var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
             
             rundown.ControlRoomName = controlRoom.Name;

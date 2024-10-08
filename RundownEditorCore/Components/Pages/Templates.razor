@@ -1,4 +1,18 @@
 ﻿@page "/templates"
 @using RundownEditorCore.Components.Shared
+@using RundownEditorCore.DTO
+@using RundownEditorCore.Interfaces
+@inject ITemplateService TemplateService
 
- <TemplatesTable />
+<div class="container-fluid" style="max-width:1600px">
+    <TemplatesTable Templates="AllTemplates"/>
+ </div>
+ @code{
+
+    private List<TemplateDTO> AllTemplates = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllTemplates = await TemplateService.GetAllTemplatesAsync();
+    }
+ }

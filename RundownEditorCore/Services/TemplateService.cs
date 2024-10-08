@@ -1,4 +1,5 @@
-﻿using RundownEditorCore.DTO;
+﻿using Microsoft.Extensions.Logging.Console;
+using RundownEditorCore.DTO;
 using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
@@ -7,9 +8,10 @@ namespace RundownEditorCore.Services
     {
         private readonly HttpClient _httpClient = httpClient;
 
-        public async Task<List<RundownDTO>> GetAllTemplatesAsync()
+        public async Task<List<TemplateDTO>> GetAllTemplatesAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-all-rundown-templates");
+            Console.WriteLine("Fetching all templates ");
+            var response = await _httpClient.GetFromJsonAsync<List<TemplateDTO>>("fetch-all-rundown-templates");
             return response;
         }
     }

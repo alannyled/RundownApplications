@@ -4,6 +4,6 @@ namespace RundownEditorCore.Interfaces
 {
     public interface ITemplateService
     {
-        Task<List<RundownDTO>> GetAllTemplatesAsync();
+        Task<List<TemplateDTO>> GetAllTemplatesAsync();
     }
 }

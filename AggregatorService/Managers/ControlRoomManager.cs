@@ -15,7 +15,7 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
             var hardwareService = _serviceFactory.GetService<HardwareService>();
 
-            var controlRoomData = await controlRoomService.FetchData(_apiUrls.RundownTemplateApi);
+            var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi);
 
             var hardwareData = await hardwareService.FetchData(_apiUrls.HardwareApi);
 
@@ -37,7 +37,7 @@ namespace AggregatorService.Managers
         {
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
-            var response = await controlRoomService.PostAsJsonAsync(_apiUrls.RundownTemplateApi, newControlRoom);
+            var response = await controlRoomService.PostAsJsonAsync(_apiUrls.ControlRoomApi, newControlRoom);
 
             if (response.IsSuccessStatusCode)
             {

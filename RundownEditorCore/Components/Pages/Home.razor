@@ -6,6 +6,7 @@
 @using RundownEditorCore.Data
 @inject IRundownService RundownService
 @inject IControlRoomService ControlRoomService
+@inject ITemplateService TemplateService
 @inject IHttpClientFactory ClientFactory
 @using Microsoft.AspNetCore.Authorization
 @* @using Microsoft.AspNetCore.Identity
@@ -37,7 +38,7 @@
                             <h5 class="card-title">Templates</h5>
                             <Calendar ReturnSelectedDate="SetSelectedDate" />
                             <hr />
-                            <TemplatesTable />
+                            <TemplatesTable Templates="AllTemplates" />
                         </div>
                     </div>
                 </div>
@@ -88,11 +89,13 @@
     private RundownDTO selectedRundown = new();
     private List<ControlRoomDTO> controlRooms = new ();
     private List<RundownDTO> ActiveRundowns = new();
+    private List<TemplateDTO> AllTemplates = new();
 
     protected override async Task OnInitializedAsync()
     {
         controlRooms = await ControlRoomService.GetControlRoomsAsync();
         ActiveRundowns = await RundownService.GetActiveRundowsAsync();
+        AllTemplates = await TemplateService.GetAllTemplatesAsync();
     }
 
     // protected override async Task OnParametersSetAsync()

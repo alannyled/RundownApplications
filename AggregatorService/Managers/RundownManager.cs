@@ -1,4 +1,5 @@
-﻿using AggregatorService.DTO;
+﻿using AggregatorService.Controllers;
+using AggregatorService.DTO;
 using AggregatorService.Factories;
 using AggregatorService.Models;
 using AggregatorService.Services;
@@ -12,6 +13,23 @@ namespace AggregatorService.Managers
         private readonly ServiceFactory _serviceFactory = serviceFactory;
         private readonly ApiUrls _apiUrls = apiUrls.Value;
 
+        public async Task<Rundown> CreateRundownFromTemplate(string templateId, DateTime date)
+        {
+            var rundownService = _serviceFactory.GetService<RundownService>();
+            var templateService = _serviceFactory.GetService<TemplateService>();
+
+            var template = await templateService.GetByIdAsync($"{_apiUrls.RundownTemplateApi}/{templateId}");
+            var rundown = JsonSerializer.Deserialize<Rundown>(template);
+            rundown.BroadcastDate = date;
+
+            var response = await rundownService.PostAsJsonAsync(_apiUrls.RundownApi, date);
+            response.EnsureSuccessStatusCode();
+
+            var createdRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            return createdRundown;
+        }
+        
+        
         public async Task<List<Rundown>> FetchRundownsWithControlRoomData()
         {
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();

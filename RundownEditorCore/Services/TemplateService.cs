@@ -10,7 +10,6 @@ namespace RundownEditorCore.Services
 
         public async Task<List<TemplateDTO>> GetAllTemplatesAsync()
         {
-            Console.WriteLine("Fetching all templates ");
             var response = await _httpClient.GetFromJsonAsync<List<TemplateDTO>>("fetch-all-rundown-templates");
             return response;
         }

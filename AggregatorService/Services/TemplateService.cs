@@ -17,6 +17,16 @@ namespace AggregatorService.Services
             return content;
         }
 
+        public async Task<string> GetByIdAsync(string api)
+        {
+            var response = await _httpClient.GetAsync(api);
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            return content;
+        }
+
         public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)
         {
             throw new NotImplementedException();

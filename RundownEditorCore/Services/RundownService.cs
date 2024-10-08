@@ -1,6 +1,8 @@
 ﻿using Confluent.Kafka;
 using RundownEditorCore.DTO;
 using RundownEditorCore.Interfaces;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace RundownEditorCore.Services
 {
@@ -18,6 +20,17 @@ namespace RundownEditorCore.Services
         {
             var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
             return response;
+        }
+
+        public async Task<RundownDTO> CreateRundownFromTemplate(string templateId, DateTime date)
+        {
+            await _httpClient.PostAsJsonAsync($"create-rundown-from-template/{templateId}", date);
+            return new RundownDTO
+            {
+                Uuid   = Guid.NewGuid(),
+                ControlRoomId = Guid.Empty,
+                Items = new List<RundownItemDTO>()
+            };
         }
 
         public async Task UpdateRundownControlRoomAsync(string rundownId, string controlRoomId)

@@ -1,6 +1,7 @@
 ﻿using AggregatorService.Abstractions;
 using AggregatorService.DTO;
 using AggregatorService.Models;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
@@ -34,19 +35,18 @@ namespace AggregatorService.Services
         public async Task<HttpResponseMessage> PutAsJsonAsync(string url, RundownDTO rundown)
         {
             var json = JsonSerializer.Serialize(rundown);
-            Console.WriteLine("JSON Payload: " + json);
 
             var response = await _httpClient.PutAsJsonAsync(url, rundown);
             response.EnsureSuccessStatusCode();
             return response;
         }
 
-
-
-
         public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)
         {
-           throw new NotImplementedException();
+            Console.WriteLine("poster data til " + url);
+            var response = await _httpClient.PostAsJsonAsync(url, payload);
+            response.EnsureSuccessStatusCode();
+            return response;
         }
     }
 

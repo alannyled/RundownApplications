@@ -10,6 +10,14 @@ namespace AggregatorService.Controllers
     {
         private readonly RundownManager _rundownManager = rundownManager;
 
+        [HttpPost("create-rundown-from-template/{templateId}")]
+        public async Task<IActionResult> CreateRundownFromTemplate(string templateId, [FromBody] DateTime date)
+        {
+            var rundown = await _rundownManager.CreateRundownFromTemplate(templateId, date);
+            return Ok(rundown);
+        }
+        
+        
         [HttpGet("fetch-active-rundowns-with-controlrooms")]
         public async Task<IActionResult> FetchRundownsWithControlRooms()
         {
@@ -23,13 +31,6 @@ namespace AggregatorService.Controllers
             var data = await _rundownManager.FetchSelectedRundown(rundownId);
             return Ok(data);
         }
-
-        //[HttpPut("update-rundown-controlroom/{rundownId}")]
-        //public async Task<IActionResult> UpdateRundownControlRoom(string rundownId, string controlRoomId)
-        //{
-        //    var data = await _rundownManager.UpdateControlRoomAsync(rundownId, controlRoomId);
-        //    return Ok(data);
-        //}
 
         [HttpPut("update-rundown-controlroom/{rundownId}")]
         public async Task<IActionResult> UpdateRundownControlRoom(string rundownId, [FromBody] RundownDTO request)

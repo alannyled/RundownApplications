@@ -38,7 +38,7 @@
                             <h5 class="card-title">Templates</h5>
                             <Calendar ReturnSelectedDate="SetSelectedDate" />
                             <hr />
-                            <TemplatesTable Templates="AllTemplates" />
+                            <TemplatesTable Templates="AllTemplates" OnTemplateSelect="CreateRundownFromTemplate"/>
                         </div>
                     </div>
                 </div>
@@ -83,9 +83,9 @@
 
 @code {
     private string? teleprompterText { get; set; }
-    private DateTime SelectedDate = DateTime.Now;
+    private DateTime SelectedDate = DateTime.Now;   
     private string activeTab = "Rundowns";
-    //private string currentRundown = string.Empty;
+
     private RundownDTO selectedRundown = new();
     private List<ControlRoomDTO> controlRooms = new ();
     private List<RundownDTO> ActiveRundowns = new();
@@ -98,11 +98,11 @@
         AllTemplates = await TemplateService.GetAllTemplatesAsync();
     }
 
-    // protected override async Task OnParametersSetAsync()
-    // {
-    //     ActiveRundowns = await RundownService.GetActiveRundowsAsync();
-    // }
-   
+    private async Task CreateRundownFromTemplate(string uuid)
+    {
+        await RundownService.CreateRundownFromTemplate(uuid, SelectedDate);
+    }
+
 
     private async Task UpdateRundownListOnControlRoomChange()
     {

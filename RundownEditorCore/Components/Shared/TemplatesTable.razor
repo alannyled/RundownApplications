@@ -29,7 +29,7 @@ else
         <tbody>
             @foreach (var template in Templates)
             {
-                <tr role="button" >
+                    <tr role="button" @onclick="() => SelectTemplate(template.Uuid.ToString())">
 
                     <td class="text-nowrap">@template.Name</td>
                     <td class="text-nowrap">@template.CreatedDate.ToString("dddd d. MMMM yyyy")</td>
@@ -43,6 +43,9 @@ else
 }
 
 @code {
+
+    [Parameter]
+    public EventCallback<string> OnTemplateSelect { get; set; }
      
     [Parameter]
     public List<TemplateDTO> Templates { get; set; }
@@ -55,5 +58,10 @@ else
         {
             isLoading = false;
         }
+    }
+
+    private async Task SelectTemplate(string uuid)
+    {
+        await OnTemplateSelect.InvokeAsync(uuid);
     }
 }

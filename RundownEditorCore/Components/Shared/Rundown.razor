@@ -80,6 +80,7 @@
     private async Task ControlRoomChange()
     {
         await UpdateRundownList.InvokeAsync();
+        StateHasChanged();
     }
 
     private Task<int> RandomNumber()

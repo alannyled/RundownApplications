@@ -47,6 +47,30 @@ services:
     networks:
       - shared-mongo-net
 
+  template-primary-database:
+    image: mongo
+    container_name: template-primary-database
+    restart: always
+    ports:
+      - "27037:27017"
+    volumes:
+      - template-mongo-data:/data/db
+    #command: mongod --replSet template-replica-set --bind_ip_all
+    networks:
+      - shared-mongo-net
+
+  template-secondary-database:
+    image: mongo
+    container_name: template-secondary-database
+    restart: always
+    ports:
+      - "27038:27017"
+    volumes:
+      - template-mongo-data-secondary:/data/db
+    #command: mongod --replSet template-replica-set --bind_ip_all
+    networks:
+      - shared-mongo-net
+
   zookeeper:
     image: bitnami/zookeeper:latest 
     container_name: zookeeper
@@ -78,4 +102,8 @@ volumes:
   rundown-mongo-data:
     driver: local
   rundown-mongo-data-secondary:
+    driver: local
+  template-mongo-data:
+    driver: local
+  template-mongo-data-secondary:
     driver: local

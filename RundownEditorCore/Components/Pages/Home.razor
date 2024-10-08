@@ -118,6 +118,7 @@
         try
         {
             selectedRundown = await RundownService.GetRundownAsync(uuid);
+            StateHasChanged();
         }
         catch (HttpRequestException e)
         {
@@ -125,6 +126,7 @@
         }
         activeTab = "Rundowns";
     }
+
     private void SelectTab(string tabName)
     {
         activeTab = tabName;

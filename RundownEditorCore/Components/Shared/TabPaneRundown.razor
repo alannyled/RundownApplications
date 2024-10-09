@@ -80,6 +80,11 @@
 
     private string? draggedChildId;
 
+    protected override void OnParametersSet()
+    {
+        selectedControlRoomId = SelectedRundown.ControlRoomId.ToString();
+    }
+
     private string FormatDateWithCapitalDay(DateTime date)
     {
         var formattedDate = date.ToString("dddd d. MMMM yyyy", new System.Globalization.CultureInfo("da-DK"));

@@ -42,12 +42,6 @@
     [Parameter]
     public EventCallback UpdateSelectedRundown { get; set; }
 
-    // private string ObjectName { get; set; } = string.Empty;
-    // private string Duration { get; set; } = "00:00:00";
-    // private string Category { get; set; } = string.Empty;
-
-   // private List<string> Categories = new List<string> { "TVA Intro", "Indslag", "Indslag VO", "Kamera Tekst" };
-
     private bool showDialog = false;
     private string activeTab = string.Empty;
 
@@ -107,6 +101,7 @@
 
         AddTabPane();
     }
+
     private void AddTabPane()
     {
         string tabName = activeTab;

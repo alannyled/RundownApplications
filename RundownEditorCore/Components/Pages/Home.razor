@@ -120,8 +120,6 @@
     private List<RundownDTO> ActiveRundowns = new();
     private List<TemplateDTO> AllTemplates = new();
 
-
-
     protected override async Task OnInitializedAsync()
     {
         controlRooms = await ControlRoomService.GetControlRoomsAsync();
@@ -129,12 +127,6 @@
         AllTemplates = await TemplateService.GetAllTemplatesAsync();
 
     }
-
-    // skal nok ikke bruges mere - fjern fra templates table
-    // private async Task CreateRundownFromTemplate(string uuid)
-    // {
-    //     await RundownService.CreateRundownFromTemplate(uuid, savedControlRoom, SelectedDate);
-    // }
 
     private async Task UpdateRundownListOnControlRoomChange()
     {
@@ -239,6 +231,7 @@
         currentSaveAction?.Invoke();
         StateHasChanged();        
     }
+
     private async Task SaveRundownItemForm()
     {
 
@@ -273,7 +266,7 @@
     {
 
         var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
-        Console.WriteLine($"Rundown created: {JsonSerializer.Serialize(rundown)}");
+      
         ActiveRundowns.Add(rundown);
         selectedRundown = rundown;
         showDialog = false;

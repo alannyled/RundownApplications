@@ -4,6 +4,7 @@
 @using RundownEditorCore.DTO
 @using RundownEditorCore.Interfaces
 @using RundownEditorCore.Data
+@using RundownEditorCore.Components.Forms
 @inject IRundownService RundownService
 @inject IControlRoomService ControlRoomService
 @inject ITemplateService TemplateService
@@ -34,7 +35,7 @@
 <Modal ShowDialog="@showDialog"
        SaveChanges="SaveCurrentObject"
        ShowDialogChanged="@((value) => showDialog = value)"
-       Title="Dynamisk Indhold">
+       Title="@modalTitle">
     @CurrentContent
 </Modal>
 
@@ -105,6 +106,7 @@
     // modal indohold
     private bool showDialog = false;
     private string? validationMessage;
+    private string? modalTitle; 
     private RenderFragment? CurrentContent { get; set; }
     private Func<Task>? currentSaveAction;
 
@@ -175,6 +177,7 @@
         CurrentContent = RundownItemFormContent;
         currentSaveAction = SaveRundownItemForm;
         validationMessage = string.Empty;
+        modalTitle = "Opret nyt element";
         showDialog = true;
 
     }
@@ -183,6 +186,7 @@
         CurrentContent = FormTwoContent;
         currentSaveAction = SaveFormTwo;
         validationMessage = string.Empty;
+        modalTitle = "Opret ny rækkefølge";
         showDialog = true;
     }
 
@@ -193,12 +197,12 @@
 
     private RenderFragment RundownItemFormContent => builder =>
     {
-        builder.OpenComponent(0, typeof(RundownObjectForm));
+        builder.OpenComponent(0, typeof(RundownItemForm));
         builder.AddAttribute(1, "ItemName", ItemName);
         builder.AddAttribute(2, "Duration", Duration);
         builder.AddAttribute(3, "Category", Category);
         //builder.AddAttribute(4, "Categories", Categories);
-        builder.AddAttribute(5, "ObjectNameChanged", EventCallback.Factory.Create<string>(this, value => ItemName = value));
+        builder.AddAttribute(5, "ItemNameChanged", EventCallback.Factory.Create<string>(this, value => ItemName = value));
         builder.AddAttribute(6, "DurationChanged", EventCallback.Factory.Create<string>(this, value => Duration = value));
         builder.AddAttribute(7, "CategoryChanged", EventCallback.Factory.Create<string>(this, value => Category = value));
         builder.CloseComponent();

@@ -1,8 +1,8 @@
 ﻿<form>
     <div class="mb-3">
-        <label for="objectname" class="form-label">Navn</label>
-        <input type="text" class="form-control form-control-sm" id="objectname" value="@ItemName"
-               @oninput="HandleObjectNameChange" />
+        <label for="itemname" class="form-label">Navn</label>
+        <input type="text" class="form-control form-control-sm" id="itemname" value="@ItemName"
+               @oninput="HandleItemNameChange" />
     </div>
     <div class="mb-3">
         <label for="duration" class="form-label">Planlagt længde</label>
@@ -36,7 +36,7 @@
     public List<string> Categories { get; set; } = new List<string>();
 
     [Parameter]
-    public EventCallback<string> ObjectNameChanged { get; set; }
+    public EventCallback<string> ItemNameChanged { get; set; }
 
     [Parameter]
     public EventCallback<string> DurationChanged { get; set; }
@@ -44,10 +44,10 @@
     [Parameter]
     public EventCallback<string> CategoryChanged { get; set; }
 
-    private async Task HandleObjectNameChange(ChangeEventArgs e)
+    private async Task HandleItemNameChange(ChangeEventArgs e)
     {
         ItemName = e.Value?.ToString();
-        await ObjectNameChanged.InvokeAsync(ItemName);
+        await ItemNameChanged.InvokeAsync(ItemName);
     }
 
     private async Task HandleDurationChange(ChangeEventArgs e)

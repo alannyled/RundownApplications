@@ -39,7 +39,6 @@
     public List<ControlRoomDTO> ControlRooms { get; set; }
     [Parameter]
     public EventCallback UpdateRundownList { get; set; }
-
     [Parameter]
     public EventCallback UpdateSelectedRundown { get; set; }
 
@@ -54,8 +53,8 @@
 
     private List<TabFragment> menuTabs = new();
     private List<TabFragment> tabPanes = new();
-
-    public List<RundownObjects> RundownObjects { get; set; } = new List<RundownObjects>();
+    // anvendes ved drag n drop lige nu - en anden logik måske?
+    public List<RundownObjects> RundownObjects { get; set; } = new List<RundownObjects>(); // brug RundownItemsDTO i stedet for??
 
     protected override void OnParametersSet()
     {
@@ -114,7 +113,7 @@
 
         var newChild = new RenderFragment(builder =>
         {
-            builder.OpenComponent<TabPaneRundownObject>(0);
+            builder.OpenComponent<TabPaneRundownItem>(0);
             builder.AddAttribute(1, "Name", tabName);
             builder.AddAttribute(2, "ActiveTab", activeTab);
             builder.AddAttribute(3, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));

@@ -22,6 +22,22 @@
 <PageTitle>Home</PageTitle>
 
 
+@if (!string.IsNullOrEmpty(validationMessage))
+{
+    <div class="container">
+    <div class="alert alert-warning alert-dismissible">
+        @validationMessage
+        <button type="button" class="btn-close" @onclick="CloseAlert" aria-label="Luk"></button>
+    </div>
+    </div>
+}
+<Modal ShowDialog="@showDialog"
+       SaveChanges="SaveCurrentObject"
+       ShowDialogChanged="@((value) => showDialog = value)"
+       Title="Dynamisk Indhold">
+    @CurrentContent
+</Modal>
+
 <div class="container-fluid full-height">
     <div class="row h-100">
         <div class="col-xl-3 h-100">
@@ -53,8 +69,11 @@
                 </div>
                 <div class="tab-pane @(activeTab == "Rundowns" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
-                        <div class="card-body">                           
+                        <div class="card-body">    
+                            <div class="d-flex justify-content-between mb-3">
                             <h5 class="card-title text-muted">Aktive rækkefølger</h5>
+                            <button class="btn btn-sm btn-primary" @onclick="ShowFormTwo">Opret ny</button>
+                            </div>
                             <RundownTable OpenRundown="OpenRundown" Rundowns="ActiveRundowns" />
                         </div>
                     </div>
@@ -63,7 +82,7 @@
         </div>
         @* rundown card *@
         <div class="col-xl-8">
-            <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" UpdateRundownList="UpdateRundownListOnControlRoomChange" UpdateSelectedRundown="UpdateSelectedRundown" />
+            <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" OpenModal="ShowRundownItemForm" UpdateRundownList="UpdateRundownListOnControlRoomChange" UpdateSelectedRundown="UpdateSelectedRundown" />
 
         </div>
 
@@ -82,7 +101,14 @@
 
 
 @code {
-    private string? teleprompterText { get; set; }
+    //private string? teleprompterText { get; set; }
+    // modal indohold
+    private bool showDialog = false;
+    private string? validationMessage;
+    private RenderFragment? CurrentContent { get; set; }
+    private Func<Task>? currentSaveAction;
+
+
     private DateTime SelectedDate = DateTime.Now;   
     private string activeTab = "Rundowns";
 
@@ -103,7 +129,6 @@
         await RundownService.CreateRundownFromTemplate(uuid, SelectedDate);
     }
 
-
     private async Task UpdateRundownListOnControlRoomChange()
     {
         ActiveRundowns = await RundownService.GetActiveRundowsAsync();
@@ -114,6 +139,11 @@
     {
         selectedRundown = await RundownService.GetRundownAsync(selectedRundown.Uuid.ToString());
         StateHasChanged();
+    }
+
+    private void CloseAlert()
+    {
+        validationMessage = string.Empty;
     }
 
     private async Task OpenRundown(string uuid)
@@ -138,6 +168,92 @@
     private void SetSelectedDate(DateTime date)
     {
         SelectedDate = date;
+    }
+
+    private void ShowRundownItemForm()
+    {
+        CurrentContent = RundownItemFormContent;
+        currentSaveAction = SaveRundownItemForm;
+        validationMessage = string.Empty;
+        showDialog = true;
+
+    }
+    private void ShowFormTwo()
+    {
+        CurrentContent = FormTwoContent;
+        currentSaveAction = SaveFormTwo;
+        validationMessage = string.Empty;
+        showDialog = true;
+    }
+
+    // modal variabler til form
+    private string ItemName { get; set; } = string.Empty;
+    private string Duration { get; set; } = "00:00:00";
+    private string Category { get; set; } = string.Empty;
+
+    private RenderFragment RundownItemFormContent => builder =>
+    {
+        builder.OpenComponent(0, typeof(RundownObjectForm));
+        builder.AddAttribute(1, "ItemName", ItemName);
+        builder.AddAttribute(2, "Duration", Duration);
+        builder.AddAttribute(3, "Category", Category);
+        //builder.AddAttribute(4, "Categories", Categories);
+        builder.AddAttribute(5, "ObjectNameChanged", EventCallback.Factory.Create<string>(this, value => ItemName = value));
+        builder.AddAttribute(6, "DurationChanged", EventCallback.Factory.Create<string>(this, value => Duration = value));
+        builder.AddAttribute(7, "CategoryChanged", EventCallback.Factory.Create<string>(this, value => Category = value));
+        builder.CloseComponent();
+    };
+
+    private RenderFragment FormTwoContent => builder =>
+    {
+        builder.OpenElement(0, "div");
+        builder.AddContent(1, "Dette er indholdet for Form 2");
+        builder.CloseElement();
+    };
+
+    /// <summary>
+    /// Ved klik på Modal save button, vækkes den aktuelle metode
+    /// </summary>
+    private void SaveCurrentObject()
+    {
+        currentSaveAction?.Invoke();
+        StateHasChanged();        
+    }
+    private async Task SaveRundownItemForm()
+    {
+
+        if (string.IsNullOrEmpty(ItemName))
+        {
+            validationMessage = "Navnet må ikke være tomt.";
+            return;
+        }
+
+        var newRundownItem = new RundownItemDTO
+            {
+                UUID = Guid.NewGuid(),
+                RundownId = selectedRundown.Uuid,
+                Name = ItemName,
+                Duration = Duration,
+                Order = selectedRundown.Items.Count // + 1  eller *10?
+            };
+
+        await RundownService.AddItemToRundownAsync(selectedRundown.Uuid.ToString(), newRundownItem);
+        // kan denne ikke komme som svar på ovenstående, i stedet for at kalde igen
+        await UpdateSelectedRundown();
+
+        // nulstil alle felter
+        ItemName = string.Empty;
+        Duration = "00:00:00";
+        Category = string.Empty;
+        validationMessage = string.Empty;
+        showDialog = false;
+        
+    }
+
+    private async Task SaveFormTwo()
+    {
+        showDialog = false;
+       
     }
 
 

@@ -3,38 +3,26 @@
 @using RundownEditorCore.Interfaces
 @inject IRundownService RundownService
 
-<Modal ShowDialog="@showDialog" SaveChanges="SaveNewObject" ShowDialogChanged="@((value) => showDialog = value)" Title="Nyt rækkefølge objekt">
-    <RundownObjectForm ObjectName="@ObjectName"
-                       Duration="@Duration"
-                       Category="@Category"
-                       Categories="@Categories"
-                       ObjectNameChanged="@(value => ObjectName = value)"
-                       DurationChanged="@(value => Duration = value)"
-                       CategoryChanged="@(value => Category = value)">
-    </RundownObjectForm>
-</Modal>
-
 
 @if (!string.IsNullOrEmpty(SelectedRundown.Name))
 {
-<ul class="nav nav-tabs mb-2">
+    <ul class="nav nav-tabs mb-2">
         <TabItem MenuItem="@SelectedRundown.Name" ActiveTab="@activeTab" SelectTab="SelectTab" />
-    @foreach (var item in menuTabs)
-    {
-        @item.Content
-    }
-</ul>
+        @foreach (var item in menuTabs)
+        {
+            @item.Content
+        }
+    </ul>
 }
 <div class="tab-content">
 
-    <TabPaneRundown 
-        SelectedRundown="SelectedRundown" 
-        ControlRooms="ControlRooms" 
-        ActiveTab="@activeTab" 
-        UpdateRundownList="ControlRoomChange" 
-        ShowDialog="OpenRundownObject" 
-        OpenTabPane="OpenTabPane" 
-        CurrentObjects="RundownObjects" />
+    <TabPaneRundown SelectedRundown="SelectedRundown"
+                    ControlRooms="ControlRooms"
+                    ActiveTab="@activeTab"
+                    UpdateRundownList="ControlRoomChange"
+                    ShowDialog="OpenModal"
+                    OpenTabPane="OpenTabPane"
+                    CurrentObjects="RundownObjects" />
 
     @foreach (var tab in tabPanes)
     {
@@ -44,20 +32,22 @@
 
 @code {
     [Parameter]
+    public EventCallback OpenModal { get; set; }
+    [Parameter]
     public RundownDTO SelectedRundown { get; set; }
     [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; }
     [Parameter]
-    public EventCallback UpdateRundownList { get; set; } 
+    public EventCallback UpdateRundownList { get; set; }
 
     [Parameter]
     public EventCallback UpdateSelectedRundown { get; set; }
 
-    private string ObjectName { get; set; } = string.Empty;
-    private string Duration { get; set; } = "00:00:00";
-    private string Category { get; set; } = string.Empty;
+    // private string ObjectName { get; set; } = string.Empty;
+    // private string Duration { get; set; } = "00:00:00";
+    // private string Category { get; set; } = string.Empty;
 
-    private List<string> Categories = new List<string> { "TVA Intro", "Indslag", "Indslag VO", "Kamera Tekst" };
+   // private List<string> Categories = new List<string> { "TVA Intro", "Indslag", "Indslag VO", "Kamera Tekst" };
 
     private bool showDialog = false;
     private string activeTab = string.Empty;
@@ -71,7 +61,7 @@
     {
         if (activeTab != SelectedRundown.Name && !string.IsNullOrEmpty(SelectedRundown.Name))
         {
-            activeTab = SelectedRundown.Name;           
+            activeTab = SelectedRundown.Name;
             menuTabs = [];
             tabPanes = [];
         }
@@ -83,87 +73,24 @@
         StateHasChanged();
     }
 
-    private Task<int> RandomNumber()
-    {
-        return Task.FromResult(new Random().Next(10000000, 100000000));
-    }
-
     private void SelectTab(string tabName)
     {
         activeTab = tabName;
-    }
-
-    private void OpenRundownObject()
-    {
-        showDialog = true;
-    }
-
-    private void CloseDialog()
-    {
-        showDialog = false;
-    }
+    }   
 
     private void OpenTabPane(string tabName)
     {
         activeTab = tabName;
 
-        if (!menuTabs.Any(tab => tab.Name == tabName)) 
+        if (!menuTabs.Any(tab => tab.Name == tabName))
         {
-            ObjectName = tabName;
             AddMenuTab();
         }
     }
 
-
-    private async Task SaveNewObject()
-    {
-        showDialog = false;
-        if (string.IsNullOrEmpty(ObjectName))
-        {
-            int random = RandomNumber().Result;
-            ObjectName = $"Unknown-{random}";
-        }
-        
-        
-
-        var newRundownItem = new RundownItemDTO
-            {
-                UUID = Guid.NewGuid(),
-                RundownId = SelectedRundown.Uuid, 
-                Name = ObjectName,
-                Duration = Duration,
-                Order = SelectedRundown.Items.Count // + 1  eller *10?
-            };
-        
-        await RundownService.AddItemToRundownAsync(SelectedRundown.Uuid.ToString(), newRundownItem);
-        await UpdateSelectedRundown.InvokeAsync();
-        await UpdateSelectedRundown.InvokeAsync();
-        AddObjectToRundown(); // denne her skal laves om / fjernes og erstattes af det faktisk items array i rundown
-        activeTab = ObjectName;
-        AddMenuTab();
-        
-        // nulstil alle felter
-        ObjectName = string.Empty;
-        Duration = "00:00:00";
-        Category = string.Empty;
-       
-
-    }
-
-    private void AddObjectToRundown()
-    {
-        RundownObjects.Add(new RundownObjects
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = ObjectName,
-            Duration = Duration,
-            Category = Category
-        });
-    }
-
     private void AddMenuTab()
-    {        
-        string tabName = ObjectName;
+    {
+        string tabName = activeTab;
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabItem>(0);
@@ -183,8 +110,8 @@
     }
     private void AddTabPane()
     {
-        string tabName = ObjectName;
-        
+        string tabName = activeTab;
+
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabPaneRundownObject>(0);
@@ -199,7 +126,7 @@
                 Name = tabName,
                 Content = newChild
             });
-        
+
     }
 
     private void RemoveTabPane(string tabName)
@@ -219,14 +146,13 @@
         {
             menuTabs.Remove(tabToRemove);
             activeTab = SelectedRundown.Name;
-            StateHasChanged(); 
+            StateHasChanged();
         }
     }
 
-
     public class TabFragment
     {
-        public string? Name { get; set; } 
+        public string? Name { get; set; }
         public RenderFragment? Content { get; set; }
     }
 
@@ -234,42 +160,3 @@
 }
 
 
-@*
-    <div class="modal fade show" style='display:@(showDialog ? "block" : "none")' tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Nyt rækkefølge objekt</h5>
-                <button type="button" class="btn-close" @onclick="CloseDialog"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="objectname" class="form-label">Navn</label>
-                        <input type="text" class="form-control form-control-sm" id="objectname" @bind="ObjectName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="duration" class="form-label">Planlagt længde</label>
-                        <input type="time" step="1" class="form-control form-control-sm" id="duration" @bind="Duration">
-                    </div>
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Skabelon</label>
-                        <select class="form-control form-control-sm" id="category" @bind="Category">
-                            <option value="">Vælg en Skabelon</option>
-                            @foreach (var category in Categories)
-                            {
-                                <option value="@category">@category</option>
-                            }
-                        </select>
-                    </div>
-                </form>
-
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-sm btn-primary" @onclick="CloseDialog">Fortryd</button>
-                <button class="btn btn-sm btn-success" @onclick="SaveNewObject">Gem</button>
-            </div>
-        </div>
-    </div>
-</div>
-*@

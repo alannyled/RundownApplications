@@ -24,6 +24,22 @@ namespace AggregatorService.Services
 
             return response;
         }
+
+        public override async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T payload)
+        {
+            var response = await _httpClient.PutAsJsonAsync(url, payload);
+            response.EnsureSuccessStatusCode();
+
+            return response;
+        }
+
+        public override async Task<HttpResponseMessage> DeleteAsync(string url)
+        {
+            var response = await _httpClient.DeleteAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            return response;
+        }
     }
 
 

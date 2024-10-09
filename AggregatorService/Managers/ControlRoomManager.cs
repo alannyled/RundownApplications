@@ -49,6 +49,38 @@ namespace AggregatorService.Managers
             }
         }
 
+        public async Task<ControlRoom> UpdateControlRoomAsync(string controlRoomId, ControlRoom updatedControlRoom)
+        {
+            var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
+
+            var response = await controlRoomService.PutAsJsonAsync($"{_apiUrls.ControlRoomApi}/{controlRoomId}", updatedControlRoom);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ControlRoom>();
+            }
+            else
+            {
+                throw new Exception("Failed to update control room in the database API.");
+            }
+        }
+
+        public async Task<ControlRoom> DeleteControlRoomAsync(string controlRoomId)
+        {
+            var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
+
+            var response = await controlRoomService.DeleteAsync($"{_apiUrls.ControlRoomApi}/{controlRoomId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ControlRoom>();
+            }
+            else
+            {
+                throw new Exception("Failed to delete control room in the database API.");
+            }
+        }
+
     }
 
 }

@@ -31,5 +31,15 @@ namespace AggregatorService.Services
         {
             throw new NotImplementedException();
         }
+
+        public override async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T payload)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task<HttpResponseMessage> DeleteAsync(string url)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

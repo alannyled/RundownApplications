@@ -1,6 +1,6 @@
 ﻿using AggregatorService.Managers;
 using Microsoft.AspNetCore.Mvc;
-using AggregatorService.Models; // Antag at ControlRoomDTO ligger her
+using AggregatorService.Models;
 using System.Threading.Tasks;
 
 namespace AggregatorService.Controllers
@@ -28,6 +28,25 @@ namespace AggregatorService.Controllers
 
             var createdControlRoom = await _controlroomManager.CreateControlRoomAsync(newControlRoom);
             return CreatedAtAction(nameof(FetchControlRoomWithHardware), new { id = createdControlRoom.Uuid }, createdControlRoom);
+        }
+
+        [HttpPut("update-controlroom/{controlRoomId}")]
+        public async Task<IActionResult> UpdateControlRoom(string controlRoomId, [FromBody] ControlRoom updatedControlRoom)
+        {
+            if (updatedControlRoom == null)
+            {
+                return BadRequest("Control room data is missing.");
+            }
+
+            var updatedControlRoomResponse = await _controlroomManager.UpdateControlRoomAsync(controlRoomId, updatedControlRoom);
+            return Ok(updatedControlRoomResponse);
+        }
+
+        [HttpDelete("delete-controlroom/{controlRoomId}")]
+        public async Task<IActionResult> DeleteControlRoom(string controlRoomId)
+        {
+            var deletedControlRoom = await _controlroomManager.DeleteControlRoomAsync(controlRoomId);
+            return Ok(deletedControlRoom);
         }
     }
 }

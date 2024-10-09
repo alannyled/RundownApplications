@@ -30,15 +30,20 @@ namespace AggregatorService.Services
             var content = await response.Content.ReadAsStringAsync();
 
             return content;
-        }
+        }       
 
-        public async Task<HttpResponseMessage> PutAsJsonAsync(string url, RundownDTO rundown)
+        public override async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T payload)
         {
-            var json = JsonSerializer.Serialize(rundown);
+            var json = JsonSerializer.Serialize(payload);
 
-            var response = await _httpClient.PutAsJsonAsync(url, rundown);
+            var response = await _httpClient.PutAsJsonAsync(url, payload);
             response.EnsureSuccessStatusCode();
             return response;
+        }
+
+        public override async Task<HttpResponseMessage> DeleteAsync(string url)
+        {
+            throw new NotImplementedException();
         }
 
         public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)

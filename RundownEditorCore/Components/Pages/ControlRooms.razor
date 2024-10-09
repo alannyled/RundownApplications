@@ -110,14 +110,26 @@
     {
         controlRooms = await ControlRoomService.GetControlRoomsAsync();
     }
+    /// <summary>
+    /// Nulstiller og lukker alle åbne forms
+    /// </summary>
+    private void CancelEdit()
+    {
+        editingControlRoom = null;
+        addingHardwareToRoom = null;
+        editingHardware = null;
+    }
 
     private async Task CreateControlRoomAsync()
     {
         await ControlRoomService.CreateControlRoomAsync(newControlRoom);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); // Opdater listen efter oprettelse
-        newControlRoom = new ControlRoomDTO(); // Nulstil formularen
+        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
+        newControlRoom = new ControlRoomDTO(); 
     }
-
+    /// <summary>
+    /// Lukker åbne forms og viser redigeringsform for det valgte kontrolrum
+    /// </summary>
+    /// <param name="id"></param>
     private void EditControlRoom(string id)
     {
         CancelEdit();
@@ -127,30 +139,29 @@
     private async Task UpdateControlRoomAsync()
     {
         await ControlRoomService.UpdateControlRoomAsync(editingControlRoom.Uuid, editingControlRoom);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); // Opdater listen efter opdatering
-        editingControlRoom = null; // Luk redigeringsformularen
-    }
-
-    private void CancelEdit()
-    {
-        editingControlRoom = null;
-        addingHardwareToRoom = null;
-        editingHardware = null;
-    }
+        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
+        editingControlRoom = null; 
+    }    
 
     private async Task DeleteControlRoom(string id)
     {
         await ControlRoomService.DeleteControlRoomAsync(id);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); // Opdater listen efter sletning
+        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
     }
-
+    /// <summary>
+    /// Lukker åbne forms og viser form til at tilføje hardware til et kontrolrum
+    /// </summary>
+    /// <param name="controlRoomId"></param>
     private void AddHardware(string controlRoomId)
     {
         CancelEdit();
         addingHardwareToRoom = controlRooms.FirstOrDefault(room => room.Uuid == controlRoomId);
         newHardware = new HardwareDTO { ControlRoomId = controlRoomId };
     }
-
+    /// <summary>
+    /// Lukker åbne forms og viser form til at redigere hardware
+    /// </summary>
+    /// <param name="id"></param>
     private void EditHardware(string id)
     {
         CancelEdit();
@@ -160,22 +171,22 @@
     private async Task CreateHardwareAsync()
     {
         await HardwareService.AddHardwareAsync(newHardware);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); // Opdater listen efter oprettelse
-        newHardware = new HardwareDTO(); // Nulstil hardwareformularen
-        addingHardwareToRoom = null; // Luk hardwareformularen
+        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
+        newHardware = new HardwareDTO(); 
+        addingHardwareToRoom = null;
     }
 
     private async Task UpdateHardwareAsync()
     {
         await HardwareService.UpdateHardwareAsync(editingHardware.Uuid, editingHardware);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); // Opdater listen efter opdatering
-        editingHardware = null; // Luk hardwareformularen
+        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
+        editingHardware = null; 
     }
 
     private async Task DeleteHardware(string id)
     {
         await HardwareService.DeleteHardwareAsync(id);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); // Opdater listen efter sletning
-        editingHardware = null; // Luk hardwareformularen
+        controlRooms = await ControlRoomService.GetControlRoomsAsync();
+        editingHardware = null; 
     }
 }

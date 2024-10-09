@@ -43,12 +43,12 @@
     <div class="row h-100">
         <div class="col-xl-3 h-100">
             <ul class="nav nav-tabs mb-2">
-                <TabItem MenuItem="Media" ActiveTab="@activeTab" SelectTab="SelectTab" />
-                <TabItem MenuItem="Rundowns" ActiveTab="@activeTab" SelectTab="SelectTab" />                
-                <TabItem MenuItem="Templates" ActiveTab="@activeTab" SelectTab="SelectTab" />
+                <TabItem MenuItem="Medier" ActiveTab="@activeTab" SelectTab="SelectTab" />
+                <TabItem MenuItem="Aktive rækkefølger" ActiveTab="@activeTab" SelectTab="SelectTab" />                
+                <TabItem MenuItem="Skabeloner" ActiveTab="@activeTab" SelectTab="SelectTab" />
             </ul>
             <div class="tab-content">
-                <div class="tab-pane @(activeTab == "Templates" ? "show active" : "fade")">
+                <div class="tab-pane @(activeTab == "Skabeloner" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
 
                         <div class="card-body">
@@ -57,7 +57,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane @(activeTab == "Media" ? "show active" : "fade")">
+                <div class="tab-pane @(activeTab == "Medier" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
 
                         <div class="card-body">
@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane @(activeTab == "Rundowns" ? "show active" : "fade")">
+                <div class="tab-pane @(activeTab == "Aktive rækkefølger" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
                         <div class="card-body">    
                             <div class="d-flex justify-content-between mb-3">
@@ -113,7 +113,7 @@
 
 
     private DateTime SelectedDate = DateTime.Now;   
-    private string activeTab = "Rundowns";
+    private string activeTab = "Aktive rækkefølger";
 
     private RundownDTO selectedRundown = new();
     private List<ControlRoomDTO> controlRooms = new ();
@@ -126,6 +126,15 @@
         ActiveRundowns = await RundownService.GetActiveRundowsAsync();
         AllTemplates = await TemplateService.GetAllTemplatesAsync();
 
+    }
+
+    /// <summary>
+    /// Ved klik på Modal save button, vækkes den aktuelle metode
+    /// </summary>
+    private void SaveCurrentObject()
+    {
+        currentSaveAction?.Invoke();
+        StateHasChanged();
     }
 
     private async Task UpdateRundownListOnControlRoomChange()
@@ -156,9 +165,13 @@
         {
             Console.WriteLine($"Error fetching rundown: {e.Message}");
         }
-        activeTab = "Rundowns";
+        activeTab = "Aktive rækkefølger";
     }
 
+    /// <summary>
+    /// Sætter og åbner den aktive tabpane ved klik på tab
+    /// </summary>
+    /// <param name="tabName"></param>
     private void SelectTab(string tabName)
     {
         activeTab = tabName;
@@ -187,7 +200,7 @@
         showDialog = true;
     }
 
-    // modal variabler til form
+    // modal variabler til rundownItem form
     private string ItemName { get; set; } = string.Empty;
     private string Duration { get; set; } = "00:00:00";
     private string Category { get; set; } = string.Empty;
@@ -204,7 +217,7 @@
         builder.CloseComponent();
     };
 
-    // modal variabler til form
+    // modal variabler til newRundown form
     private DateTime BroadcastDate { get; set; } = DateTime.Now;
     private string Template { get; set; } = string.Empty;
     private string ControlRoom { get; set; } = string.Empty;
@@ -223,14 +236,7 @@
         builder.CloseComponent();
     };
 
-    /// <summary>
-    /// Ved klik på Modal save button, vækkes den aktuelle metode
-    /// </summary>
-    private void SaveCurrentObject()
-    {
-        currentSaveAction?.Invoke();
-        StateHasChanged();        
-    }
+  
 
     private async Task SaveRundownItemForm()
     {

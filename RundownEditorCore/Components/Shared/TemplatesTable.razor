@@ -44,8 +44,8 @@ else
 
 @code {
 
-    [Parameter]
-    public EventCallback<string> OnTemplateSelect { get; set; }
+    // [Parameter]
+    // public EventCallback<string> OnTemplateSelect { get; set; }
      
     [Parameter]
     public List<TemplateDTO> Templates { get; set; }
@@ -62,6 +62,7 @@ else
 
     private async Task SelectTemplate(string uuid)
     {
-        await OnTemplateSelect.InvokeAsync(uuid);
+
+        //await OnTemplateSelect.InvokeAsync(uuid);
     }
 }

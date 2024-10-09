@@ -15,10 +15,10 @@ namespace RundownDbService.Models
         public string Name { get; set; }
 
         [BsonElement("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [BsonElement("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [BsonElement("controlRoomId")]
         public Guid ControlRoomId { get; set; }

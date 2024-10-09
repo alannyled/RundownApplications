@@ -13,19 +13,33 @@ namespace AggregatorService.Managers
         private readonly ServiceFactory _serviceFactory = serviceFactory;
         private readonly ApiUrls _apiUrls = apiUrls.Value;
 
-        public async Task<Rundown> CreateRundownFromTemplate(string templateId, DateTime date)
+        public async Task<Rundown> CreateRundownFromTemplate(string templateId, string controlroomId, DateTime date)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
             var templateService = _serviceFactory.GetService<TemplateService>();
+            var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
-            var template = await templateService.GetByIdAsync($"{_apiUrls.RundownTemplateApi}/{templateId}");
-            var rundown = JsonSerializer.Deserialize<Rundown>(template);
-            rundown.BroadcastDate = date;
+            var controlRoomData = await controlRoomService.FetchData($"{_apiUrls.ControlRoomApi}/{controlroomId}");
+            var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
 
-            var response = await rundownService.PostAsJsonAsync(_apiUrls.RundownApi, date);
+            var templateData = await templateService.GetByIdAsync($"{_apiUrls.RundownTemplateApi}/{templateId}");
+            var template = JsonSerializer.Deserialize<Rundown>(templateData);
+
+            var newRundown = new Rundown
+            {
+                Uuid = Guid.NewGuid(),
+                BroadcastDate = date,
+                ControlRoomId = controlRoom.Uuid,
+                ControlRoomName = controlRoom.Name,
+                Name = template.Name,
+                Items = template.Items
+            };
+          
+            var response = await rundownService.PostAsJsonAsync(_apiUrls.RundownApi, newRundown);
             response.EnsureSuccessStatusCode();
-
+            
             var createdRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            createdRundown.ControlRoomName = controlRoom.Name;
             return createdRundown;
         }
         

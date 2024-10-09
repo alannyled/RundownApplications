@@ -11,10 +11,10 @@ namespace AggregatorService.Models
         public string Name { get; set; }
 
         [JsonPropertyName("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [JsonPropertyName("broadcastDate")]
         public DateTime BroadcastDate { get; set; }

@@ -43,8 +43,8 @@ namespace AggregatorService.Services
 
         public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)
         {
-            Console.WriteLine("poster data til " + url);
             var response = await _httpClient.PostAsJsonAsync(url, payload);
+            Console.WriteLine($"Rundown created: {JsonSerializer.Serialize(response)}");
             response.EnsureSuccessStatusCode();
             return response;
         }

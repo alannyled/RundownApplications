@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AggregatorService", "Aggreg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownDbService", "RundownDbService\RundownDbService.csproj", "{3DA8A918-53AC-406A-BB17-810ED554DC81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateDbService", "TemplateDbService\TemplateDbService.csproj", "{22730A71-6804-4378-BEC2-69112AB6BC7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemplateDbService", "TemplateDbService\TemplateDbService.csproj", "{22730A71-6804-4378-BEC2-69112AB6BC7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

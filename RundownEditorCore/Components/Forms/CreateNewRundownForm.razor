@@ -1,0 +1,75 @@
+﻿@using RundownEditorCore.DTO
+<form>
+    <div class="mb-3">
+        <label for="broadcastdate" class="form-label">Udsendelsedato</label>
+        <input type="date" id="broadcastdate" class="form-control form-control-sm" value="@BroadcastDate.ToString("yyyy-MM-dd")"
+               @onchange="HandleBroadcastDateChange" />
+    </div>
+
+    <div class="mb-3">
+        <label for="category" class="form-label">Skabelon</label>
+        <select id="category" class="form-control form-control-sm" value="@Template"
+                @onchange="HandleTemplateChange">
+            <option value="">Vælg en Skabelon</option>
+            @foreach (var template in Templates)
+            {
+                <option value="@template.Uuid">@template.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="controlroom" class="form-label">Kontrolrum</label>
+        <select id="controlroom" class="form-control form-control-sm" value="@ControlRoom"
+                @onchange="HandleControlRoomChange">
+            <option value="">Vælg kontrolrum</option>
+            @foreach (var controlroom in ControlRooms)
+            {
+                <option value="@controlroom.Uuid">@controlroom.Name</option>
+            }
+        </select>
+    </div>
+</form>
+
+@code {
+    [Parameter]
+    public List<TemplateDTO> Templates { get; set; } = new List<TemplateDTO>();
+    [Parameter]
+    public List<ControlRoomDTO> ControlRooms { get; set; } = new List<ControlRoomDTO>();
+
+    [Parameter]
+    public DateTime BroadcastDate { get; set; } = DateTime.Now;
+    [Parameter]
+    public EventCallback<DateTime> BroadcastDateChanged { get; set; }
+
+    [Parameter]
+    public string Template { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback<string> TemplateChanged { get; set; }
+
+    [Parameter]
+    public string ControlRoom { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback<string> ControlRoomChanged { get; set; }
+
+    private async Task HandleBroadcastDateChange(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var date))
+        {
+            BroadcastDate = date;
+            await BroadcastDateChanged.InvokeAsync(BroadcastDate);
+        }
+    }
+
+    private async Task HandleTemplateChange(ChangeEventArgs e)
+    {
+        Template = e.Value?.ToString() ?? string.Empty;
+        await TemplateChanged.InvokeAsync(Template);
+    }
+
+    private async Task HandleControlRoomChange(ChangeEventArgs e)
+    {
+        ControlRoom = e.Value?.ToString() ?? string.Empty;
+        await ControlRoomChanged.InvokeAsync(ControlRoom);
+    }
+}

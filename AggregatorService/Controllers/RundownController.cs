@@ -1,6 +1,7 @@
 ﻿using AggregatorService.DTO;
 using AggregatorService.Managers;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace AggregatorService.Controllers
 {
@@ -11,9 +12,10 @@ namespace AggregatorService.Controllers
         private readonly RundownManager _rundownManager = rundownManager;
 
         [HttpPost("create-rundown-from-template/{templateId}")]
-        public async Task<IActionResult> CreateRundownFromTemplate(string templateId, [FromBody] DateTime date)
+        public async Task<IActionResult> CreateRundownFromTemplate(string templateId, [FromBody] CreateRundownRequest request)
         {
-            var rundown = await _rundownManager.CreateRundownFromTemplate(templateId, date);
+
+            var rundown = await _rundownManager.CreateRundownFromTemplate(templateId, request.ControlRoomId, request.BroadcastDate);
             return Ok(rundown);
         }
         

@@ -112,7 +112,7 @@
     private Func<Task>? currentSaveAction;
 
 
-    private DateTime SelectedDate = DateTime.Now;   
+    public DateTime SelectedDate = DateTime.Now;   
     private string activeTab = "Aktive rækkefølger";
 
     private RundownDTO selectedRundown = new();
@@ -193,6 +193,7 @@
     }
     private void ShowCreateNewRundownForm()
     {
+        BroadcastDate = SelectedDate;
         CurrentContent = CreateNewRundownContent;
         currentSaveAction = SaveNewRundownForm;
         validationMessage = string.Empty;
@@ -218,7 +219,7 @@
     };
 
     // modal variabler til newRundown form
-    private DateTime BroadcastDate { get; set; } = DateTime.Now;
+    private DateTime BroadcastDate { get; set; } 
     private string Template { get; set; } = string.Empty;
     private string ControlRoom { get; set; } = string.Empty;
 
@@ -234,9 +235,7 @@
         builder.AddAttribute(7, "ControlRoom", ControlRoom);
         builder.AddAttribute(8, "ControlRoomChanged", EventCallback.Factory.Create<string>(this, value => ControlRoom = value));
         builder.CloseComponent();
-    };
-
-  
+    };  
 
     private async Task SaveRundownItemForm()
     {

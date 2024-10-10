@@ -249,7 +249,7 @@
         var newRundownItem = new RundownItemDTO
             {
                 UUID = Guid.NewGuid(),
-                RundownId = selectedRundown.Uuid,
+                RundownId = Guid.Parse(selectedRundown.Uuid),
                 Name = ItemName,
                 Duration = Duration,
                 Order = selectedRundown.Items.Count // + 1  eller *10?

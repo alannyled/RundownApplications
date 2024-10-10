@@ -80,7 +80,7 @@
                                                 }
                                             </ul>
                                         </td>
-                                        <td>@room.CreatedDate.ToShortDateString()</td>
+                                        <td>@room.CreatedDate.ToLocalTime().ToShortDateString()</td>
                                         <td>
                                             <button class="btn btn-sm btn-primary" @onclick="() => EditControlRoom(room.Uuid.ToString())">Rediger</button>
                                             <button class="btn btn-sm btn-primary" @onclick="() => AddHardware(room.Uuid.ToString())">Tilføj Hardware</button>

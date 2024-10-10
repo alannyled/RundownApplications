@@ -22,11 +22,13 @@ namespace RundownEditorCore.Services
             return response;
         }
 
-        public async Task<RundownDTO> CreateRundownFromTemplate(string templateId, string controlroomId, DateTime date)
+        public async Task<RundownDTO> CreateRundownFromTemplate(string templateId, string controlroomId, DateTimeOffset date)
         {
+
+            Console.WriteLine("Creating rundown from template on date: " + date.ToString());
             var request = new RundownDTO
             {
-                ControlRoomId = Guid.Parse(controlroomId),
+                ControlRoomId = controlroomId,
                 BroadcastDate = date
             };
             var createdRundown = await _httpClient.PostAsJsonAsync($"create-rundown-from-template/{templateId}", request);
@@ -39,7 +41,7 @@ namespace RundownEditorCore.Services
         {
             var updateRequest = new RundownDTO
             {
-                ControlRoomId = Guid.Parse(controlRoomId)
+                ControlRoomId = controlRoomId
             };
 
             var response = await _httpClient.PutAsJsonAsync($"update-rundown-controlroom/{rundownId}", updateRequest);

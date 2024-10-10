@@ -28,7 +28,7 @@ else
                     <tr role="button" @onclick="() => OpenThisRundown(rundown.Uuid.ToString())">
 
                             <td class="text-nowrap">@rundown.Name</td>
-                            <td class="text-nowrap">@rundown.BroadcastDate.ToString("dddd d. MMMM yyyy")</td>
+                            <td class="text-nowrap">@rundown.BroadcastDate.ToLocalTime().ToString("dddd d. MMMM yyyy")</td>
                             <td class="text-nowrap">@rundown.ControlRoomName</td>
                    
 

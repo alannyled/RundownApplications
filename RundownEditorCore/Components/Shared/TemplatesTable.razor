@@ -32,7 +32,7 @@ else
                     <tr role="button" @onclick="() => SelectTemplate(template.Uuid.ToString())">
 
                     <td class="text-nowrap">@template.Name</td>
-                    <td class="text-nowrap">@template.CreatedDate.ToString("dddd d. MMMM yyyy")</td>
+                        <td class="text-nowrap">@template.CreatedDate.ToLocalTime().ToString("dddd d. MMMM yyyy")</td>
                     @* <td >@template.Uuid.ToString()</td> *@
 
                 </tr>

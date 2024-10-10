@@ -15,7 +15,7 @@
                     <select class="form-select form-select-sm" @onchange="OnControlRoomChange">
                         @foreach (var room in ControlRooms)
                         {
-                            <option value="@room.Uuid" selected="@(SelectedRundown.ControlRoomId.ToString() == room.Uuid)">@room.Name</option>
+                            <option value="@room.Uuid" selected="@(SelectedRundown.ControlRoomId == room.Uuid)">@room.Name</option>
                         }
                     </select>
                 </div>

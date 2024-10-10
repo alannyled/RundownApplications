@@ -82,8 +82,8 @@
                                         </td>
                                         <td>@room.CreatedDate.ToShortDateString()</td>
                                         <td>
-                                            <button class="btn btn-sm btn-primary" @onclick="() => EditControlRoom(room.Uuid)">Rediger</button>
-                                            <button class="btn btn-sm btn-primary" @onclick="() => AddHardware(room.Uuid)">Tilføj Hardware</button>
+                                            <button class="btn btn-sm btn-primary" @onclick="() => EditControlRoom(room.Uuid.ToString())">Rediger</button>
+                                            <button class="btn btn-sm btn-primary" @onclick="() => AddHardware(room.Uuid.ToString())">Tilføj Hardware</button>
                                         </td>
                                     </tr>
                                 }
@@ -121,7 +121,10 @@
     }
 
     private async Task CreateControlRoomAsync()
-    {
+    {   
+        Console.WriteLine("Creating control room");
+        Console.WriteLine(newControlRoom.Name);
+        Console.WriteLine(newControlRoom.Location);
         await ControlRoomService.CreateControlRoomAsync(newControlRoom);
         controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
         newControlRoom = new ControlRoomDTO(); 
@@ -133,12 +136,12 @@
     private void EditControlRoom(string id)
     {
         CancelEdit();
-        editingControlRoom = controlRooms.FirstOrDefault(room => room.Uuid == id);
+        editingControlRoom = controlRooms.FirstOrDefault(room => room.Uuid.ToString() == id);
     }
 
     private async Task UpdateControlRoomAsync()
     {
-        await ControlRoomService.UpdateControlRoomAsync(editingControlRoom.Uuid, editingControlRoom);
+        await ControlRoomService.UpdateControlRoomAsync(editingControlRoom.Uuid.ToString(), editingControlRoom);
         controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
         editingControlRoom = null; 
     }    
@@ -155,7 +158,7 @@
     private void AddHardware(string controlRoomId)
     {
         CancelEdit();
-        addingHardwareToRoom = controlRooms.FirstOrDefault(room => room.Uuid == controlRoomId);
+        addingHardwareToRoom = controlRooms.FirstOrDefault(room => room.Uuid.ToString() == controlRoomId);
         newHardware = new HardwareDTO { ControlRoomId = controlRoomId };
     }
     /// <summary>

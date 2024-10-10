@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AggregatorService.Models;
 using System.Threading.Tasks;
+using AggregatorService.DTO;
 
 namespace AggregatorService.Controllers
 {
@@ -19,7 +20,7 @@ namespace AggregatorService.Controllers
         }
 
         [HttpPost("create-controlroom")]
-        public async Task<IActionResult> CreateControlRoom([FromBody] ControlRoom newControlRoom)
+        public async Task<IActionResult> CreateControlRoom([FromBody] ControlRoomDTO newControlRoom)
         {
             if (newControlRoom == null)
             {

@@ -2,13 +2,13 @@
 {
     public class ControlRoomDTO
     {
-        public string Uuid { get; set; }
+        public Guid Uuid { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? ArchivedDate { get; set; }
         public string? ArchivedBy { get; set; } = null;
-        public List<HardwareDTO> HardwareItems { get; set; }
+        public List<HardwareDTO>? HardwareItems { get; set; }
     }    
 
 }

@@ -1,4 +1,5 @@
-﻿using AggregatorService.Factories;
+﻿using AggregatorService.DTO;
+using AggregatorService.Factories;
 using AggregatorService.Models;
 using AggregatorService.Services;
 using Microsoft.Extensions.Options;
@@ -33,8 +34,9 @@ namespace AggregatorService.Managers
             return controlRooms;
         }
 
-        public async Task<ControlRoom> CreateControlRoomAsync(ControlRoom newControlRoom)
+        public async Task<ControlRoom> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
         {
+            Console.WriteLine("Creating control room in the database API: " + newControlRoom);
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
             var response = await controlRoomService.PostAsJsonAsync(_apiUrls.ControlRoomApi, newControlRoom);

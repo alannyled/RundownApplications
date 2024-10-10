@@ -1,6 +1,8 @@
-﻿<div class="modal fade show" style='display:@(ShowDialog ? "block" : "none")' tabindex="-1">
+﻿<div id="modal-backdrop" class="modal-backdrop fade @(ShowDialog ? "show" : "")"></div>
+
+<div class="modal fade @(ShowDialog ? "show" : "none")" style='display:@(ShowDialog ? "block" : "none")' @onclick="CloseDialog" tabindex="-1">
     <div class="modal-dialog" style="margin: 10rem auto">
-        <div class="modal-content">
+        <div class="modal-content" @onclick:stopPropagation>
             <div class="modal-header">
                 <h5 class="modal-title">@Title</h5>
                 <button type="button" class="btn-close" @onclick="CloseDialog"></button>

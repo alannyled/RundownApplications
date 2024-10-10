@@ -117,6 +117,29 @@ h1:focus {
     }
 }
 
+/* Modal backdrop */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display:none;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    
+}
+
+    .modal-backdrop.show {
+        opacity: 1;
+        display: block;
+    }
+
+    .modal-backdrop.fade {
+        opacity: 1;
+    }
+
 
 
 

@@ -1,5 +1,11 @@
-﻿<li class="nav-item">
-    <a role="button" class="nav-link  @(ActiveTab == MenuItem ? "active" : "")" @onclick='() => SelectTab.InvokeAsync(MenuItem)'>@MenuItem</a>
+﻿<li class="nav-item d-flex position-relative">
+    
+    <a role="button" class="nav-link @(ActiveTab == MenuItem ? "active" : "") @(CloseTab.HasDelegate ? "padding": "")" @onclick='() => SelectTab.InvokeAsync(MenuItem)'>@MenuItem</a>
+    @if (CloseTab.HasDelegate)
+    {
+        <h5 class="position-absolute top-0 end-0 text-danger" role="button" @onclick="RemoveTabPane"><i class=" bi bi-x"></i></h5>
+    }
+   
 </li>
 
 @code {
@@ -11,4 +17,12 @@
 
     [Parameter]
     public EventCallback<string> SelectTab { get; set; }
+
+    [Parameter]
+    public EventCallback<string> CloseTab { get; set; }
+
+    public async Task RemoveTabPane()
+    {
+        await CloseTab.InvokeAsync(MenuItem);
+    }
 }

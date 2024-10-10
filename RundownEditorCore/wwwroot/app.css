@@ -70,6 +70,10 @@ h1:focus {
     border-color: #929292;
 }
 
+.padding{
+    padding-right: 2rem !important;
+}
+
 /* til kalender */
 
 .calendar-grid {

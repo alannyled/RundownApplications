@@ -90,6 +90,7 @@
             builder.AddAttribute(1, "MenuItem", tabName);
             builder.AddAttribute(2, "ActiveTab", activeTab);
             builder.AddAttribute(3, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
+            builder.AddAttribute(4, "CloseTab", EventCallback.Factory.Create<string>(this, RemoveTab));
             builder.CloseComponent();
         });
 

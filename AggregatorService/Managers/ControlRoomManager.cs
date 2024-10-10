@@ -36,7 +36,6 @@ namespace AggregatorService.Managers
 
         public async Task<ControlRoom> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
         {
-            Console.WriteLine("Creating control room in the database API: " + newControlRoom);
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
             var response = await controlRoomService.PostAsJsonAsync(_apiUrls.ControlRoomApi, newControlRoom);

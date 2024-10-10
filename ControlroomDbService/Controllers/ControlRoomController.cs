@@ -60,7 +60,7 @@ namespace ControlRoomDbService.Controllers
             updatedControlRoom.UUID = existingControlRoom.UUID;
             await _controlRoomService.UpdateControlRoomAsync(id, updatedControlRoom);
 
-            return NoContent();
+            return Ok(updatedControlRoom);
         }
 
         [HttpDelete("{id}")]
@@ -74,7 +74,7 @@ namespace ControlRoomDbService.Controllers
             }
 
             await _controlRoomService.DeleteControlRoomAsync(id);
-            return NoContent();
+            return Ok(new { Message = $"Control room with ID {id} has been deleted successfully." });
         }
 
         [HttpDelete("all")]

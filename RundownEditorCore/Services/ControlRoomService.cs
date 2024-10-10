@@ -23,8 +23,7 @@ namespace RundownEditorCore.Services
         public async Task<ControlRoomDTO> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
         {
             try
-            {
-                Console.WriteLine($"Creating control room: {newControlRoom.Name}");
+            {            
 
                 var response = await _httpClient.PostAsJsonAsync("create-controlroom", newControlRoom);
 

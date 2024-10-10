@@ -114,7 +114,7 @@
     private Func<Task>? currentSaveAction;
 
 
-    public DateTime SelectedDate = DateTime.Now;   
+    public DateTime SelectedDate = DateTime.Now.ToLocalTime();   
     private string activeTab = "Aktive rækkefølger";
 
     private RundownDTO selectedRundown = new();
@@ -182,7 +182,8 @@
 
     private void SetSelectedDate(DateTime date)
     {
-        SelectedDate = date;
+        Console.WriteLine("Date set to : " + date.ToLocalTime());
+        SelectedDate = date.ToLocalTime();
     }
 
     private void ShowRundownItemForm()

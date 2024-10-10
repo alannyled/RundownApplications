@@ -95,8 +95,7 @@
     {
         var selectedControlRoomUuid = e.Value.ToString();
         await RundownService.UpdateRundownControlRoomAsync(SelectedRundown.Uuid, selectedControlRoomUuid);       
-        await UpdateRundownList.InvokeAsync();
-       
+        await UpdateRundownList.InvokeAsync();    
     }
 
     private void OnDragStart(DragEventArgs e, string childId)

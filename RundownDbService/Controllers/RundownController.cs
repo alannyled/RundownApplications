@@ -66,7 +66,7 @@ namespace RundownDbService.Controllers
             rundown.ControlRoomId = parsedControlRoomId;
             await _rundownService.UpdateRundownAsync(id, rundown);
 
-            return NoContent();
+            return Ok(rundown);
         }
 
 

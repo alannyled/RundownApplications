@@ -67,7 +67,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var room in controlRooms)
+                                @foreach (var room in controlRooms.OrderBy(r => r.Name))
                                 {
                                     <tr>
                                         <td>@room.Name</td>

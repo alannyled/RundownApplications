@@ -37,7 +37,7 @@ namespace RundownEditorCore.Services
             return response;
         }
 
-        public async Task UpdateRundownControlRoomAsync(string rundownId, string controlRoomId)
+        public async Task<RundownDTO> UpdateRundownControlRoomAsync(string rundownId, string controlRoomId)
         {
             var updateRequest = new RundownDTO
             {
@@ -49,10 +49,12 @@ namespace RundownEditorCore.Services
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Successfully updated control room.");
+                return await response.Content.ReadFromJsonAsync<RundownDTO>();
             }
             else
             {
                 Console.WriteLine($"Error updating control room: {response.ReasonPhrase}");
+                return null;
             }
         }
 

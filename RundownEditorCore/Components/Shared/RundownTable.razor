@@ -22,7 +22,8 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var rundown in Rundowns){
+                @foreach (var rundown in Rundowns.OrderBy(r => r.BroadcastDate))
+                {
                 if(rundown.BroadcastDate.Date >= SelectedDate.Date)
                 {
                     <tr role="button" @onclick="() => OpenThisRundown(rundown.Uuid.ToString())">

@@ -5,10 +5,12 @@
 @using RundownEditorCore.Interfaces
 @using RundownEditorCore.Data
 @using RundownEditorCore.Components.Forms
+@using RundownEditorCore.Services
 @inject IRundownService RundownService
 @inject IControlRoomService ControlRoomService
 @inject ITemplateService TemplateService
 @inject IHttpClientFactory ClientFactory
+@inject ModalRenderService ModalRenderservice
 @using Microsoft.AspNetCore.Authorization
 @* @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
@@ -140,6 +142,7 @@
     private async Task UpdateRundownListOnControlRoomChange()
     {
         ActiveRundowns = await RundownService.GetActiveRundowsAsync();
+        await UpdateSelectedRundown();
         StateHasChanged();
     }
 
@@ -194,7 +197,7 @@
     private void ShowCreateNewRundownForm()
     {
         BroadcastDate = SelectedDate;
-        CurrentContent = CreateNewRundownContent;
+        CurrentContent = CreateNewRundownContent;  //ModalRenderservice.RenderNewRundownForm(AllTemplates, controlRooms, BroadcastDate);
         currentSaveAction = SaveNewRundownForm;
         validationMessage = string.Empty;
         modalTitle = "Opret ny rækkefølge";
@@ -272,7 +275,7 @@
 
         var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
       
-        ActiveRundowns.Add(rundown);
+        ActiveRundowns = await RundownService.GetActiveRundowsAsync();
         selectedRundown = rundown;
         showDialog = false;
         // nulstil alle felter

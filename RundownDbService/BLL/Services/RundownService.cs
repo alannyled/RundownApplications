@@ -29,10 +29,10 @@ namespace RundownDbService.BLL.Services
             await _rundownRepository.CreateAsync(newRundown);
         }
 
-        public async Task UpdateRundownAsync(Guid uuid, Rundown updatedRundown)
+        public async Task<Rundown> UpdateRundownAsync(Guid uuid, Rundown updatedRundown)
         {
             // Eventuel forretningslogik, før rundown opdateres
-            await _rundownRepository.UpdateAsync(uuid, updatedRundown);
+            return await _rundownRepository.UpdateAsync(uuid, updatedRundown);
         }
 
         public async Task DeleteRundownAsync(Guid uuid)

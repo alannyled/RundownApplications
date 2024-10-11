@@ -39,7 +39,7 @@ builder.Services.AddHttpClient<ITemplateService, TemplateService>(client =>
     client.BaseAddress = new Uri("https://localhost:3010/api/Template/"); // ikke APIGateway adresse
 });
 
-builder.Services.AddScoped<ModalRenderService>(); // skal den bruges?
+builder.Services.AddScoped<FormRenderService>(); // skal den bruges?
 
 
 

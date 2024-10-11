@@ -1,65 +1,78 @@
-﻿<form>
+﻿@using RundownEditorCore.DTO
+@using RundownEditorCore.Interfaces
+
+<form @onsubmit="HandleSubmit">
     <div class="mb-3">
         <label for="itemname" class="form-label">Navn</label>
-        <input type="text" class="form-control form-control-sm" id="itemname" value="@ItemName"
-               @oninput="HandleItemNameChange" />
+        <input type="text" class="form-control form-control-sm" id="itemname" @bind="@ItemName"/>
     </div>
     <div class="mb-3">
         <label for="duration" class="form-label">Planlagt længde</label>
-        <input type="time" step="1" class="form-control form-control-sm" id="duration" value="@Duration"
-               @onchange="HandleDurationChange" />
+        <input type="time" step="1" class="form-control form-control-sm" id="duration" @bind="@Duration" />
     </div>
     <div class="mb-3">
         <label for="category" class="form-label">Skabelon</label>
-        <select class="form-control form-control-sm" id="category" value="@Category"
-                @onchange="HandleCategoryChange">
+        <select class="form-control form-control-sm" id="category" @bind="@Template">
             <option value="">Vælg en Skabelon</option>
-            @foreach (var category in Categories)
+            @foreach (var template in Templates)
             {
-                <option value="@category">@category</option>
+                <option value="@template">@template</option>
             }
         </select>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-sm btn-primary">Opret rækkefølge objekt</button>
     </div>
 </form>
 
 @code {
+    [Inject]
+    private IRundownService RundownService { get; set; }
+
     [Parameter]
+    public List<string> Templates { get; set; } = new List<string>();
+    [Parameter]
+    public RundownDTO SelectedRundown { get; set; }
+    [Parameter]
+    public EventCallback<RundownDTO> OnItemCreated { get; set; }
+
+    // [Parameter]
     public string ItemName { get; set; } = string.Empty;
 
-    [Parameter]
-    public string Duration { get; set; }
+    // [Parameter]
+    public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
 
-    [Parameter]
-    public string Category { get; set; } = string.Empty;
+    // [Parameter]
+    public string Template { get; set; } = string.Empty;
 
-    [Parameter]
-    public List<string> Categories { get; set; } = new List<string>();
-
-    [Parameter]
-    public EventCallback<string> ItemNameChanged { get; set; }
-
-    [Parameter]
-    public EventCallback<string> DurationChanged { get; set; }
-
-    [Parameter]
-    public EventCallback<string> CategoryChanged { get; set; }
-
-    private async Task HandleItemNameChange(ChangeEventArgs e)
+    private async Task HandleSubmit()
     {
-        ItemName = e.Value?.ToString();
-        await ItemNameChanged.InvokeAsync(ItemName);
+        // if (string.IsNullOrEmpty(ItemName))
+        // {
+        //     validationMessage = "Navnet må ikke være tomt.";
+        //     return;
+        // }
+
+        var newRundownItem = new RundownItemDTO
+            {
+                UUID = Guid.NewGuid(),
+                RundownId = SelectedRundown.Uuid,
+                Name = ItemName,
+                Duration = Duration.ToString(),
+                Order = SelectedRundown.Items.Count // + 1  eller *10?
+            };
+
+     
+        SelectedRundown = await RundownService.AddItemToRundownAsync(SelectedRundown.Uuid, newRundownItem);
+
+  
+        // var result = new CreateRundownItemResultDTO
+        //     {
+        //         SelectedRundown = updatedRundown
+        //     };
+
+        await OnItemCreated.InvokeAsync(SelectedRundown);
     }
 
-    private async Task HandleDurationChange(ChangeEventArgs e)
-    {
-            Duration = e.Value?.ToString();
-            await DurationChanged.InvokeAsync(Duration);
-      
-    }
 
-    private async Task HandleCategoryChange(ChangeEventArgs e)
-    {
-        Category = e.Value?.ToString();
-        await CategoryChanged.InvokeAsync(Category);
-    }
 }

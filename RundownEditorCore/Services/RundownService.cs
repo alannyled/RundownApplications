@@ -58,18 +58,22 @@ namespace RundownEditorCore.Services
             }
         }
 
-        public async Task AddItemToRundownAsync(string rundownId, RundownItemDTO item)
+        public async Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
         {
             var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
-
+            Console.WriteLine("Adding item to rundown.");
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(response.ReasonPhrase);
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Successfully added item to rundown.");
+                return await response.Content.ReadFromJsonAsync<RundownDTO>();
             }
             else
             {
                 Console.WriteLine($"Error adding item to rundown: {response.ReasonPhrase}");
             }
+            return null;
         }
 
 

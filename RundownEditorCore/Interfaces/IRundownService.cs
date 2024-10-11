@@ -9,6 +9,6 @@ namespace RundownEditorCore.Interfaces
         Task<RundownDTO> CreateRundownFromTemplate(string templateId, string controlroonId, DateTimeOffset date);
         Task<RundownDTO> UpdateRundownControlRoomAsync(string uuid, string controlRoomId);
 
-        Task AddItemToRundownAsync(string rundownId, RundownItemDTO item);
+        Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item);
     }
 }

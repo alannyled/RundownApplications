@@ -41,8 +41,6 @@ namespace AggregatorService.Controllers
             {
                 return BadRequest("Invalid request.");
             }
-
-            // Kald DB-tjenesten og send request som JSON
             var updatedRundown = await _rundownManager.UpdateControlRoomAsync(rundownId, request);
 
             return Ok(updatedRundown);
@@ -51,8 +49,8 @@ namespace AggregatorService.Controllers
         [HttpPut("add-item-to-rundown/{rundownId}")]
         public async Task<IActionResult> AddItemToRundown(string rundownId, [FromBody] RundownItemDTO itemDto)
         {
-            await _rundownManager.AddItemToRundownAsync(Guid.Parse(rundownId), itemDto);
-            return Ok();
+            var rundown = await _rundownManager.AddItemToRundownAsync(Guid.Parse(rundownId), itemDto);
+            return Ok(rundown);
         }
 
 

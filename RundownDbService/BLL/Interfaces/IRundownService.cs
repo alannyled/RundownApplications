@@ -7,7 +7,7 @@ namespace RundownDbService.BLL.Interfaces
         Task<List<Rundown>> GetAllRundownsAsync();
         Task<Rundown> GetRundownByIdAsync(Guid uuid);
         Task CreateRundownAsync(Rundown newRundown);
-        Task UpdateRundownAsync(Guid uuid, Rundown updatedRundown);
+        Task<Rundown> UpdateRundownAsync(Guid uuid, Rundown updatedRundown);
         Task DeleteRundownAsync(Guid uuid);
     }
 }

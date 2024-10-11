@@ -10,7 +10,7 @@
 @inject IControlRoomService ControlRoomService
 @inject ITemplateService TemplateService
 @inject IHttpClientFactory ClientFactory
-@inject ModalRenderService ModalRenderservice
+@inject FormRenderService FormRenderservice
 @using Microsoft.AspNetCore.Authorization
 @* @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
@@ -35,7 +35,7 @@
     </div>
 }
 <Modal ShowDialog="@showDialog"
-       SaveChanges="SaveCurrentObject"
+       OnDataReceived="dynamicOnDataReceived"
        ShowDialogChanged="@((value) => showDialog = value)"
        Title="@modalTitle">
     @CurrentContent
@@ -111,7 +111,8 @@
     private string? validationMessage;
     private string? modalTitle; 
     private RenderFragment? CurrentContent { get; set; }
-    private Func<Task>? currentSaveAction;
+    private EventCallback<object> dynamicOnDataReceived;
+    private Func<Task>? currentSaveAction; // skal væk
 
 
     public DateTime SelectedDate = DateTime.Now.ToLocalTime();   
@@ -182,114 +183,86 @@
 
     private void SetSelectedDate(DateTime date)
     {
-        Console.WriteLine("Date set to : " + date.ToLocalTime());
         SelectedDate = date.ToLocalTime();
     }
 
+    List<string> Templates = ["Template1", "Template2", "Template3"];
+    /// <summary>
+    /// Kalder rending af Modal med RundownItemForm
+    /// </summary>
     private void ShowRundownItemForm()
-    {
-        CurrentContent = RundownItemFormContent;
-        currentSaveAction = SaveRundownItemForm;
+    {        
+        CurrentContent = FormRenderservice.RenderRundownItemForm(
+            Templates,
+            selectedRundown,
+            EventCallback.Factory.Create<RundownDTO>(this, HandleRundownItemCreated)
+        );   
+        dynamicOnDataReceived = EventCallback.Factory.Create<object>(this, data => HandleRundownItemCreated((RundownDTO)data));
         validationMessage = string.Empty;
         modalTitle = "Opret nyt element";
         showDialog = true;
 
     }
+    ///<summary>
+    /// Kalder rending af Modal med CreateNewRundownForm
+    /// </summary>
     private void ShowCreateNewRundownForm()
     {
-        BroadcastDate = SelectedDate;
-        CurrentContent = CreateNewRundownContent;  //ModalRenderservice.RenderNewRundownForm(AllTemplates, controlRooms, BroadcastDate);
-        currentSaveAction = SaveNewRundownForm;
-        validationMessage = string.Empty;
+        CurrentContent = FormRenderservice.RenderNewRundownForm(
+            AllTemplates, 
+            controlRooms, 
+            SelectedDate, 
+            EventCallback.Factory.Create<CreateRundownResultDTO>(this, HandleRundownCreated)
+        );
+        dynamicOnDataReceived = EventCallback.Factory.Create<object>(this, data => HandleRundownCreated((CreateRundownResultDTO)data));
+        validationMessage = string.Empty; // den her kan måske flyttes??
         modalTitle = "Opret ny rækkefølge";
         showDialog = true;
     }
 
-    // modal variabler til rundownItem form
-    private string ItemName { get; set; } = string.Empty;
-    private string Duration { get; set; } = "00:00:00";
-    private string Category { get; set; } = string.Empty;
+    // private async Task SaveRundownItemForm()
+    // {
 
-    private RenderFragment RundownItemFormContent => builder =>
+    //     // if (string.IsNullOrEmpty(ItemName))
+    //     // {
+    //     //     validationMessage = "Navnet må ikke være tomt.";
+    //     //     return;
+    //     // }
+
+    //     // var newRundownItem = new RundownItemDTO
+    //     //     {
+    //     //         UUID = Guid.NewGuid(),
+    //     //         RundownId = selectedRundown.Uuid,
+    //     //         Name = ItemName,
+    //     //         Duration = Duration,
+    //     //         Order = selectedRundown.Items.Count // + 1  eller *10?
+    //     //     };
+
+    //   //  await RundownService.AddItemToRundownAsync(selectedRundown.Uuid, newRundownItem);
+    //     // kan denne ikke komme som svar på ovenstående, i stedet for at kalde igen
+    //   //  await UpdateSelectedRundown();
+    //     showDialog = false;
+    //     // nulstil alle felter
+    //     // ItemName = string.Empty;
+    //     // Duration = "00:00:00";
+    //     // Category = string.Empty;
+    //     validationMessage = string.Empty;     
+
+    // }
+
+    private void HandleRundownItemCreated(RundownDTO result)
     {
-        builder.OpenComponent(0, typeof(RundownItemForm));
-        builder.AddAttribute(1, "ItemName", ItemName);
-        builder.AddAttribute(2, "Duration", Duration);
-        builder.AddAttribute(3, "Category", Category);
-        builder.AddAttribute(5, "ItemNameChanged", EventCallback.Factory.Create<string>(this, value => ItemName = value));
-        builder.AddAttribute(6, "DurationChanged", EventCallback.Factory.Create<string>(this, value => Duration = value));
-        builder.AddAttribute(7, "CategoryChanged", EventCallback.Factory.Create<string>(this, value => Category = value));
-        builder.CloseComponent();
-    };
-
-    // modal variabler til newRundown form
-    private DateTime BroadcastDate { get; set; } 
-    private string Template { get; set; } = string.Empty;
-    private string ControlRoom { get; set; } = string.Empty;
-
-    private RenderFragment CreateNewRundownContent => builder =>
-    {
-        builder.OpenComponent(0, typeof(CreateNewRundownForm));
-        builder.AddAttribute(1, "Templates", AllTemplates);
-        builder.AddAttribute(2, "ControlRooms", controlRooms);
-        builder.AddAttribute(3, "BroadcastDate", BroadcastDate);
-        builder.AddAttribute(4, "BroadcastDateChanged", EventCallback.Factory.Create<DateTime>(this, value => BroadcastDate = value));
-        builder.AddAttribute(5, "Template", Template);
-        builder.AddAttribute(6, "TemplateChanged", EventCallback.Factory.Create<string>(this, value => Template = value));
-        builder.AddAttribute(7, "ControlRoom", ControlRoom);
-        builder.AddAttribute(8, "ControlRoomChanged", EventCallback.Factory.Create<string>(this, value => ControlRoom = value));
-        builder.CloseComponent();
-    };  
-
-    private async Task SaveRundownItemForm()
-    {
-
-        if (string.IsNullOrEmpty(ItemName))
-        {
-            validationMessage = "Navnet må ikke være tomt.";
-            return;
-        }
-
-        var newRundownItem = new RundownItemDTO
-            {
-                UUID = Guid.NewGuid(),
-                RundownId = selectedRundown.Uuid,
-                Name = ItemName,
-                Duration = Duration,
-                Order = selectedRundown.Items.Count // + 1  eller *10?
-            };
-
-        await RundownService.AddItemToRundownAsync(selectedRundown.Uuid, newRundownItem);
-        // kan denne ikke komme som svar på ovenstående, i stedet for at kalde igen
-        await UpdateSelectedRundown();
-        showDialog = false;
-        // nulstil alle felter
-        ItemName = string.Empty;
-        Duration = "00:00:00";
-        Category = string.Empty;
-        validationMessage = string.Empty;     
-
+        selectedRundown = result;
+        validationMessage = string.Empty;
+        showDialog = false; 
     }
 
-    private async Task SaveNewRundownForm()
+    private void HandleRundownCreated(CreateRundownResultDTO result)
     {
-
-        var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
-      
-        ActiveRundowns = await RundownService.GetActiveRundowsAsync();
-        selectedRundown = rundown;
-        showDialog = false;
-        // nulstil alle felter
-        BroadcastDate = DateTime.Now;
-        Template = string.Empty;
-        ControlRoom = string.Empty;
-        StateHasChanged();
-       
-       
+        ActiveRundowns = result.ActiveRundowns;
+        selectedRundown = result.SelectedRundown;
+        showDialog = false; 
     }
-
-
-    
 
     // private ClaimsPrincipal user;
     // private ApplicationUser currentUser;

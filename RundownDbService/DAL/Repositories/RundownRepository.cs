@@ -31,9 +31,12 @@ namespace RundownDbService.DAL.Repositories
             await _rundownCollection.InsertOneAsync(newRundown);
         }
 
-        public async Task UpdateAsync(Guid uuid, Rundown updatedRundown)
+        public async Task<Rundown> UpdateAsync(Guid uuid, Rundown updatedRundown)
         {
             await _rundownCollection.ReplaceOneAsync(rundown => rundown.UUID == uuid, updatedRundown);
+            var rundown = await GetByIdAsync(uuid);
+            Console.WriteLine($"Updated rundown: {rundown.Name}");
+            return rundown;
         }
 
         public async Task DeleteAsync(Guid uuid)

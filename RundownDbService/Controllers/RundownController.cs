@@ -71,11 +71,11 @@ namespace RundownDbService.Controllers
 
 
         [HttpPut("add-item-to-rundown/{id:guid}")]
-        public async Task<ActionResult> AddItemToRundown(Guid id, [FromBody] RundownDTO rundownDto)
+        public async Task<IActionResult> AddItemToRundown(Guid id, [FromBody] RundownDTO rundownDto)
         {
             if (rundownDto == null)
             {
-                return BadRequest("The RundownDTO field is required.");
+                return BadRequest("RundownDTO modellen mangler?");
             }
 
             // Hent eksisterende rundown baseret på ID
@@ -96,9 +96,9 @@ namespace RundownDbService.Controllers
             }));
 
             // Opdater rundown i databasen
-            await _rundownService.UpdateRundownAsync(id, existingRundown);
+           var updatedRundown = await _rundownService.UpdateRundownAsync(id, existingRundown);
 
-            return NoContent();
+            return Ok(updatedRundown);
         }
 
 

@@ -104,7 +104,7 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
-        public async Task AddItemToRundownAsync(Guid rundownId, RundownItemDTO itemDto)
+        public async Task<Rundown> AddItemToRundownAsync(Guid rundownId, RundownItemDTO itemDto)
         {
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
@@ -118,12 +118,12 @@ namespace AggregatorService.Managers
 
             // Tilføj det nye item til eksisterende liste
             rundown.Items.Add(itemDto);
-            Console.WriteLine(JsonSerializer.Serialize(rundown));
-
-
+       
             // Send opdateringen tilbage til service
             var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-to-rundown/{rundownId}", rundown);
             response.EnsureSuccessStatusCode();
+            var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            return updatedRundown;
         }
 
 

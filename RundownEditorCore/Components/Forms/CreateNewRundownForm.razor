@@ -1,15 +1,17 @@
 ﻿@using RundownEditorCore.DTO
-<form>
+@using RundownEditorCore.Interfaces
+
+<form @onsubmit="HandleSubmit">
     <div class="mb-3">
         <label for="broadcastdate" class="form-label">Udsendelsedato</label>
-        <input type="date" id="broadcastdate" class="form-control form-control-sm" value="@BroadcastDate.ToString("yyyy-MM-dd")"
-               @onchange="HandleBroadcastDateChange" />
+        <input type="date" id="broadcastdate" class="form-control form-control-sm"
+               @bind="BroadcastDate" />
     </div>
 
     <div class="mb-3">
         <label for="category" class="form-label">Skabelon</label>
-        <select id="category" class="form-control form-control-sm" value="@Template"
-                @onchange="HandleTemplateChange">
+        <select id="category" class="form-control form-control-sm"
+                @bind="Template">
             <option value="">Vælg en Skabelon</option>
             @foreach (var template in Templates)
             {
@@ -20,8 +22,8 @@
 
     <div class="mb-3">
         <label for="controlroom" class="form-label">Kontrolrum</label>
-        <select id="controlroom" class="form-control form-control-sm" value="@ControlRoom"
-                @onchange="HandleControlRoomChange">
+        <select id="controlroom" class="form-control form-control-sm"
+                @bind="ControlRoom">
             <option value="">Vælg kontrolrum</option>
             @foreach (var controlroom in ControlRooms)
             {
@@ -29,50 +31,44 @@
             }
         </select>
     </div>
-  @*   <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-sm btn-primary">Opret</button>
-    </div> *@
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-sm btn-primary">Opret rækkefølge</button>
+    </div>
 </form>
 
 @code {
+    [Inject]
+    private IRundownService RundownService { get; set; }
+
     [Parameter]
     public List<TemplateDTO> Templates { get; set; } = new List<TemplateDTO>();
     [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; } = new List<ControlRoomDTO>();
-
     [Parameter]
     public DateTime BroadcastDate { get; set; } = DateTime.Now;
     [Parameter]
-    public EventCallback<DateTime> BroadcastDateChanged { get; set; }
+    public EventCallback<CreateRundownResultDTO> OnRundownCreated { get; set; }
 
-    [Parameter]
+
+
     public string Template { get; set; } = string.Empty;
-    [Parameter]
-    public EventCallback<string> TemplateChanged { get; set; }
-
-    [Parameter]
     public string ControlRoom { get; set; } = string.Empty;
-    [Parameter]
-    public EventCallback<string> ControlRoomChanged { get; set; }
 
-    private async Task HandleBroadcastDateChange(ChangeEventArgs e)
-    {
-        if (DateTime.TryParse(e.Value?.ToString(), out var date))
-        {
-            BroadcastDate = date;
-            await BroadcastDateChanged.InvokeAsync(BroadcastDate);
-        }
-    }
+  
 
-    private async Task HandleTemplateChange(ChangeEventArgs e)
+    private async Task HandleSubmit()
     {
-        Template = e.Value?.ToString() ?? string.Empty;
-        await TemplateChanged.InvokeAsync(Template);
-    }
+        // Lav rundown og hent aktive rundowns
+        var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
+        var activeRundowns = await RundownService.GetActiveRundowsAsync();
 
-    private async Task HandleControlRoomChange(ChangeEventArgs e)
-    {
-        ControlRoom = e.Value?.ToString() ?? string.Empty;
-        await ControlRoomChanged.InvokeAsync(ControlRoom);
+        // Indstil værdier og send resultatet til moderkomponenten
+        var result = new CreateRundownResultDTO
+            {
+                ActiveRundowns = activeRundowns,
+                SelectedRundown = rundown
+            };
+
+        await OnRundownCreated.InvokeAsync(result);
     }
 }

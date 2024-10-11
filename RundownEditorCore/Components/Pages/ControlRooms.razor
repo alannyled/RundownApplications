@@ -150,6 +150,7 @@
     {
         await ControlRoomService.DeleteControlRoomAsync(id);
         controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
+        editingControlRoom = null;
     }
     /// <summary>
     /// Lukker åbne forms og viser form til at tilføje hardware til et kontrolrum

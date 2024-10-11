@@ -253,13 +253,13 @@
         var newRundownItem = new RundownItemDTO
             {
                 UUID = Guid.NewGuid(),
-                RundownId = Guid.Parse(selectedRundown.Uuid),
+                RundownId = selectedRundown.Uuid,
                 Name = ItemName,
                 Duration = Duration,
                 Order = selectedRundown.Items.Count // + 1  eller *10?
             };
 
-        await RundownService.AddItemToRundownAsync(selectedRundown.Uuid.ToString(), newRundownItem);
+        await RundownService.AddItemToRundownAsync(selectedRundown.Uuid, newRundownItem);
         // kan denne ikke komme som svar på ovenstående, i stedet for at kalde igen
         await UpdateSelectedRundown();
         showDialog = false;

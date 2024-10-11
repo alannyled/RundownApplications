@@ -64,7 +64,7 @@ namespace ControlRoomDbService.Controllers
             updatedHardware.UUID = existingHardware.UUID;
             await _hardwareService.UpdateHardwareAsync(id, updatedHardware);
 
-            return NoContent();
+            return Ok(updatedHardware);
         }
 
         [HttpDelete("{id}")]

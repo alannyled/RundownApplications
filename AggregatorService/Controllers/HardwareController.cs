@@ -11,7 +11,7 @@ namespace AggregatorService.Controllers
     {
         private readonly HardwareManager _hardwareManager = hardwareManager;
 
-        [HttpPost]
+        [HttpPost("create-hardware")]
         public async Task<IActionResult> Create([FromBody] Hardware hardware)
         {
             if (hardware == null)
@@ -32,7 +32,7 @@ namespace AggregatorService.Controllers
         //    return Ok(hardware);
         //}
 
-        [HttpPut("{uuid}")]
+        [HttpPut("update-hardware/{uuid}")]
         public async Task<IActionResult> Update(string uuid, [FromBody] Hardware updatedHardware)
         {
             if (updatedHardware == null)
@@ -44,7 +44,7 @@ namespace AggregatorService.Controllers
             return Ok(updatedHardware);
         }
 
-        [HttpDelete("{uuid}")]
+        [HttpDelete("delete-hardware/{uuid}")]
         public async Task<IActionResult> Delete(string uuid)
         {
             await _hardwareManager.DeleteHardwareAsync(uuid);

@@ -15,7 +15,7 @@ namespace RundownEditorCore.Services
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(string.Empty, newHardware);
+                var response = await _httpClient.PostAsJsonAsync("create-hardware", newHardware);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -36,12 +36,46 @@ namespace RundownEditorCore.Services
         }
         public async Task<HardwareDTO> UpdateHardwareAsync(string hardwareId, HardwareDTO updatedHardware)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"update-hardware/{hardwareId}", updatedHardware);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var updatedHardwareResponse = await response.Content.ReadFromJsonAsync<HardwareDTO>();
+                    return updatedHardwareResponse;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error updating hardware: {response.StatusCode}, {errorContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during hardware update: {ex.Message}");
+                throw;
+            }
         }
-        public async Task<HardwareDTO> DeleteHardwareAsync(string hardwareId)
+        public async Task DeleteHardwareAsync(string hardwareId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"delete-hardware/{hardwareId}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error deleting hardware: {response.StatusCode}, {errorContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during hardware deletion: {ex.Message}");
+                throw;
+            }
         }
-  
+
+
     }
 }

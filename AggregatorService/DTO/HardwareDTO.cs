@@ -1,4 +1,6 @@
-﻿namespace RundownEditorCore.DTO
+﻿using System.Text.Json.Serialization;
+
+namespace AggregatorService.DTO
 {
     public class HardwareDTO
     {
@@ -10,8 +12,8 @@
         public string MacAddress { get; set; }
         public string IpAddress { get; set; }
         public int Port { get; set; }
-        public DateTime CreatedDate { get; set; } 
-        public DateTime? ArchivedDate { get; set; } = null;
-        public string? ArchivedBy { get; set; } = null;
+        public DateTime CreatedDate { get; set; }
+        public DateTime? ArchivedDate { get; set; }
+        public string? ArchivedBy { get; set; }
     }
 }

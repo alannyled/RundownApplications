@@ -46,16 +46,11 @@ namespace RundownDbService.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> Update(Guid id, [FromBody] RundownDTO dto)
         {
-            // Valider at controlRoomId er til stede og er en gyldig GUID
             if (dto == null || string.IsNullOrEmpty(dto.ControlRoomId) || !Guid.TryParse(dto.ControlRoomId, out var parsedControlRoomId))
             {
                 return BadRequest("A valid controlRoomId is required.");
             }
 
-            Console.WriteLine("Received PUT request for Rundown ID: " + id);
-            Console.WriteLine("ControlRoomId from DTO: " + dto.ControlRoomId);
-
-            // Hent den eksisterende rundown
             var rundown = await _rundownService.GetRundownByIdAsync(id);
             if (rundown == null)
             {

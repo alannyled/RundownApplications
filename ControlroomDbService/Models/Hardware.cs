@@ -7,7 +7,7 @@ namespace ControlRoomDbService.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
-        public Guid UUID { get; set; } = Guid.NewGuid();
+        public Guid UUID { get; set; }
 
         [BsonElement("controlRoomId")]
         public string ControlRoomId { get; set; }

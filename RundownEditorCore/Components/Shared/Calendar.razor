@@ -38,8 +38,8 @@
 @code {
     [Parameter]
     public EventCallback<DateTime> ReturnSelectedDate { get; set; }
-    private DateTime CurrentDate = DateTime.Now;
-    private DateTime DisplayDate = DateTime.Now;
+    private DateTime CurrentDate = DateTime.Now.ToLocalTime();
+    private DateTime DisplayDate = DateTime.Now.ToLocalTime();
     private int DaysInMonth => DateTime.DaysInMonth(DisplayDate.Year, DisplayDate.Month);
     // fordi ugen starter med søndag, rykker jeg det hele en dag herunder
     private int StartDayOfWeek => ((int)new DateTime(DisplayDate.Year, DisplayDate.Month, 1).DayOfWeek + 6) % 7;

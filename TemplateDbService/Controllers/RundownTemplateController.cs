@@ -52,7 +52,7 @@ namespace TemplateDbService.Controllers
 
             template.UUID = uuid;
             await _service.UpdateAsync(uuid, template);
-            return NoContent();
+            return Ok(template);
         }
 
         [HttpDelete("{uuid}")]

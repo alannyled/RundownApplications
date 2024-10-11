@@ -29,7 +29,7 @@
             @if (addingHardwareToRoom != null)
             {
                 <AddHardwareToControlRoomForm Hardware="newHardware"
-                                              RoomName="@addingHardwareToRoom.Name"
+                                              Room="@addingHardwareToRoom"
                                               OnValidSubmit="CreateHardwareAsync"
                                               OnCancel="CancelEdit" />
 
@@ -122,9 +122,6 @@
 
     private async Task CreateControlRoomAsync()
     {   
-        Console.WriteLine("Creating control room");
-        Console.WriteLine(newControlRoom.Name);
-        Console.WriteLine(newControlRoom.Location);
         await ControlRoomService.CreateControlRoomAsync(newControlRoom);
         controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
         newControlRoom = new ControlRoomDTO(); 

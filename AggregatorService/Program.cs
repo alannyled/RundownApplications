@@ -43,6 +43,8 @@ builder.Services.AddSingleton<ServiceFactory>();
 builder.Services.AddSingleton<ControlRoomManager>();
 builder.Services.AddSingleton<RundownManager>();
 builder.Services.AddSingleton<TemplateManager>();
+builder.Services.AddSingleton<HardwareManager>();
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

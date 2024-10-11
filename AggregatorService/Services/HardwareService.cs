@@ -7,25 +7,34 @@ namespace AggregatorService.Services
     {
         private readonly HttpClient _httpClient = httpClient;
 
-        public override async Task<string> FetchData(string api)
+        public override async Task<string> FetchData(string url)
         {            
-            var response = await _httpClient.GetStringAsync(api);
+            var response = await _httpClient.GetStringAsync(url);
             return response;
         }
 
         public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.PostAsJsonAsync(url, payload);
+            response.EnsureSuccessStatusCode();
+
+            return response;
         }
 
         public override async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T payload)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.PutAsJsonAsync(url, payload);
+            response.EnsureSuccessStatusCode();
+
+            return response;
         }
 
         public override async Task<HttpResponseMessage> DeleteAsync(string url)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.DeleteAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            return response;
         }
     }
 

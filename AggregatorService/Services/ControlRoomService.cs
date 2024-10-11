@@ -7,9 +7,9 @@ namespace AggregatorService.Services
     {
         private readonly HttpClient _httpClient = httpClient;
 
-        public override async Task<string> FetchData(string api)
+        public override async Task<string> FetchData(string url)
         {
-            var response = await _httpClient.GetAsync(api);
+            var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();

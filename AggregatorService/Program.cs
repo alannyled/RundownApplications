@@ -6,37 +6,21 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.Configure<ApiUrls>(builder.Configuration.GetSection("ApiUrls"));
+
 builder.Services.AddControllers();
 
 builder.Services.AddHttpClient<ControlRoomService>()
-    .AddTypedClient<Aggregator>((httpClient) =>
-    {
-       // var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
-        return new ControlRoomService(httpClient);
-    });
+    .AddTypedClient<Aggregator>((httpClient) => new ControlRoomService(httpClient));   
 
 builder.Services.AddHttpClient<HardwareService>()
-    .AddTypedClient<Aggregator>((httpClient) =>
-    {
-        //var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
-        return new HardwareService(httpClient);
-    });
+    .AddTypedClient<Aggregator>((httpClient) => new HardwareService(httpClient));
 
 builder.Services.AddHttpClient<RundownService>()
-    .AddTypedClient<Aggregator>((httpClient) =>
-    {
-            //var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
-            return new RundownService(httpClient);
-    });
+    .AddTypedClient<Aggregator>((httpClient) => new RundownService(httpClient));
 
 builder.Services.AddHttpClient<TemplateService>()
-    .AddTypedClient<Aggregator>((httpClient) =>
-    {
-        //var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>().Value;
-        return new TemplateService(httpClient);
-    });
+    .AddTypedClient<Aggregator>((httpClient) => new TemplateService(httpClient));
 
 
 builder.Services.AddSingleton<ServiceFactory>();

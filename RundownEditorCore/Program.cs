@@ -23,23 +23,34 @@ builder.Services.AddHttpClient("TemplatesAPI", client =>
 // Add services to the container.
 builder.Services.AddHttpClient<IRundownService, RundownService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Rundown/"); // ikke APIGateway adresse
+    client.BaseAddress = new Uri("https://localhost:3010/api/Rundown/"); // ikke APIGateway adresse!
 });
 
 builder.Services.AddHttpClient<IHardwareService, HardwareService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Hardware/"); // ikke APIGateway adresse
+    client.BaseAddress = new Uri("https://localhost:3010/api/Hardware/"); // ikke APIGateway adresse!
 });
 builder.Services.AddHttpClient<IControlRoomService, ControlRoomService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/ControlRoom/"); // ikke APIGateway adresse
+    client.BaseAddress = new Uri("https://localhost:3010/api/ControlRoom/"); // ikke APIGateway adresse!
 });
 builder.Services.AddHttpClient<ITemplateService, TemplateService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Template/"); // ikke APIGateway adresse
+    client.BaseAddress = new Uri("https://localhost:3010/api/Template/"); // ikke APIGateway adresse!
 });
 
-builder.Services.AddScoped<FormRenderService>(); // skal den bruges?
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders(); // Fjerner alle standard loggere
+    loggingBuilder.AddProvider(new InMemoryLoggerProvider()); // Tilføj  custom logger
+    loggingBuilder.AddFilter("Microsoft", LogLevel.Warning); // Logger kun advarsler eller højere fra Microsoft namespace
+    loggingBuilder.AddFilter("System", LogLevel.Warning); // Logger kun advarsler eller højere fra System namespace
+    loggingBuilder.AddFilter("RundownEditorCore", LogLevel.Information); // Log kun for app namespace
+});
+
+
+
+builder.Services.AddScoped<FormRenderService>(); 
 
 
 

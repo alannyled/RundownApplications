@@ -3,20 +3,22 @@ using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
 {
-    public class ControlRoomService(HttpClient httpClient) : IControlRoomService
+    public class ControlRoomService(HttpClient httpClient, ILogger<ControlRoomService> logger) : IControlRoomService
     {
         private readonly HttpClient _httpClient = httpClient;
+        private readonly ILogger<ControlRoomService> _logger = logger;
 
         public async Task<List<ControlRoomDTO>> GetControlRoomsAsync()
         {
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<List<ControlRoomDTO>>("fetch-controlroom-with-hardware");
+                _logger.LogInformation($"Succefully fetched controlrooms");
                 return response;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching control rooms: {ex.Message}");
+                _logger.LogInformation($"Error fetching control rooms: {ex.Message}");               
                 return null;
             }
         }

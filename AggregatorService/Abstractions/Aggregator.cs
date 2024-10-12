@@ -6,5 +6,10 @@
         public abstract Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload);
         public abstract Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T payload);
         public abstract Task<HttpResponseMessage> DeleteAsync(string url);
+
+        public void Test()
+        {
+            Console.WriteLine("Test");
+        }
     }
 }

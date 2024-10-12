@@ -85,19 +85,29 @@
             </div>
         </div>
         @* rundown card *@
-        <div class="col-xl-8">
+        <div class="col-xl-9">
+            <div class="row">
+        <div class="col-xl-10">
             <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" OpenModal="ShowRundownItemForm" UpdateRundownList="UpdateRundownListOnControlRoomChange" UpdateSelectedRundown="UpdateSelectedRundown" />
 
         </div>
 
-        <div class="col-xl-1 pt-1">
-            <div class="card card-height-100 mt-5">
+        <div class="col-xl-2 pt-1">
+                    <div class="card card-height-100 mt-5">
                 <AdvancedClock />
-                <div class="card-body">
+                        <div class="card-body overflow-auto">
+                    <ul>
+                        @foreach (var log in InMemoryLogger.GetLogs().Reverse())
+                        {
+                            <li><small>@((MarkupString)log)</small></li>
+                        }
+                    </ul>
                     
                 </div>
 
             </div>
+        </div>
+        </div>
         </div>
     </div>
 </div>
@@ -215,7 +225,7 @@
             EventCallback.Factory.Create<CreateRundownResultDTO>(this, HandleRundownCreated)
         );
         dynamicOnDataReceived = EventCallback.Factory.Create<object>(this, data => HandleRundownCreated((CreateRundownResultDTO)data));
-        validationMessage = string.Empty; // den her kan måske flyttes??
+        validationMessage = string.Empty; 
         modalTitle = "Opret ny rækkefølge";
         showDialog = true;
     }

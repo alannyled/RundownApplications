@@ -20,7 +20,6 @@ namespace AggregatorService.Managers
 
             var hardwareData = await hardwareService.FetchData(_apiUrls.HardwareApi);
 
-
             var controlRooms = JsonSerializer.Deserialize<List<ControlRoom>>(controlRoomData);
             var hardwareItems = JsonSerializer.Deserialize<List<Hardware>>(hardwareData);
 
@@ -41,13 +40,9 @@ namespace AggregatorService.Managers
             var response = await controlRoomService.PostAsJsonAsync(_apiUrls.ControlRoomApi, newControlRoom);
 
             if (response.IsSuccessStatusCode)
-            {
                 return await response.Content.ReadFromJsonAsync<ControlRoom>();
-            }
-            else
-            {
-                throw new Exception("Failed to create control room in the database API.");
-            }
+
+            throw new Exception("Failed to create control room in the database API.");
         }
 
         public async Task<ControlRoom> UpdateControlRoomAsync(string controlRoomId, ControlRoom updatedControlRoom)

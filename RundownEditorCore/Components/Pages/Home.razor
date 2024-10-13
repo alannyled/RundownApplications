@@ -28,10 +28,10 @@
 @if (!string.IsNullOrEmpty(validationMessage))
 {
     <div class="container">
-    <div class="alert alert-warning alert-dismissible">
-        @validationMessage
-        <button type="button" class="btn-close" @onclick="CloseAlert" aria-label="Luk"></button>
-    </div>
+        <div class="alert alert-warning alert-dismissible">
+            @validationMessage
+            <button type="button" class="btn-close" @onclick="CloseAlert" aria-label="Luk"></button>
+        </div>
     </div>
 }
 <Modal ShowDialog="@showDialog"
@@ -46,7 +46,7 @@
         <div class="col-xl-3 h-100">
             <ul class="nav nav-tabs mb-2">
                 <TabItem MenuItem="Medier" ActiveTab="@activeTab" SelectTab="SelectTab" />
-                <TabItem MenuItem="Aktive rækkefølger" ActiveTab="@activeTab" SelectTab="SelectTab" />                
+                <TabItem MenuItem="Aktive rækkefølger" ActiveTab="@activeTab" SelectTab="SelectTab" />
                 <TabItem MenuItem="Skabeloner" ActiveTab="@activeTab" SelectTab="SelectTab" />
             </ul>
             <div class="tab-content">
@@ -70,15 +70,15 @@
                 </div>
                 <div class="tab-pane @(activeTab == "Aktive rækkefølger" ? "show active" : "fade")">
                     <div class="card card-height-100 mb-2">
-                        <div class="card-body">    
+                        <div class="card-body">
                             <div class="d-flex justify-content-between mb-3">
-                            <h5 class="card-title text-muted">Aktive rækkefølger</h5>
+                                <h5 class="card-title text-muted">Aktive rækkefølger</h5>
                                 <button class="btn btn-sm btn-danger" @onclick="ShowCreateNewRundownForm">Opret ny</button>
                             </div>
                             <hr />
                             <Calendar ReturnSelectedDate="SetSelectedDate" />
                             <hr />
-                            <RundownTable OpenRundown="OpenRundown" Rundowns="ActiveRundowns" SelectedDate="SelectedDate"/>
+                            <RundownTable OpenRundown="OpenRundown" Rundowns="ActiveRundowns" SelectedDate="SelectedDate" />
                         </div>
                     </div>
                 </div>
@@ -87,27 +87,27 @@
         @* rundown card *@
         <div class="col-xl-9">
             <div class="row">
-        <div class="col-xl-10">
-            <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" OpenModal="ShowRundownItemForm" UpdateRundownList="UpdateRundownListOnControlRoomChange" UpdateSelectedRundown="UpdateSelectedRundown" />
+                <div class="col-xl-10">
+                    <Rundown SelectedRundown="selectedRundown" ControlRooms="controlRooms" OpenModal="ShowRundownItemForm" UpdateRundownList="UpdateRundownListOnControlRoomChange" UpdateSelectedRundown="UpdateSelectedRundown" />
 
-        </div>
-
-        <div class="col-xl-2 pt-1">
-                    <div class="card card-height-100 mt-5">
-                <AdvancedClock />
-                        <div class="card-body overflow-auto">
-                    <ul>
-                        @foreach (var log in InMemoryLogger.GetLogs().Reverse())
-                        {
-                            <li><small>@((MarkupString)log)</small></li>
-                        }
-                    </ul>
-                    
                 </div>
 
+                <div class="col-xl-2 pt-1">
+                    <div class="card card-height-100 mt-5">
+                        <AdvancedClock />
+                        <div class="card-body overflow-auto">
+                            <ul>
+                                @foreach (var log in InMemoryLogger.GetSimpleLogs().Reverse())
+                                {
+                                    <li><small>@((MarkupString)log)</small></li>
+                                }
+                            </ul>
+
+                        </div>
+
+                    </div>
+                </div>
             </div>
-        </div>
-        </div>
         </div>
     </div>
 </div>
@@ -119,17 +119,17 @@
     // modal indohold
     private bool showDialog = false;
     private string? validationMessage;
-    private string? modalTitle; 
+    private string? modalTitle;
     private RenderFragment? CurrentContent { get; set; }
     private EventCallback<object> dynamicOnDataReceived;
     private Func<Task>? currentSaveAction; // skal væk
 
 
-    public DateTime SelectedDate = DateTime.Now.ToLocalTime();   
+    public DateTime SelectedDate = DateTime.Now.ToLocalTime();
     private string activeTab = "Aktive rækkefølger";
 
     private RundownDTO selectedRundown = new();
-    private List<ControlRoomDTO> controlRooms = new ();
+    private List<ControlRoomDTO> controlRooms = new();
     private List<RundownDTO> ActiveRundowns = new();
     private List<TemplateDTO> AllTemplates = new();
 
@@ -201,12 +201,12 @@
     /// Kalder rending af Modal med RundownItemForm
     /// </summary>
     private void ShowRundownItemForm()
-    {        
+    {
         CurrentContent = FormRenderservice.RenderRundownItemForm(
             Templates,
             selectedRundown,
             EventCallback.Factory.Create<RundownDTO>(this, HandleRundownItemCreated)
-        );   
+        );
         dynamicOnDataReceived = EventCallback.Factory.Create<object>(this, data => HandleRundownItemCreated((RundownDTO)data));
         validationMessage = string.Empty;
         modalTitle = "Opret nyt element";
@@ -219,13 +219,13 @@
     private void ShowCreateNewRundownForm()
     {
         CurrentContent = FormRenderservice.RenderNewRundownForm(
-            AllTemplates, 
-            controlRooms, 
-            SelectedDate, 
+            AllTemplates,
+            controlRooms,
+            SelectedDate,
             EventCallback.Factory.Create<CreateRundownResultDTO>(this, HandleRundownCreated)
         );
         dynamicOnDataReceived = EventCallback.Factory.Create<object>(this, data => HandleRundownCreated((CreateRundownResultDTO)data));
-        validationMessage = string.Empty; 
+        validationMessage = string.Empty;
         modalTitle = "Opret ny rækkefølge";
         showDialog = true;
     }
@@ -256,7 +256,7 @@
     //     // ItemName = string.Empty;
     //     // Duration = "00:00:00";
     //     // Category = string.Empty;
-    //     validationMessage = string.Empty;     
+    //     validationMessage = string.Empty;
 
     // }
 
@@ -264,14 +264,14 @@
     {
         selectedRundown = result;
         validationMessage = string.Empty;
-        showDialog = false; 
+        showDialog = false;
     }
 
     private void HandleRundownCreated(CreateRundownResultDTO result)
     {
         ActiveRundowns = result.ActiveRundowns;
         selectedRundown = result.SelectedRundown;
-        showDialog = false; 
+        showDialog = false;
     }
 
     // private ClaimsPrincipal user;

@@ -20,19 +20,23 @@
                     <span class="bi bi-list-columns-reverse" aria-hidden="true"></span> Templates
                 </NavLink>
             </div>
+            <div class="nav-item">
+                <NavLink class="nav-link text-white" href="log">
+                    <span class="bi bi-list-columns-reverse" aria-hidden="true"></span> log
+                </NavLink>
+            </div>
             <AuthorizeView Roles="Administrator">
                 <Authorized>
+                    <div class="nav-item">
+                        <NavLink class="nav-link text-white" href="rundowns">
+                            <span class="bi bi-list-columns-reverse" aria-hidden="true"></span> Rækkefølger
+                        </NavLink>
+                    </div>
                     <div class="nav-item">
                         <NavLink class="nav-link text-white" href="controlrooms">
                             <span class="bi bi-hdd-network" aria-hidden="true"></span> Kontrolrum og Hardware
                         </NavLink>
                     </div>
-                        <div class="nav-item">
-                            <NavLink class="nav-link text-white" href="rundowns">
-                                <span class="bi bi-list-columns-reverse" aria-hidden="true"></span> Rækkefølger
-                            </NavLink>
-                        </div>
-                   
                 </Authorized>
             </AuthorizeView>
 
@@ -55,10 +59,10 @@
                     </div>
                 </Authorized>
                 <NotAuthorized>
-               @*      <div class="nav-item px-3 ms-auto">
-                        <NavLink class="nav-link" href="Account/Register">
-                            <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                        </NavLink>
+                    @*      <div class="nav-item px-3 ms-auto">
+                    <NavLink class="nav-link" href="Account/Register">
+                    <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                    </NavLink>
                     </div> *@
                     <div class="nav-item px-3 ms-auto">
                         <NavLink class="nav-link text-white" href="Account/Login">
@@ -68,10 +72,10 @@
                 </NotAuthorized>
             </AuthorizeView>
 
-           @*  <div class="nav-item ms-auto">
-                <div class="nav-link text-white">
-                    <Clock ClassList="fs-4"/>
-                </div>
+            @*  <div class="nav-item ms-auto">
+            <div class="nav-link text-white">
+            <Clock ClassList="fs-4"/>
+            </div>
             </div> *@
         </div>
 
@@ -92,7 +96,7 @@
 
     protected override void OnInitialized()
     {
-       
+
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
     }

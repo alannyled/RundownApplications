@@ -7,7 +7,6 @@ namespace AggregatorService.Services
 {
     public class HardwareService(HttpClient httpClient, IOptions<ApiUrls> apiUrls, ICacheService cacheService) : Aggregator(httpClient)
     {
-        private readonly HttpClient _httpClient = httpClient;
         private readonly ApiUrls _apiUrls = apiUrls.Value;
         private readonly ICacheService _cacheService = cacheService;
 

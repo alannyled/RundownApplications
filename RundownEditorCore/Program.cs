@@ -44,7 +44,7 @@ builder.Services.AddLogging(loggingBuilder =>
     loggingBuilder.ClearProviders(); // Fjerner alle standard loggere
     loggingBuilder.AddProvider(new InMemoryLoggerProvider()); // Tilføj  custom logger
     loggingBuilder.AddFilter("Microsoft", LogLevel.Warning); // Logger kun advarsler eller højere fra Microsoft namespace
-    loggingBuilder.AddFilter("System", LogLevel.Warning); // Logger kun advarsler eller højere fra System namespace
+    //loggingBuilder.AddFilter("System", LogLevel.Warning); // Logger kun advarsler eller højere fra System namespace
     loggingBuilder.AddFilter("RundownEditorCore", LogLevel.Information); // Log kun for app namespace
 });
 

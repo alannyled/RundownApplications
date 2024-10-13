@@ -14,7 +14,7 @@ namespace RundownEditorCore.Services
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<List<ControlRoomDTO>>("fetch-controlroom-with-hardware");
-                _logger.LogInformation($"Successfully fetched controlrooms");
+                _logger.LogInformation($"Controlrooms fetched");
                 return response;
             }
             catch (Exception ex)
@@ -33,7 +33,7 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var createdControlRoom = await response.Content.ReadFromJsonAsync<ControlRoomDTO>();
-                    _logger.LogInformation($"Successfully created controlrooms");
+                    _logger.LogInformation($"Controlroom {createdControlRoom.Name} created");
                     return createdControlRoom;
                 }
                 else

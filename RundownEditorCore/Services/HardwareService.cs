@@ -1,17 +1,19 @@
-﻿using RundownEditorCore.DTO;
+﻿using Microsoft.Extensions.Logging;
+using RundownEditorCore.DTO;
 using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
 {
-    public class HardwareService(HttpClient httpClient) : IHardwareService
+    public class HardwareService(HttpClient httpClient, ILogger<HardwareService> logger) : IHardwareService
     {
         private readonly HttpClient _httpClient = httpClient;
+        private readonly ILogger<HardwareService> _logger = logger;
 
         public async Task<List<HardwareDTO>> GetHardwareAsync()
         {
             throw new NotImplementedException();
         }
-        public async Task<HardwareDTO> AddHardwareAsync(HardwareDTO newHardware)
+        public async Task<HardwareDTO?> AddHardwareAsync(HardwareDTO newHardware)
         {
             try
             {
@@ -20,18 +22,20 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var createdHardware = await response.Content.ReadFromJsonAsync<HardwareDTO>();
+                    _logger.LogInformation($"Hardware {createdHardware.Name} created");
                     return createdHardware;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Error creating Hardware: {response.StatusCode}, {errorContent}");
+                    _logger.LogInformation($"Error creating Hardware: {response.StatusCode}, {errorContent}");
+                    return null;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during hardware creation: {ex.Message}");
-                throw;
+                _logger.LogInformation($"Exception during hardware creation: {ex.Message}");
+                return null;
             }
         }
         public async Task<HardwareDTO> UpdateHardwareAsync(string hardwareId, HardwareDTO updatedHardware)
@@ -43,6 +47,7 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var updatedHardwareResponse = await response.Content.ReadFromJsonAsync<HardwareDTO>();
+                    _logger.LogInformation($"Hardware {updatedHardwareResponse.Name} updated");
                     return updatedHardwareResponse;
                 }
                 else

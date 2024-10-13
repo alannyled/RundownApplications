@@ -6,6 +6,7 @@ namespace RundownEditorCore.Services
     {
         private readonly string _name;
         private static readonly ConcurrentQueue<string> _logs = new();
+        private static readonly ConcurrentQueue<string> _simpleLogs = new();
 
         public InMemoryLogger(string name)
         {
@@ -20,12 +21,15 @@ namespace RundownEditorCore.Services
         {
             if (formatter != null)
             {
-                var logMessage = $"{DateTime.Now}: [{logLevel}]<br>&emsp;{formatter(state, exception)}"; //{_name}
+                var logMessage = $"<td>{DateTime.Now}</td><td>{logLevel}</td><td> {_name}</td><td>{formatter(state, exception)}</td>"; 
+                var simpleLogMessage = $"{DateTime.Now:HH:mm:ss} {formatter(state, exception)}";
                 _logs.Enqueue(logMessage);
+                _simpleLogs.Enqueue(simpleLogMessage);
             }
         }
 
         public static IEnumerable<string> GetLogs() => _logs;
+        public static IEnumerable<string> GetSimpleLogs() => _simpleLogs;
     }
 
     public class InMemoryLoggerProvider : ILoggerProvider

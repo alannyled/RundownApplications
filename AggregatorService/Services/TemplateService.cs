@@ -5,8 +5,6 @@ namespace AggregatorService.Services
 {
     public class TemplateService(HttpClient httpClient) : Aggregator(httpClient)
     {
-        private readonly HttpClient _httpClient = httpClient;
-
         public override async Task<string> FetchData(string url)
         {
             var response = await _httpClient.GetAsync(url);
@@ -17,9 +15,9 @@ namespace AggregatorService.Services
             return content;
         }
 
-        public async Task<string> GetByIdAsync(string api)
+        public async Task<string> GetByIdAsync(string url)
         {
-            var response = await _httpClient.GetAsync(api);
+            var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();

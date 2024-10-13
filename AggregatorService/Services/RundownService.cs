@@ -9,8 +9,6 @@ namespace AggregatorService.Services
 {
     public class RundownService(HttpClient httpClient) : Aggregator(httpClient)
     {
-        private readonly HttpClient _httpClient = httpClient;    
-
         public override async Task<string> FetchData(string api)
         {
             var response = await _httpClient.GetAsync(api);

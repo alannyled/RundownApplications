@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace AggregatorService.Services
 {
-    public class TemplateService(HttpClient httpClient) : Aggregator
+    public class TemplateService(HttpClient httpClient) : Aggregator(httpClient)
     {
         private readonly HttpClient _httpClient = httpClient;
 

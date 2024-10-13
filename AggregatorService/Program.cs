@@ -6,15 +6,27 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.Configure<ApiUrls>(builder.Configuration.GetSection("ApiUrls"));
 
 builder.Services.AddControllers();
 
 builder.Services.AddHttpClient<ControlRoomService>()
-    .AddTypedClient<Aggregator>((httpClient) => new ControlRoomService(httpClient));   
+    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    {
+        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>();
+        var cacheService = serviceProvider.GetRequiredService<ICacheService>();
+        return new ControlRoomService(httpClient, apiUrls, cacheService);
+    });
 
 builder.Services.AddHttpClient<HardwareService>()
-    .AddTypedClient<Aggregator>((httpClient) => new HardwareService(httpClient));
+    .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>
+    {
+        var apiUrls = serviceProvider.GetRequiredService<IOptions<ApiUrls>>();
+        var cacheService = serviceProvider.GetRequiredService<ICacheService>();
+        return new HardwareService(httpClient, apiUrls, cacheService);
+    });
 
 builder.Services.AddHttpClient<RundownService>()
     .AddTypedClient<Aggregator>((httpClient) => new RundownService(httpClient));

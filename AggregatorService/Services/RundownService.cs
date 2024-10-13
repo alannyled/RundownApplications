@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace AggregatorService.Services
 {
-    public class RundownService(HttpClient httpClient) : Aggregator
+    public class RundownService(HttpClient httpClient) : Aggregator(httpClient)
     {
         private readonly HttpClient _httpClient = httpClient;    
 

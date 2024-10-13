@@ -1,4 +1,5 @@
-﻿using RundownEditorCore.DTO;
+﻿using Microsoft.AspNetCore.Mvc;
+using RundownEditorCore.DTO;
 using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
@@ -13,7 +14,7 @@ namespace RundownEditorCore.Services
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<List<ControlRoomDTO>>("fetch-controlroom-with-hardware");
-                _logger.LogInformation($"Succefully fetched controlrooms");
+                _logger.LogInformation($"Successfully fetched controlrooms");
                 return response;
             }
             catch (Exception ex)
@@ -22,7 +23,7 @@ namespace RundownEditorCore.Services
                 return null;
             }
         }
-        public async Task<ControlRoomDTO> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
+        public async Task<ControlRoomDTO?> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
         {
             try
             {            
@@ -32,19 +33,21 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var createdControlRoom = await response.Content.ReadFromJsonAsync<ControlRoomDTO>();
+                    _logger.LogInformation($"Successfully created controlrooms");
                     return createdControlRoom;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Error creating control room: {response.StatusCode}, {errorContent}");
+                    _logger.LogInformation($"Error creating control room: {response.StatusCode}, {errorContent}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during control room creation: {ex.Message}");
-                throw;
+                _logger.LogInformation($"Error creating control room: {ex.Message}");
+                
             }
+            return null;
         }
 
         public async Task<ControlRoomDTO> UpdateControlRoomAsync(string controlRoomId, ControlRoomDTO updatedControlRoom)

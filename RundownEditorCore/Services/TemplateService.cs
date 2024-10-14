@@ -4,13 +4,15 @@ using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
 {
-    public class TemplateService(HttpClient httpClient) : ITemplateService
+    public class TemplateService(HttpClient httpClient, ILogger<TemplateService> logger) : ITemplateService
     {
         private readonly HttpClient _httpClient = httpClient;
+        private readonly ILogger<TemplateService> _logger = logger;
 
         public async Task<List<TemplateDTO>> GetAllTemplatesAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<List<TemplateDTO>>("fetch-all-rundown-templates");
+            _logger.LogInformation($"FETCHED Templates");
             return response;
         }
     }

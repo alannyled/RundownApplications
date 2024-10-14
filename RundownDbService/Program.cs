@@ -23,6 +23,9 @@ builder.Services.AddScoped<IRundownService, RundownService>();
 builder.Services.AddScoped<IRundownItemService, RundownItemService>();
 builder.Services.AddScoped<IItemDetailService, ItemDetailService>();
 
+builder.Services.AddSingleton<KafkaService>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

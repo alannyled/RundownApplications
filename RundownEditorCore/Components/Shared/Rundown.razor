@@ -52,7 +52,7 @@
 
     protected override void OnParametersSet()
     {
-        if (activeTab != SelectedRundown.Name && !string.IsNullOrEmpty(SelectedRundown.Name))
+        if (SelectedRundown != null && activeTab != SelectedRundown.Name && !string.IsNullOrEmpty(SelectedRundown.Name))
         {
             activeTab = SelectedRundown.Name;
             menuTabs = [];

@@ -21,10 +21,15 @@ namespace RundownEditorCore.Services
         {
             if (formatter != null)
             {
-                var logMessage = $"<td>{DateTime.Now}</td><td>{logLevel}</td><td> {_name}</td><td>{formatter(state, exception)}</td>"; 
-                var simpleLogMessage = $"{DateTime.Now:HH:mm:ss} {formatter(state, exception)}";
+                var logMessage = $"<td>{DateTime.Now}</td><td>{logLevel}</td><td> {_name}</td><td>{formatter(state, exception)}</td>";                 
                 _logs.Enqueue(logMessage);
-                _simpleLogs.Enqueue(simpleLogMessage);
+
+                if (_name.Contains("RundownEditorCore"))
+                {
+                    var simpleLogMessage = $"<strong>{DateTime.Now:HH:mm:ss}</strong> {formatter(state, exception)}";
+                    _simpleLogs.Enqueue(simpleLogMessage);
+                }
+                
             }
         }
 

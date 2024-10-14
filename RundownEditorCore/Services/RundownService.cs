@@ -6,19 +6,22 @@ using System.Runtime.CompilerServices;
 
 namespace RundownEditorCore.Services
 {
-    public class RundownService(HttpClient httpClient) : IRundownService
+    public class RundownService(HttpClient httpClient, ILogger<RundownService> logger) : IRundownService
     {
         private readonly HttpClient _httpClient = httpClient;
+        private readonly ILogger<RundownService> _logger = logger;
 
         public async Task<List<RundownDTO>> GetActiveRundowsAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-active-rundowns-with-controlrooms");
+            _logger.LogInformation($"FETCHED Rundowns");
             return response;
         }
 
         public async Task<RundownDTO> GetRundownAsync(string uuid)
         {
             var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
+            _logger.LogInformation($"FETCHED Rundown {response.Name}");
             return response;
         }
 
@@ -33,7 +36,7 @@ namespace RundownEditorCore.Services
             };
             var createdRundown = await _httpClient.PostAsJsonAsync($"create-rundown-from-template/{templateId}", request);
             var response = await createdRundown.Content.ReadFromJsonAsync<RundownDTO>();
-            
+            _logger.LogInformation($"CREATED Rundown {response.Name}");
             return response;
         }
 
@@ -48,14 +51,12 @@ namespace RundownEditorCore.Services
 
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Successfully updated control room.");
-                return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                var rundown = await response.Content.ReadFromJsonAsync<RundownDTO>();
+                _logger.LogInformation($"UPDATED Rundown {rundown.Name}");
+                return rundown;
             }
-            else
-            {
-                Console.WriteLine($"Error updating control room: {response.ReasonPhrase}");
-                return null;
-            }
+            _logger.LogInformation($"ERROR updating control room: {response.ReasonPhrase}");
+            return null;
         }
 
         public async Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
@@ -66,13 +67,10 @@ namespace RundownEditorCore.Services
             Console.WriteLine(response.ReasonPhrase);
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Successfully added item to rundown.");
+                _logger.LogInformation($"ADDED Item to Rundown");
                 return await response.Content.ReadFromJsonAsync<RundownDTO>();
             }
-            else
-            {
-                Console.WriteLine($"Error adding item to rundown: {response.ReasonPhrase}");
-            }
+            _logger.LogInformation($"ERROR adding item to rundown: {response.ReasonPhrase}");
             return null;
         }
 

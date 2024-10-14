@@ -1,4 +1,4 @@
-﻿using KafkaFactoryLibrary;
+﻿using KafkaServiceLibrary;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 
@@ -7,7 +7,7 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
-var kafkaFactory = new KafkaFactory(configuration);
+var kafkaService = new KafkaService(configuration);
 
 while (true)
 {
@@ -24,7 +24,7 @@ while (true)
 
         if (topics != null && topics.Length > 0)
         {
-            await kafkaFactory.CreateTopicAsync(topics);
+            await kafkaService.CreateTopicAsync(topics);
         }
         else
         {
@@ -41,7 +41,7 @@ while (true)
 
         if (topics != null && topics.Length > 0)
         {
-            await kafkaFactory.DeleteTopicsAsync(topics);
+            await kafkaService.DeleteTopicsAsync(topics);
         }
         else
         {
@@ -50,12 +50,12 @@ while (true)
     }
     else if (choice == "5")
     {
-        await kafkaFactory.ListTopicsAsync();
+        await kafkaService.ListTopicsAsync();
     }
     else if (choice == "1")
     {
-        // Din eksisterende kode til producer
-        var producerClient = (KafkaProducerClient)kafkaFactory.CreateKafkaClient("producer");
+        
+        var producerClient = (KafkaProducerClient)kafkaService.CreateKafkaClient("producer");
         Console.WriteLine("Indtast topic:");
         var topic = Console.ReadLine();
 
@@ -72,14 +72,14 @@ while (true)
     }
     else if (choice == "2")
     {
-        // Din eksisterende kode til consumer
+       
         Console.WriteLine("Indtast group-id:");
         var groupId = Console.ReadLine();
 
         Console.WriteLine("Indtast topics (komma-separeret):");
         var topics = Console.ReadLine()?.Split(',');
 
-        var consumerClient = (KafkaConsumerClient)kafkaFactory.CreateKafkaClient("consumer", groupId, topics);
+        var consumerClient = (KafkaConsumerClient)kafkaService.CreateKafkaClient("consumer", groupId, topics);
         var consumer = consumerClient.Consumer;
 
         Console.WriteLine("Lytter til beskeder... Tryk 'exit' for at vende tilbage til hovedmenuen.");

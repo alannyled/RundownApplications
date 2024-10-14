@@ -20,7 +20,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\KafkaFactoryLibrary\KafkaFactoryLibrary.csproj" />
+		<ProjectReference Include="..\KafkaFactoryLibrary\KafkaServiceLibrary.csproj" />
 	</ItemGroup>
 
 

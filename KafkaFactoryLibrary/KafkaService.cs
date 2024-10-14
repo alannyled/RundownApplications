@@ -3,15 +3,15 @@ using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
-namespace KafkaFactoryLibrary
+namespace KafkaServiceLibrary
 {
-    public class KafkaFactory
+    public class KafkaService
     {
         private readonly ProducerConfig _producerConfig;
         private readonly ConsumerConfig _consumerConfig;
         private readonly string _bootstrapServers;
 
-        public KafkaFactory(IConfiguration configuration)
+        public KafkaService(IConfiguration configuration)
         {
             _bootstrapServers = configuration.GetValue<string>("Kafka:BootstrapServers");
 

@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
 
-namespace KafkaFactoryLibrary
+namespace KafkaServiceLibrary
 {
     public class KafkaProducerClient : IKafkaClient
     {

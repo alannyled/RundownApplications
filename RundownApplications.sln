@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownEditorCore", "Rundow
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeleprompterSimulator", "TeleprompterSimulator\TeleprompterSimulator.csproj", "{CF13503B-A63D-41B1-BFFC-197D95E8E294}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaFactoryTestApp", "KafkaFactoryTestApp\KafkaFactoryTestApp.csproj", "{D2429722-1EDF-4382-82F4-6AE00A892F71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaServiceTestApp", "KafkaFactoryTestApp\KafkaServiceTestApp.csproj", "{D2429722-1EDF-4382-82F4-6AE00A892F71}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaFactoryLibrary", "KafkaFactoryLibrary\KafkaFactoryLibrary.csproj", "{6DCCEC9F-D12E-45AA-8325-992EF87A3961}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaServiceLibrary", "KafkaFactoryLibrary\KafkaServiceLibrary.csproj", "{6DCCEC9F-D12E-45AA-8325-992EF87A3961}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlRoomDbService", "ControlroomDbService\ControlRoomDbService.csproj", "{429CF27F-E57A-4764-B55D-A3DA6EB0497D}"
 EndProject

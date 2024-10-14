@@ -11,7 +11,15 @@ var kafkaService = new KafkaService(configuration);
 
 while (true)
 {
-    Console.WriteLine("Vælg funktion: 1 for Producer, 2 for Consumer, 3 for Create Topics, 4 for Delete Topics, 5 for List Topics, eller 'exit' for at afslutte");
+    Console.WriteLine("Vælg funktion:");
+    Console.WriteLine("  • 1: Producer.");
+    Console.WriteLine("  • 2: Consumer.");
+    Console.WriteLine("  • 3: Create Topics.");
+    Console.WriteLine("  • 4: Delete Topics.");
+    Console.WriteLine("  • 5: List Topics.");
+    Console.WriteLine("  • x: for at afslutte.");
+
+
     var choice = Console.ReadLine();
 
     if (choice == "3")
@@ -61,9 +69,9 @@ while (true)
 
         while (true)
         {
-            Console.WriteLine("Indtast besked (eller 'exit' for at stoppe producenten og vende tilbage til hovedmenuen):");
+            Console.WriteLine("Indtast besked (eller 'x' for at stoppe producenten og vende tilbage til hovedmenuen):");
             var message = Console.ReadLine();
-            if (message?.ToLower() == "exit")
+            if (message?.ToLower() == "x")
                 break;
 
             producerClient.Producer.Produce(topic, new Message<string, string> { Key = Guid.NewGuid().ToString(), Value = message });
@@ -82,7 +90,7 @@ while (true)
         var consumerClient = (KafkaConsumerClient)kafkaService.CreateKafkaClient("consumer", groupId, topics);
         var consumer = consumerClient.Consumer;
 
-        Console.WriteLine("Lytter til beskeder... Tryk 'exit' for at vende tilbage til hovedmenuen.");
+        Console.WriteLine("Lytter til beskeder... Tryk 'x' for at vende tilbage til hovedmenuen.");
 
         var consumeTask = Task.Run(() =>
         {
@@ -96,7 +104,7 @@ while (true)
         while (true)
         {
             var exitCommand = Console.ReadLine();
-            if (exitCommand?.ToLower() == "exit")
+            if (exitCommand?.ToLower() == "x")
             {
                 consumer.Close();
                 break;
@@ -105,7 +113,7 @@ while (true)
 
         await consumeTask;
     }
-    else if (choice?.ToLower() == "exit")
+    else if (choice?.ToLower() == "x")
     {
         Console.WriteLine("Afslutter programmet.");
         break;

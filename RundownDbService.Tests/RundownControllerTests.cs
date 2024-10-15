@@ -4,9 +4,6 @@ using RundownDbService.BLL.Interfaces;
 using RundownDbService.Controllers;
 using RundownDbService.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace RundownDbService.Tests
 {

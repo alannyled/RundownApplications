@@ -23,7 +23,7 @@ namespace RundownDbService.BLL.Services
 
         }
 
-        public void SendMessage(string topic, string message)
+        public virtual void SendMessage(string topic, string message)
         {
             _producerClient.Producer.Produce(topic, new Message<string, string> { Key = Guid.NewGuid().ToString(), Value = message });
         }

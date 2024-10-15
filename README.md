@@ -43,5 +43,13 @@ tasklist | findstr RundownDbService
 taskkill /F /IM RundownDbService.exe
 dotnet build
 ```
+Tilføj Test projekt
+```
+dotnet new xunit -o [NAME].Tests
+dotnet sln RundownApplications.sln add [NAME].Tests/[NAME].Tests.csproj
+cd [NAME].Tests
+dotnet add reference ../[NAME]/[NAME].csproj
+```
+
 
 

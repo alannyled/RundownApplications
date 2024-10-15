@@ -21,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownDbService", "Rundown
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemplateDbService", "TemplateDbService\TemplateDbService.csproj", "{22730A71-6804-4378-BEC2-69112AB6BC7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RundownDbService.Tests", "RundownDbService.Tests\RundownDbService.Tests.csproj", "{CC76A1A5-E86F-49C9-A24E-25D83643F9C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownDbService.Tests", "RundownDbService.Tests\RundownDbService.Tests.csproj", "{CC76A1A5-E86F-49C9-A24E-25D83643F9C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AggregatorService.Tests", "AggregatorService.Tests\AggregatorService.Tests.csproj", "{37690E74-723E-4D02-A85F-F0CF5E3165EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AggregatorService.Tests", "AggregatorService.Tests\AggregatorService.Tests.csproj", "{37690E74-723E-4D02-A85F-F0CF5E3165EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,13 +6,15 @@
         </div>
 
         <div class="card-header">
-            <div class="d-flex">      
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-camera-video"></i></button>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-card-text"></i></button>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-palette"></i></button>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-film"></i></button>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5"><i class="bi bi-badge-vo"></i></button>             
-                
+            <div class="d-flex">
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("camera")'><i class="bi bi-camera-video"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("text")'><i class="bi bi-card-text"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("graphic")'><i class="bi bi-palette"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("film")'><i class="bi bi-film"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("voiceover")'><i class="bi bi-badge-vo"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("comment")'><i class="bi bi-chat-right-text"></i></button>
+
+
             </div>
         </div>
 
@@ -34,9 +36,16 @@
     [Parameter]
     public EventCallback<string> OnRemove { get; set; } 
 
+    [Parameter]
+    public EventCallback ShowDialog { get; set; }
+
     public async Task RemoveTabPane()
     {
         await OnRemove.InvokeAsync(Name);
+    }
+    public void AddSelected(string type)
+    {
+        ShowDialog.InvokeAsync(type);
     }
 }
 

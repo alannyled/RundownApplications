@@ -1,6 +1,4 @@
-﻿@using RundownEditorCore.DTO
-@using RundownEditorCore.Interfaces
-@inject IRundownService RundownService
+﻿@inject IRundownService RundownService
 
 <div class="tab-pane @(ActiveTab == SelectedRundown.Name && !string.IsNullOrEmpty(ActiveTab) && !string.IsNullOrEmpty(SelectedRundown.Name) ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">

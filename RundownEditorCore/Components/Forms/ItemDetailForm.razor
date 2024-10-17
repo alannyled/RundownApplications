@@ -1,5 +1,4 @@
-﻿@using RundownEditorCore.DTO
-@using RundownEditorCore.Interfaces
+﻿@inject IRundownService RundownService
 
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
@@ -26,46 +25,57 @@
 </form>
 
 @code {
-    [Inject]
-    private IRundownService RundownService { get; set; }
-
+    // [Inject]
+    // private IRundownService RundownService { get; set; }
     [Parameter]
-    public List<string> DetailType { get; set; } = new List<string>();
+    public string DetailType { get; set; } = string.Empty;
     [Parameter]
-    public RundownDTO SelectedRundown { get; set; }
-    [Parameter]
-    public RundownItemDTO SelectedRundownItem { get; set; }
-
+    public string Uuid { get; set; } = string.Empty;
+    // [Parameter]
+    // public RundownItemDTO SelectedRundownItem { get; set; }
     [Parameter]
     public EventCallback<RundownDTO> OnItemCreated { get; set; }
 
-    public string Title { get; set; } = string.Empty;
+    public RundownDTO SelectedRundown { get; set; } = new();
 
-    public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
+    public TimeSpan Duration { get; set; } = new TimeSpan(0, 0, 0);
 
     public string Template { get; set; } = string.Empty;
 
     public List<string> Cameras { get; set; } = ["Kamera 1", "Kamera 2", "Kamera 3"];
 
+    public ItemDetail? GetModel(string type) =>
+    type switch
+    {
+        "video" => new ItemDetailDTO.ItemDetailVideo(),
+        "text" => new ItemDetailDTO.ItemDetailTeleprompter(),
+        "graphic" => new ItemDetailDTO.ItemDetailGraphic(),
+        "comment" => new ItemDetailDTO.ItemDetailComment(),
+        "voiceover" => new ItemDetailDTO.ItemDetailTeleprompter(),
+        _ => null
+
+    };
+
+
     private async Task HandleSubmit()
     {
-        // if (string.IsNullOrEmpty(ItemName))
-        // {
-        //     validationMessage = "Navnet må ikke være tomt.";
-        //     return;
-        // }
+        var newRundownItem = GetModel(DetailType);
 
-        var newRundownItem = new RundownItemDTO
-            {
-                UUID = Guid.NewGuid(),
-                RundownId = SelectedRundown.Uuid,
-                Name = Title,
-                Duration = Duration.ToString(),
-                Order = SelectedRundown.Items.Count // + 1  eller *10?
-            };
+        newRundownItem.UUID = Guid.NewGuid();
+        newRundownItem.ItemId = Guid.Parse(Uuid);
+        newRundownItem.Type = DetailType;
+
+        // var newRundownItem = new ItemDetailDTO.ItemDetail
+        //     {
+        //         UUID = Guid.NewGuid(),
+        //         ItemId = Guid.Parse(Uuid),
+        //     Type = DetailType
+        //        // Duration = Duration.ToString(),
+        //        // Order = SelectedRundown.Items.Count // + 1  eller *10?
+        //     };
 
 
-        SelectedRundown = await RundownService.AddItemToRundownAsync(SelectedRundown.Uuid, newRundownItem);
+        SelectedRundown = await RundownService.AddDetailToItemAsync(Uuid, newRundownItem);
 
 
         // var result = new CreateRundownItemResultDTO

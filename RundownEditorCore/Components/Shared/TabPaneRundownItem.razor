@@ -1,4 +1,7 @@
-﻿<div class="tab-pane @(ActiveTab == @Name ? "show active" : "fade")">
+﻿@inject ModalState Modalstate
+@inject FormRenderService FormRenderservice
+
+<div class="tab-pane @(ActiveTab == @Name ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
         <div class="card-header d-flex justify-content-between bg-danger text-white">
             <h5 class="mb-0">@Name</h5>
@@ -10,14 +13,11 @@
                 <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("camera")'><i class="bi bi-camera-video"></i></button>
                 <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("text")'><i class="bi bi-card-text"></i></button>
                 <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("graphic")'><i class="bi bi-palette"></i></button>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("film")'><i class="bi bi-film"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("video")'><i class="bi bi-film"></i></button>
                 <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("voiceover")'><i class="bi bi-badge-vo"></i></button>
                 <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick='() => AddSelected("comment")'><i class="bi bi-chat-right-text"></i></button>
-
-
             </div>
         </div>
-
 
         <div class="card-body" contenteditable="true">
 
@@ -32,6 +32,8 @@
     public string ActiveTab { get; set; } = string.Empty;
     [Parameter]
     public string Name { get; set; } = "Unknown Name";
+    [Parameter]
+    public string ItemID { get; set; }
 
     [Parameter]
     public EventCallback<string> OnRemove { get; set; } 
@@ -45,7 +47,21 @@
     }
     public void AddSelected(string type)
     {
-        ShowDialog.InvokeAsync(type);
+        var content = new RenderFragment(builder =>
+       {
+           builder.AddContent(0, FormRenderservice.RenderItemDetailForm(
+               ItemID,
+               type,
+               EventCallback.Factory.Create<ItemDetailDTO>(this, HandleItemDetailCreated)
+           ));
+       });
+
+        ModalState.SetContent(content, "Opret objekt");
+    }
+
+    public void HandleItemDetailCreated()
+    {
+        Console.WriteLine("Detail creating in play here");
     }
 }
 

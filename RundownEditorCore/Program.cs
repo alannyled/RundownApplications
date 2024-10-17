@@ -11,6 +11,7 @@ using RundownEditorCore.Data;
 using Microsoft.Extensions.Options;
 using RundownEditorCore.Services;
 using RundownEditorCore.Interfaces;
+using RundownEditorCore.States;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +50,8 @@ builder.Services.AddLogging(loggingBuilder =>
 });
 
 
-
+builder.Services.AddScoped<ModalState>();
+builder.Services.AddScoped<ToastState>();
 builder.Services.AddScoped<FormRenderService>(); 
 
 

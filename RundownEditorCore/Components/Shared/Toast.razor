@@ -1,0 +1,28 @@
+﻿@inject ToastState ToastState
+
+<div class="fixed-top" style="top:50px;z-index:5000">
+    <div class="modal-dialog @(ToastState.Show ? "" : "d-none")">
+        <div class="alert @ToastState.Color alert-dismissible" role="alert">
+            @ToastState.Message
+            <button type="button" class="btn-close" @onclick="CloseToast"></button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        ToastState.OnChange += StateHasChanged;
+    }
+
+    public void CloseToast()
+    {
+        ToastState.Close();
+    }
+
+    public void Dispose()
+    {
+        ToastState.OnChange -= StateHasChanged;
+    }
+}

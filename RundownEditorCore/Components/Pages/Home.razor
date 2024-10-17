@@ -1,16 +1,12 @@
 ﻿@page "/"
-@using System.Text.Json;
-@using RundownEditorCore.Components.Shared
-@using RundownEditorCore.DTO
-@using RundownEditorCore.Interfaces
-@using RundownEditorCore.Data
-@using RundownEditorCore.Components.Forms
-@using RundownEditorCore.Services
+
 @inject IRundownService RundownService
 @inject IControlRoomService ControlRoomService
 @inject ITemplateService TemplateService
 @inject IHttpClientFactory ClientFactory
 @inject FormRenderService FormRenderservice
+@inject ModalState ModalState
+@inject ToastState ToastState
 @using Microsoft.AspNetCore.Authorization
 @* @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
@@ -24,22 +20,8 @@
 
 <PageTitle>Home</PageTitle>
 
-
-@if (!string.IsNullOrEmpty(validationMessage))
-{
-    <div class="container">
-        <div class="alert alert-warning alert-dismissible">
-            @validationMessage
-            <button type="button" class="btn-close" @onclick="CloseAlert" aria-label="Luk"></button>
-        </div>
-    </div>
-}
-<Modal ShowDialog="@showDialog"
-       OnDataReceived="dynamicOnDataReceived"
-       ShowDialogChanged="@((value) => showDialog = value)"
-       Title="@modalTitle">
-    @CurrentContent
-</Modal>
+<Toast></Toast>
+<Modal></Modal>
 
 <div class="container-fluid full-height">
     <div class="row h-100">
@@ -115,15 +97,6 @@
 
 
 @code {
-    //private string? teleprompterText { get; set; }
-    // modal indohold
-    private bool showDialog = false;
-    private string? validationMessage;
-    private string? modalTitle;
-    private RenderFragment? CurrentContent { get; set; }
-    private EventCallback<object> dynamicOnDataReceived;
-    private Func<Task>? currentSaveAction; // skal væk
-
 
     public DateTime SelectedDate = DateTime.Now.ToLocalTime();
     private string activeTab = "Aktive rækkefølger";
@@ -141,15 +114,6 @@
 
     }
 
-    /// <summary>
-    /// Ved klik på Modal save button, vækkes den aktuelle metode
-    /// </summary>
-    private void SaveCurrentObject()
-    {
-        currentSaveAction?.Invoke();
-        StateHasChanged();
-    }
-
     private async Task UpdateRundownListOnControlRoomChange()
     {
         ActiveRundowns = await RundownService.GetActiveRundowsAsync();
@@ -163,10 +127,6 @@
         StateHasChanged();
     }
 
-    private void CloseAlert()
-    {
-        validationMessage = string.Empty;
-    }
 
     private async Task OpenRundown(string uuid)
     {
@@ -202,15 +162,16 @@
     /// </summary>
     private void ShowRundownItemForm()
     {
-        CurrentContent = FormRenderservice.RenderRundownItemForm(
+        var content = new RenderFragment(builder =>
+        {
+            builder.AddContent(0, FormRenderservice.RenderRundownItemForm(
             Templates,
             selectedRundown,
             EventCallback.Factory.Create<RundownDTO>(this, HandleRundownItemCreated)
-        );
-        dynamicOnDataReceived = EventCallback.Factory.Create<object>(this, data => HandleRundownItemCreated((RundownDTO)data));
-        validationMessage = string.Empty;
-        modalTitle = "Opret nyt element";
-        showDialog = true;
+        ));
+        });
+
+        ModalState.SetContent(content, "Opret ny historie");
 
     }
     ///<summary>
@@ -218,16 +179,36 @@
     /// </summary>
     private void ShowCreateNewRundownForm()
     {
-        CurrentContent = FormRenderservice.RenderNewRundownForm(
-            AllTemplates,
-            controlRooms,
-            SelectedDate,
-            EventCallback.Factory.Create<CreateRundownResultDTO>(this, HandleRundownCreated)
-        );
-        dynamicOnDataReceived = EventCallback.Factory.Create<object>(this, data => HandleRundownCreated((CreateRundownResultDTO)data));
-        validationMessage = string.Empty;
-        modalTitle = "Opret ny rækkefølge";
-        showDialog = true;
+        var content = new RenderFragment(builder =>
+        {
+            builder.AddContent(0, FormRenderservice.RenderNewRundownForm(
+                AllTemplates,
+                controlRooms,
+                SelectedDate,
+                EventCallback.Factory.Create<CreateRundownResultDTO>(this, HandleRundownCreated)
+            ));
+        });
+
+        ModalState.SetContent(content, "Opret ny rækkefølge");
+
+    }
+
+    /// <summary>
+    /// Sætter values efter gem rundownItem og lukker modal
+    /// </summary>
+    private void HandleRundownItemCreated(RundownDTO result)
+    {
+        selectedRundown = result;
+        ModalState.Close();
+    }
+    /// <summary>
+    /// Sætter values efter gem Rundown og lukker modal
+    /// </summary>
+    private void HandleRundownCreated(CreateRundownResultDTO result)
+    {
+        ActiveRundowns = result.ActiveRundowns;
+        selectedRundown = result.SelectedRundown;
+        ModalState.Close();
     }
 
     // private async Task SaveRundownItemForm()
@@ -246,7 +227,7 @@
     //     //         Name = ItemName,
     //     //         Duration = Duration,
     //     //         Order = selectedRundown.Items.Count // + 1  eller *10?
-    //     //     };
+        //     //     };
 
     //   //  await RundownService.AddItemToRundownAsync(selectedRundown.Uuid, newRundownItem);
     //     // kan denne ikke komme som svar på ovenstående, i stedet for at kalde igen
@@ -260,19 +241,7 @@
 
     // }
 
-    private void HandleRundownItemCreated(RundownDTO result)
-    {
-        selectedRundown = result;
-        validationMessage = string.Empty;
-        showDialog = false;
-    }
 
-    private void HandleRundownCreated(CreateRundownResultDTO result)
-    {
-        ActiveRundowns = result.ActiveRundowns;
-        selectedRundown = result.SelectedRundown;
-        showDialog = false;
-    }
 
     // private ClaimsPrincipal user;
     // private ApplicationUser currentUser;

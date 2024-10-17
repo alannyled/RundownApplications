@@ -1,9 +1,8 @@
-﻿@using RundownEditorCore.DTO
-@using RundownEditorCore.Interfaces
+﻿@inject ToastState ToastState
 
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
-        <label for="itemname" class="form-label">Navn</label>
+        <label for="itemname" class="form-label">Titel</label>
         <input type="text" class="form-control form-control-sm" id="itemname" @bind="@ItemName"/>
     </div>
     <div class="mb-3">
@@ -21,7 +20,7 @@
         </select>
     </div>
     <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-sm btn-primary">Opret rækkefølge objekt</button>
+        <button type="submit" class="btn btn-sm btn-primary">Opret historie</button>
     </div>
 </form>
 
@@ -36,41 +35,29 @@
     [Parameter]
     public EventCallback<RundownDTO> OnItemCreated { get; set; }
 
-    // [Parameter]
     public string ItemName { get; set; } = string.Empty;
-
-    // [Parameter]
     public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
-
-    // [Parameter]
     public string Template { get; set; } = string.Empty;
 
     private async Task HandleSubmit()
     {
-        // if (string.IsNullOrEmpty(ItemName))
-        // {
-        //     validationMessage = "Navnet må ikke være tomt.";
-        //     return;
-        // }
+        if (string.IsNullOrEmpty(ItemName))
+        {
+            ToastState.FireToast("Du skal angive en titel", "alert-warning");
+            return;
+        }
 
         var newRundownItem = new RundownItemDTO
             {
                 UUID = Guid.NewGuid(),
                 RundownId = SelectedRundown.Uuid,
                 Name = ItemName,
-                Duration = Duration.ToString(),
+                Duration = Duration.ToString("HH:mm:ss"),
                 Order = SelectedRundown.Items.Count // + 1  eller *10?
             };
 
-     
+
         SelectedRundown = await RundownService.AddItemToRundownAsync(SelectedRundown.Uuid, newRundownItem);
-
-  
-        // var result = new CreateRundownItemResultDTO
-        //     {
-        //         SelectedRundown = updatedRundown
-        //     };
-
         await OnItemCreated.InvokeAsync(SelectedRundown);
     }
 

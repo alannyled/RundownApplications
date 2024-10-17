@@ -73,6 +73,10 @@ namespace RundownEditorCore.Services
             _logger.LogInformation($"ERROR adding item to rundown: {response.ReasonPhrase}");
             return null;
         }
+        public Task<RundownDTO> AddDetailToItemAsync(string Uuid, RundownDTO newRundownItem)
+        {
+            return null;
+        }
 
 
     }

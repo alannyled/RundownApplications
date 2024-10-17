@@ -1,6 +1,13 @@
-﻿<li class="nav-item d-flex position-relative">
+﻿@inject RundownState RundownState
+
+<li class="nav-item d-flex position-relative">
     
-    <a role="button" class="nav-link @(ActiveTab == MenuItem ? "active" : "") @(CloseTab.HasDelegate ? "padding": "")" @onclick='() => SelectTab.InvokeAsync(MenuItem)'>@MenuItem</a>
+    <a 
+        role="button"
+       class="nav-link @(ActiveTab == MenuItem ? "active" : "") @(CloseTab.HasDelegate ? "padding": "")"
+       @onclick='() => SelectTab.InvokeAsync(MenuItem)'>
+        @MenuItem
+    </a>
     @if (CloseTab.HasDelegate)
     {
         <h5 class="position-absolute top-0 end-0 text-danger" role="button" @onclick="RemoveTabPane"><i class=" bi bi-x"></i></h5>
@@ -21,8 +28,16 @@
     [Parameter]
     public EventCallback<string> CloseTab { get; set; }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if(MenuItem == string.Empty)
+        {
+            MenuItem = RundownState.Item.Name;
+        }
+    }
+
     public async Task RemoveTabPane()
     {
-        await CloseTab.InvokeAsync(MenuItem);
+        await CloseTab.InvokeAsync(RundownState.Item.Name);
     }
 }

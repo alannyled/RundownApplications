@@ -49,7 +49,7 @@ builder.Services.AddLogging(loggingBuilder =>
     //loggingBuilder.AddFilter("RundownEditorCore", LogLevel.Information); // Log kun for app namespace
 });
 
-
+builder.Services.AddScoped<RundownState>();
 builder.Services.AddScoped<ModalState>();
 builder.Services.AddScoped<ToastState>();
 builder.Services.AddScoped<FormRenderService>(); 

@@ -1,88 +1,107 @@
 ﻿@inject IRundownService RundownService
+@inject RundownState RundownState
+@inject ToastState ToastState
 
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
         <label for="title" class="form-label">Titel</label>
         <input type="text" class="form-control form-control-sm" id="title" @bind="@Title" />
     </div>
+    @if (new string[] { "Teleprompter", "Voiceover", "Kommentar" }.Contains(DetailType))
+    {
+        <div class="mb-3">
+            <label for="text" class="form-label">@DetailType tekst</label>
+        <textarea class="form-control form-control-sm" id="text" rows="3" @bind="@Text"></textarea>
+    </div>
+    }
     <div class="mb-3">
         <label for="duration" class="form-label">Planlagt længde</label>
         <input type="time" step="1" class="form-control form-control-sm" id="duration" @bind="@Duration" />
     </div>
-    <div class="mb-3">
+    @* <div class="mb-3">
         <label for="category" class="form-label">Kamera</label>
-        <select class="form-control form-control-sm" id="category" @bind="@Cameras">
+        <select class="form-control form-control-sm" id="category" @bind="@SelectedCamera">
             <option value="">Vælg Kamera</option>
             @foreach (var cam in Cameras)
             {
                 <option value="@cam">@cam</option>
             }
         </select>
-    </div>
+    </div> *@
     <div class="d-flex justify-content-end">
         <button type="submit" class="btn btn-sm btn-primary">Opret rækkefølge objekt</button>
     </div>
 </form>
 
 @code {
-    // [Inject]
-    // private IRundownService RundownService { get; set; }
     [Parameter]
     public string DetailType { get; set; } = string.Empty;
     [Parameter]
-    public string Uuid { get; set; } = string.Empty;
-    // [Parameter]
-    // public RundownItemDTO SelectedRundownItem { get; set; }
-    [Parameter]
-    public EventCallback<RundownDTO> OnItemCreated { get; set; }
+    public EventCallback<RundownDTO> OnItemDetailCreated { get; set; }
 
     public RundownDTO SelectedRundown { get; set; } = new();
 
-    public TimeSpan Duration { get; set; } = new TimeSpan(0, 0, 0);
-
+    public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
+    public string Title { get; set; } = string.Empty; 
+    public string Text { get; set; } = string.Empty;
     public string Template { get; set; } = string.Empty;
-
+    public string SelectedCamera { get; set; } = string.Empty;
     public List<string> Cameras { get; set; } = ["Kamera 1", "Kamera 2", "Kamera 3"];
 
-    public ItemDetail? GetModel(string type) =>
+    public ItemDetailDTO.ItemDetail? GetModel(string type) =>
     type switch
     {
-        "video" => new ItemDetailDTO.ItemDetailVideo(),
-        "text" => new ItemDetailDTO.ItemDetailTeleprompter(),
-        "graphic" => new ItemDetailDTO.ItemDetailGraphic(),
-        "comment" => new ItemDetailDTO.ItemDetailComment(),
-        "voiceover" => new ItemDetailDTO.ItemDetailTeleprompter(),
+        "Video" => new ItemDetailDTO.ItemDetailVideo(),
+        "Teleprompter" => new ItemDetailDTO.ItemDetailTeleprompter(),
+        "Grafik" => new ItemDetailDTO.ItemDetailGraphic(),
+        "Kommentar" => new ItemDetailDTO.ItemDetailComment(),
+        "Voiceover" => new ItemDetailDTO.ItemDetailTeleprompter(),
         _ => null
 
     };
 
+    private async Task<bool> ValidateInput()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            ToastState.FireToast("Du skal angive en titel", "alert-warning");
+            return false;
+        }
+        return true;
+    }
 
     private async Task HandleSubmit()
     {
+        if (!await ValidateInput())
+        {
+            return;
+        }
         var newRundownItem = GetModel(DetailType);
 
         newRundownItem.UUID = Guid.NewGuid();
-        newRundownItem.ItemId = Guid.Parse(Uuid);
+        newRundownItem.ItemId = RundownState.Item.UUID;
         newRundownItem.Type = DetailType;
+        switch (newRundownItem)
+        {
+            case ItemDetailDTO.ItemDetailTeleprompter teleprompterItem:
+                teleprompterItem.PrompterText = Text;
+                break;
+            case ItemDetailDTO.ItemDetailVideo videoItem:
+                videoItem.title = Title;
+                videoItem.Duration = Duration.ToString("HH:mm:ss");
+                videoItem.VideoPath = "video.mp4";
+                break;
+            case ItemDetailDTO.ItemDetailGraphic graphicItem:
+                graphicItem.GraphicId = "Graphic ID";
+                graphicItem.Duration = Duration.ToString("HH:mm:ss");
+                break;
+            case ItemDetailDTO.ItemDetailComment commentItem:
+                commentItem.Comment = Text;
+                break;
+        }
 
-        // var newRundownItem = new ItemDetailDTO.ItemDetail
-        //     {
-        //         UUID = Guid.NewGuid(),
-        //         ItemId = Guid.Parse(Uuid),
-        //     Type = DetailType
-        //        // Duration = Duration.ToString(),
-        //        // Order = SelectedRundown.Items.Count // + 1  eller *10?
-        //     };
+        SelectedRundown = await RundownService.AddDetailToItemAsync(RundownState.Item.UUID.ToString(), newRundownItem);
 
-
-        SelectedRundown = await RundownService.AddDetailToItemAsync(Uuid, newRundownItem);
-
-
-        // var result = new CreateRundownItemResultDTO
-        //     {
-        //         SelectedRundown = updatedRundown
-        //     };
-
-        await OnItemCreated.InvokeAsync(SelectedRundown);
+        await OnItemDetailCreated.InvokeAsync(SelectedRundown);
     }
 }

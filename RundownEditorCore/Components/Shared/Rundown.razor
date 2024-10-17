@@ -1,9 +1,10 @@
 ﻿@inject IRundownService RundownService
+@inject RundownState RundownState
 
-@if (!string.IsNullOrEmpty(SelectedRundown.Name))
+@if (!string.IsNullOrEmpty(RundownState.Rundown.Name))
 {
     <ul class="nav nav-tabs mb-2">
-        <TabItem MenuItem="@SelectedRundown.Name" ActiveTab="@activeTab" SelectTab="SelectTab" />
+        <TabItem MenuItem="@RundownState.Rundown.Name" ActiveTab="@activeTab" SelectTab="SelectTab" />
         @foreach (var item in menuTabs)
         {
             @item.Content
@@ -12,8 +13,7 @@
 }
 <div class="tab-content">
 
-    <TabPaneRundown SelectedRundown="SelectedRundown"
-                    ControlRooms="ControlRooms"
+    <TabPaneRundown ControlRooms="ControlRooms"
                     ActiveTab="@activeTab"
                     UpdateRundownList="ControlRoomChange"
                     ShowDialog="OpenModal"
@@ -29,8 +29,8 @@
 @code {
     [Parameter]
     public EventCallback OpenModal { get; set; }
-    [Parameter]
-    public RundownDTO SelectedRundown { get; set; }
+    // [Parameter]
+    // public RundownDTO SelectedRundown { get; set; }
     [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; }
     [Parameter]
@@ -48,9 +48,9 @@
 
     protected override void OnParametersSet()
     {
-        if (SelectedRundown != null && activeTab != SelectedRundown.Name && !string.IsNullOrEmpty(SelectedRundown.Name))
+        if (RundownState.Rundown != null && activeTab != RundownState.Rundown.Name && !string.IsNullOrEmpty(RundownState.Rundown.Name))
         {
-            activeTab = SelectedRundown.Name;
+            activeTab = RundownState.Rundown.Name;
             menuTabs = [];
             tabPanes = [];
         }
@@ -67,11 +67,12 @@
         activeTab = tabName;
     }   
 
-    private void OpenTabPane(string tabName)
+    private void OpenTabPane(RundownItemDTO item)
     {
-        activeTab = tabName;
+        RundownState.SelectedItem(item);
+        activeTab = item.Name;
 
-        if (!menuTabs.Any(tab => tab.Name == tabName))
+        if (!menuTabs.Any(tab => tab.Name == item.Name))
         {
             AddMenuTab();
         }
@@ -83,7 +84,6 @@
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabItem>(0);
-            builder.AddAttribute(1, "MenuItem", tabName);
             builder.AddAttribute(2, "ActiveTab", activeTab);
             builder.AddAttribute(3, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
             builder.AddAttribute(4, "CloseTab", EventCallback.Factory.Create<string>(this, RemoveTabPane));
@@ -106,9 +106,8 @@
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabPaneRundownItem>(0);
-            builder.AddAttribute(1, "Name", tabName);
-            builder.AddAttribute(2, "ActiveTab", activeTab);
-            builder.AddAttribute(3, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));
+            builder.AddAttribute(1, "ActiveTab", activeTab);
+            builder.AddAttribute(2, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));
             builder.CloseComponent();
         });
 
@@ -136,7 +135,7 @@
         if (tabToRemove != null)
         {
             menuTabs.Remove(tabToRemove);
-            activeTab = SelectedRundown.Name;
+            activeTab = RundownState.Rundown.Name;
             StateHasChanged();
         }
     }

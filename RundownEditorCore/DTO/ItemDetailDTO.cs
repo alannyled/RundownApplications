@@ -24,7 +24,7 @@ namespace RundownEditorCore.DTO
         {
             public string title { get; set; }
             public string VideoPath { get; set; }
-            public TimeSpan Duration { get; set; }
+            public string Duration { get; set; }
             public string DetailType { get; set; } = "ItemDetailVideo";
         }
 
@@ -32,7 +32,7 @@ namespace RundownEditorCore.DTO
         public class ItemDetailGraphic : ItemDetail
         {
             public string GraphicId { get; set; }
-            public TimeSpan Duration { get; set; }
+            public string Duration { get; set; }
             public string DetailType { get; set; } = "ItemDetailGraphic";
         }
 

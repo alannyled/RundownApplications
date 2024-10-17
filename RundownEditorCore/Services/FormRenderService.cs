@@ -7,16 +7,14 @@ namespace RundownEditorCore.Services
     public class FormRenderService
     {
         public RenderFragment RenderItemDetailForm(
-            string ItemID,
-            string Type,
+            string DetailType,
             EventCallback<RundownDTO> onCreateCallback
             )
         {
             return builder =>
             {
-                builder.OpenComponent(0, typeof(RundownItemForm));
-                builder.AddAttribute(1, "Uuid", ItemID);
-                builder.AddAttribute(2, "Type", Type);
+                builder.OpenComponent(0, typeof(ItemDetailForm));
+                builder.AddAttribute(2, "DetailType", DetailType);
                 builder.AddAttribute(3, "OnItemDetailCreated", EventCallback.Factory.Create<RundownDTO>(this, onCreateCallback));
                 builder.CloseComponent();
             };

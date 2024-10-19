@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RundownDbService.BLL.Interfaces;
+using RundownDbService.BLL.Services;
 using RundownDbService.DTO;
 using RundownDbService.Models;
-using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace RundownDbService.Controllers
 {
@@ -11,10 +12,14 @@ namespace RundownDbService.Controllers
     public class RundownController : ControllerBase
     {
         private readonly IRundownService _rundownService;
+        private readonly IItemDetailService _itemDetailService;
+        private readonly IRundownItemService _rundownItemService;
 
-        public RundownController(IRundownService rundownService)
+        public RundownController(IRundownService rundownService, IItemDetailService itemDetailService, IRundownItemService rundownItemService)
         {
             _rundownService = rundownService;
+            _itemDetailService = itemDetailService;
+            _rundownItemService = rundownItemService;
         }
 
         [HttpGet]
@@ -97,10 +102,146 @@ namespace RundownDbService.Controllers
         }
 
 
+        [HttpPut("add-item-detail-to-rundown/{rundownId:guid}")]
+        public async Task<IActionResult> AddItemDetailToRundown(Guid rundownId, [FromBody] RundownItemDTO itemDto)
+        {
+            var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
+            if (existingRundown == null)
+            {
+                return NotFound("Rundown ikke fundet.");
+            }
+
+            var existingItem = existingRundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
+            if (existingItem == null)
+            {
+                return NotFound("Item ikke fundet.");
+            }
+
+            // Brug GetModel() til at oprette den korrekte itemDetail instans baseret på typen
+            existingItem.Details.AddRange(itemDto.Details.Select(detail =>
+            {
+                var itemDetail = _itemDetailService.GetModel(detail.Type);
+                itemDetail.UUID = Guid.NewGuid();
+                itemDetail.Title = detail.Title;
+                itemDetail.Duration = TimeSpan.Parse(detail.Duration);
+                itemDetail.ItemId = itemDto.UUID;
+                itemDetail.Type = detail.Type;
+                itemDetail.Order = detail.Order;
+
+                switch (itemDetail)
+                {
+                    case ItemDetailVideo video when detail.VideoPath != null:
+                        video.VideoPath = detail.VideoPath;
+                        break;
+                    case ItemDetailTeleprompter teleprompter when detail.PrompterText != null:
+                        teleprompter.PrompterText = detail.PrompterText;
+                        break;
+                    case ItemDetailGraphic graphic when detail.GraphicId != null:
+                        graphic.GraphicId = detail.GraphicId;
+                        break;
+                    case ItemDetailComment comment when detail.Comment != null:
+                        comment.Comment = detail.Comment;
+                        break;
+                }
+
+                return itemDetail;
+            }));
+
+            await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
+            return Ok(existingRundown);
+        }
+
+
+        [HttpPut("edit-item-detail-in-rundown/{rundownId:guid}")]
+        public async Task<IActionResult> EditItemDetailInRundown(Guid rundownId, [FromBody] ItemDetailDTO detailDto)
+        {
+            // Hent det eksisterende rundown baseret på ID
+            var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
+            if (existingRundown == null)
+            {
+                return NotFound("Rundown ikke fundet.");
+            }
+
+            // Find det item, som har den detail, der skal opdateres
+            var existingItem = existingRundown.Items.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailDto.UUID));
+            if (existingItem == null)
+            {
+                return NotFound("Item der indeholder detail ikke fundet.");
+            }
+
+            // Find den specifikke detail i itemet og opdater den
+            var existingDetail = existingItem.Details.FirstOrDefault(d => d.UUID == detailDto.UUID);
+            if (existingDetail == null)
+            {
+                return NotFound($"ItemDetail med UUID {detailDto.UUID} blev ikke fundet.");
+            }
+
+            // Opdater de generelle felter for det specifikke detail
+            existingDetail.Title = detailDto.Title;
+            existingDetail.Duration = TimeSpan.Parse(detailDto.Duration);
+            existingDetail.Type = detailDto.Type;
+            existingDetail.Order = detailDto.Order;
+
+            // Switch for at håndtere opdateringen af felter afhængig af typen af detail
+            switch (existingDetail)
+            {
+                case ItemDetailVideo video when detailDto.VideoPath != null:
+                    video.VideoPath = detailDto.VideoPath;
+                    break;
+                case ItemDetailTeleprompter teleprompter when detailDto.PrompterText != null:
+                    teleprompter.PrompterText = detailDto.PrompterText;
+                    break;
+                case ItemDetailGraphic graphic when detailDto.GraphicId != null:
+                    graphic.GraphicId = detailDto.GraphicId;
+                    break;
+                case ItemDetailComment comment when detailDto.Comment != null:
+                    comment.Comment = detailDto.Comment;
+                    break;
+            }
+
+            // Gem ændringerne
+            await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
+
+            return Ok(existingRundown);
+        }
 
 
 
+        [HttpDelete("delete-item-detail-from-rundown/{rundownId:guid}/{detailId:guid}")]
+        public async Task<IActionResult> DeleteItemDetailFromRundown(Guid rundownId, Guid detailId)
+        {
+            // Hent eksisterende rundown baseret på ID
+            var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
+            if (existingRundown == null)
+            {
+                return NotFound("Rundown ikke fundet.");
+            }
 
+            // Gennemgå items i rundown
+            var existingItem = existingRundown.Items.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailId));
+            if (existingItem == null)
+            {
+                return NotFound("Item med det ønskede ItemDetail ikke fundet.");
+            }
+
+            // Find og fjern detail baseret på detailId (UUID)
+            var detailToRemove = existingItem.Details.FirstOrDefault(d => d.UUID == detailId);
+            if (detailToRemove == null)
+            {
+                return NotFound("ItemDetail ikke fundet.");
+            }
+
+            // Fjern det fundne detail
+            existingItem.Details.Remove(detailToRemove);
+
+            // Opdater rundown i databasen
+            var updatedRundown = await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
+
+            return Ok(updatedRundown);
+        }
+
+
+        // delete rundown
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
@@ -114,10 +255,6 @@ namespace RundownDbService.Controllers
             return NoContent();
         }
     }
-    //public class ControlRoomUpdateRequest
-    //{
-    //    [JsonPropertyName("controlRoomId")]
-    //    public string ControlRoomId { get; set; }
-    //}
 
+    
 }

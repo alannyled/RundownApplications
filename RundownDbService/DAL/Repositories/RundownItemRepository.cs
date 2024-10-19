@@ -39,6 +39,7 @@ namespace RundownDbService.DAL.Repositories
         public async Task UpdateAsync(Guid uuid, RundownItem item)
         {
             await _rundownItemCollection.ReplaceOneAsync(i => i.UUID == uuid, item);
+           
         }
 
         public async Task DeleteAsync(Guid uuid)

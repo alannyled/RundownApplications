@@ -11,23 +11,34 @@
     {
         <div class="mb-3">
             <label for="text" class="form-label">@DetailType tekst</label>
-        <textarea class="form-control form-control-sm" id="text" rows="3" @bind="@Text"></textarea>
-    </div>
+            <textarea class="form-control form-control-sm" id="text" rows="3" @bind="@Text"></textarea>
+        </div>
+    }
+    @if (DetailType == "Grafik")
+    {
+        <div class="mb-3">
+            <label for="path" class="form-label">Grafik</label>
+            <input type="file" class="form-control form-control-sm" id="title" @bind="@Graphic" />
+        </div>
+    }
+    @if (DetailType == "Teleprompter")
+    {
+        <div class="mb-3">
+            <label for="category" class="form-label">Kamera</label>
+            <select class="form-control form-control-sm" id="category" @bind="@SelectedCamera">
+                <option value="">Vælg Kamera</option>
+                @foreach (var cam in Cameras)
+                {
+                    <option value="@cam">@cam</option>
+                }
+            </select>
+        </div>
     }
     <div class="mb-3">
         <label for="duration" class="form-label">Planlagt længde</label>
         <input type="time" step="1" class="form-control form-control-sm" id="duration" @bind="@Duration" />
     </div>
-    @* <div class="mb-3">
-        <label for="category" class="form-label">Kamera</label>
-        <select class="form-control form-control-sm" id="category" @bind="@SelectedCamera">
-            <option value="">Vælg Kamera</option>
-            @foreach (var cam in Cameras)
-            {
-                <option value="@cam">@cam</option>
-            }
-        </select>
-    </div> *@
+
     <div class="d-flex justify-content-end">
         <button type="submit" class="btn btn-sm btn-primary">Opret rækkefølge objekt</button>
     </div>
@@ -42,8 +53,9 @@
     public RundownDTO SelectedRundown { get; set; } = new();
 
     public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
-    public string Title { get; set; } = string.Empty; 
+    public string Title { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
+    public string Graphic { get; set; } = string.Empty;
     public string Template { get; set; } = string.Empty;
     public string SelectedCamera { get; set; } = string.Empty;
     public List<string> Cameras { get; set; } = ["Kamera 1", "Kamera 2", "Kamera 3"];
@@ -81,19 +93,18 @@
         newRundownItem.UUID = Guid.NewGuid();
         newRundownItem.ItemId = RundownState.Item.UUID;
         newRundownItem.Type = DetailType;
+        newRundownItem.Title = Title;
+        newRundownItem.Duration = Duration.ToString("HH:mm:ss");
         switch (newRundownItem)
         {
             case ItemDetailDTO.ItemDetailTeleprompter teleprompterItem:
                 teleprompterItem.PrompterText = Text;
                 break;
             case ItemDetailDTO.ItemDetailVideo videoItem:
-                videoItem.title = Title;
-                videoItem.Duration = Duration.ToString("HH:mm:ss");
                 videoItem.VideoPath = "video.mp4";
                 break;
             case ItemDetailDTO.ItemDetailGraphic graphicItem:
                 graphicItem.GraphicId = "Graphic ID";
-                graphicItem.Duration = Duration.ToString("HH:mm:ss");
                 break;
             case ItemDetailDTO.ItemDetailComment commentItem:
                 commentItem.Comment = Text;

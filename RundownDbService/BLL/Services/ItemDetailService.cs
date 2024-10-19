@@ -8,6 +8,19 @@ namespace RundownDbService.BLL.Services
     {
         private readonly IItemDetailRepository _itemDetailRepository;
 
+        public ItemDetail? GetModel(string type)
+        {
+            return type switch
+            {
+                "Video" => new ItemDetailVideo(),
+                "Teleprompter" => new ItemDetailTeleprompter(),
+                "Grafik" => new ItemDetailGraphic(),
+                "Kommentar" => new ItemDetailComment(),
+                "Voiceover" => new ItemDetailTeleprompter(),
+                _ => new ItemDetail()
+
+            };
+        }
         public ItemDetailService(IItemDetailRepository itemDetailRepository)
         {
             _itemDetailRepository = itemDetailRepository;

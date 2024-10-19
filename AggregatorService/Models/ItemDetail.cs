@@ -16,13 +16,19 @@ namespace AggregatorService.Models
 
         [JsonPropertyName("order")]
         public int Order { get; set; }
+
+        [JsonPropertyName("title")]
+        public string title { get; set; }
+
+        [JsonPropertyName("duration")]
+        public TimeSpan Duration { get; set; }
     }
 
   
     public class ItemDetailTeleprompter : ItemDetail
     {
         [JsonPropertyName("prompterText")]
-        public string PrompterText { get; set; }
+        public string? PrompterText { get; set; }
 
         [JsonPropertyName("detailType")]
         public string DetailType { get; set; } = "ItemDetailTeleprompter";
@@ -31,14 +37,9 @@ namespace AggregatorService.Models
 
     public class ItemDetailVideo : ItemDetail
     {
-        [JsonPropertyName("title")]
-        public string title { get; set; }
 
         [JsonPropertyName("videoPath")]
-        public string VideoPath { get; set; }
-
-        [JsonPropertyName("duration")]
-        public TimeSpan Duration { get; set; }
+        public string? VideoPath { get; set; }
 
         [JsonPropertyName("detailType")]
         public string DetailType { get; set; } = "ItemDetailVideo";
@@ -47,11 +48,9 @@ namespace AggregatorService.Models
 
     public class ItemDetailGraphic : ItemDetail
     {
-        [JsonPropertyName("graphicId")]
-        public string GraphicId { get; set; }
 
-        [JsonPropertyName("duration")]
-        public TimeSpan Duration { get; set; }
+        [JsonPropertyName("graphicId")]
+        public string? GraphicId { get; set; }
 
         [JsonPropertyName("detailType")]
         public string DetailType { get; set; } = "ItemDetailGraphic";
@@ -61,7 +60,7 @@ namespace AggregatorService.Models
     public class ItemDetailComment : ItemDetail
     {
         [JsonPropertyName("comment")]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         [JsonPropertyName("detailType")]
         public string DetailType { get; set; } = "ItemDetailComment";

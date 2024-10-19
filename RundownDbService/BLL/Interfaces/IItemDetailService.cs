@@ -4,6 +4,7 @@ namespace RundownDbService.BLL.Interfaces
 {
     public interface IItemDetailService
     {
+        ItemDetail? GetModel(string type);
         Task<List<ItemDetail>> GetAllItemDetailsAsync();
         Task<ItemDetail> GetItemDetailByIdAsync(Guid uuid);
         Task CreateItemDetailAsync(ItemDetail newItemDetail);

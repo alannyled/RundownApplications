@@ -18,6 +18,12 @@ namespace RundownDbService.Models
         [BsonElement("type")]
         public string Type { get; set; }
 
+        [BsonElement("title")]
+        public string Title { get; set; }
+
+        [BsonElement("duration")]
+        public TimeSpan Duration { get; set; }
+
         [BsonElement("order")]
         public int Order { get; set; }
     }
@@ -35,14 +41,9 @@ namespace RundownDbService.Models
     [BsonDiscriminator("ItemDetailVideo")]
     public class ItemDetailVideo : ItemDetail
     {
-        [BsonElement("title")]
-        public string Title { get; set; }
 
         [BsonElement("videoPath")]
         public string VideoPath { get; set; }
-
-        [BsonElement("duration")]
-        public TimeSpan Duration { get; set; }
 
         [BsonElement("detailType")]
         public string DetailType { get; set; } = "ItemDetailVideo";
@@ -53,9 +54,6 @@ namespace RundownDbService.Models
     {
         [BsonElement("graphicId")]
         public string GraphicId { get; set; }
-
-        [BsonElement("duration")]
-        public TimeSpan Duration { get; set; }
 
         [BsonElement("detailType")]
         public string DetailType { get; set; } = "ItemDetailGraphic";

@@ -10,7 +10,12 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.Configure<ApiUrls>(builder.Configuration.GetSection("ApiUrls"));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
+        // options.SerializerSettings.TypeNameHandling = TypeNameHandling.None;
+    });
 
 builder.Services.AddHttpClient<ControlRoomService>()
     .AddTypedClient<Aggregator>((httpClient, serviceProvider) =>

@@ -108,14 +108,14 @@ namespace AggregatorService.Managers
         {
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
-            var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
+            var existingRundownResponse = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
             var rundown = JsonSerializer.Deserialize<RundownDTO>(existingRundownResponse);
-            
+            Console.WriteLine($"Rundown: {JsonSerializer.Serialize(rundown)}");
             if (existingRundownResponse is null)
             {
                 throw new Exception("Rundown not found.");
             }
-
+            itemDto.UUID = Guid.NewGuid();
             // Tilføj det nye item til eksisterende liste
             rundown.Items.Add(itemDto);
        
@@ -126,7 +126,33 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
-
+        public async Task<Rundown> AddDetailToItemAsync(Guid rundownId, RundownItemDTO itemDto)
+        {
+            // Hent det eksisterende rundown
+            var rundownService = _serviceFactory.GetService<RundownService>();
+            var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
+            var rundown = JsonSerializer.Deserialize<RundownDTO>(existingRundownResponse);
+          
+            if (existingRundownResponse is null)
+            {
+                throw new Exception("Rundown not found.");
+            }
+            var item = rundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
+            if (item is null)
+            {
+                throw new Exception("Item not found.");
+            }
+            item.UUID = itemDto.UUID;
+            var detail = itemDto.Details.First();
+            detail.UUID = Guid.NewGuid();
+            item.Details = [detail];
+          
+            // Send opdateringen tilbage til service
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-detail-to-rundown/{rundownId}", item);
+            response.EnsureSuccessStatusCode();
+            var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            return updatedRundown;
+        }
 
     }
 }

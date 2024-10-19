@@ -60,6 +60,13 @@ namespace AggregatorService.Controllers
             return Ok(rundown);
         }
 
+        [HttpPut("update-detail-in-item/{rundownId}")]
+        public async Task<IActionResult> UpdateDetailInItem(string rundownId, [FromBody] ItemDetailDTO itemDetailDto)
+        {
+            var rundown = await _rundownManager.UpdateItemDetailAsync(Guid.Parse(rundownId), itemDetailDto);
+            return Ok(rundown);
+        }
+
 
 
 

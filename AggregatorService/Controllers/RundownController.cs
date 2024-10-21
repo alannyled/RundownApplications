@@ -54,9 +54,11 @@ namespace AggregatorService.Controllers
         }
 
         [HttpPut("add-detail-to-item/{rundownId}")]
-        public async Task<IActionResult> AddDetailToItem(string rundownId, [FromBody] RundownItemDTO itemDto)
+        public async Task<IActionResult> AddDetailToItem(string rundownId, [FromBody] ItemDetailDTO itemDetailDto)
         {
-            var rundown = await _rundownManager.AddDetailToItemAsync(Guid.Parse(rundownId), itemDto);
+            var json = JsonSerializer.Serialize(itemDetailDto);
+            Console.WriteLine("Adding detail to item: " + json);
+            var rundown = await _rundownManager.AddDetailToItemAsync(Guid.Parse(rundownId), itemDetailDto);
             return Ok(rundown);
         }
 

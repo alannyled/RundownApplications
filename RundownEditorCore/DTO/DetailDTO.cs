@@ -23,15 +23,15 @@ namespace RundownEditorCore.DTO
         public string Duration { get; set; }
 
      //   [JsonPropertyName("prompterText")]
-        public string? PrompterText { get; set; }
+        public string? PrompterText { get; set; } = null;
 
       //  [JsonPropertyName("videoPath")]
-        public string? VideoPath { get; set; }
+        public string? VideoPath { get; set; } = null;
 
       //  [JsonPropertyName("graphicId")]
-        public string? GraphicId { get; set; }
+        public string? GraphicId { get; set; } = null;
 
       //  [JsonPropertyName("comment")]
-        public string? Comment { get; set; }
+        public string? Comment { get; set; } = null;
     }
 }

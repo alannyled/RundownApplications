@@ -112,7 +112,7 @@ namespace RundownDbService.Controllers
 
 
         [HttpPut("add-item-detail-to-rundown/{rundownId:guid}")]
-        public async Task<IActionResult> AddItemDetailToRundown(Guid rundownId, [FromBody] RundownItemDTO itemDto)
+        public async Task<IActionResult> AddItemDetailToRundown(Guid rundownId, [FromBody] ItemDetailDTO itemDetailDto)
         {
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
             if (existingRundown == null)
@@ -120,41 +120,46 @@ namespace RundownDbService.Controllers
                 return NotFound("Rundown ikke fundet.");
             }
 
-            var existingItem = existingRundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
+            var existingItem = existingRundown.Items.FirstOrDefault(i => i.UUID == itemDetailDto.ItemId);
             if (existingItem == null)
             {
                 return NotFound("Item ikke fundet.");
             }
 
             // Brug GetModel() til at oprette den korrekte itemDetail instans baseret på typen
-            existingItem.Details.AddRange(itemDto.Details.Select(detail =>
+            var itemDetail = _itemDetailService.GetModel(itemDetailDto.Type);
+            if (itemDetail == null)
             {
-                var itemDetail = _itemDetailService.GetModel(detail.Type);
-                itemDetail.UUID = Guid.NewGuid();
-                itemDetail.Title = detail.Title;
-                itemDetail.Duration = TimeSpan.Parse(detail.Duration);
-                itemDetail.ItemId = itemDto.UUID;
-                itemDetail.Type = detail.Type;
-                itemDetail.Order = detail.Order;
+                return BadRequest("Kunne ikke oprette item detail baseret på den angivne type.");
+            }
 
-                switch (itemDetail)
-                {
-                    case ItemDetailVideo video when detail.VideoPath != null:
-                        video.VideoPath = detail.VideoPath;
-                        break;
-                    case ItemDetailTeleprompter teleprompter when detail.PrompterText != null:
-                        teleprompter.PrompterText = detail.PrompterText;
-                        break;
-                    case ItemDetailGraphic graphic when detail.GraphicId != null:
-                        graphic.GraphicId = detail.GraphicId;
-                        break;
-                    case ItemDetailComment comment when detail.Comment != null:
-                        comment.Comment = detail.Comment;
-                        break;
-                }
+            // Sæt værdierne på den nye item detail
+            itemDetail.UUID = Guid.NewGuid();
+            itemDetail.Title = itemDetailDto.Title;
+            itemDetail.Duration = TimeSpan.Parse(itemDetailDto.Duration);
+            itemDetail.ItemId = itemDetailDto.ItemId;
+            itemDetail.Type = itemDetailDto.Type;
+            itemDetail.Order = itemDetailDto.Order;
 
-                return itemDetail;
-            }));
+            // Tilpas værdier afhængigt af den specifikke type af item detail
+            switch (itemDetail)
+            {
+                case ItemDetailVideo video when itemDetailDto.VideoPath != null:
+                    video.VideoPath = itemDetailDto.VideoPath;
+                    break;
+                case ItemDetailTeleprompter teleprompter when itemDetailDto.PrompterText != null:
+                    teleprompter.PrompterText = itemDetailDto.PrompterText;
+                    break;
+                case ItemDetailGraphic graphic when itemDetailDto.GraphicId != null:
+                    graphic.GraphicId = itemDetailDto.GraphicId;
+                    break;
+                case ItemDetailComment comment when itemDetailDto.Comment != null:
+                    comment.Comment = itemDetailDto.Comment;
+                    break;
+            }
+
+            // Tilføj itemDetail til existingItem's detaljer
+            existingItem.Details.Add(itemDetail);
 
             await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
             return Ok(existingRundown);

@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <div class="card-body" contenteditable="true">
+        <div class="card-body">
             @foreach(DetailDTO detail in RundownItem.Details)
             {
                 <ItemDetail Detail="detail"></ItemDetail>
@@ -41,8 +41,8 @@
     [Parameter]
     public EventCallback<string> OnRemove { get; set; } 
 
-    [Parameter]
-    public EventCallback ShowDialog { get; set; }
+    // [Parameter]
+    // public EventCallback ShowDialog { get; set; }
 
     public RundownItemDTO RundownItem { get; set; }
 
@@ -69,9 +69,12 @@
         ModalState.SetContent(content, $"Opret {type} element");
     }
 
-    public void HandleItemDetailCreated()
+    public void HandleItemDetailCreated(RundownDTO rundown)
     {
-        Console.WriteLine("Detail creating in play here : " + ItemId);
+        ModalState.Close();
+        RundownItem = rundown.Items.FirstOrDefault(i => i.UUID == RundownItem.UUID);
+        RundownState.SelectedItem(RundownItem);
     }
+
 }
 

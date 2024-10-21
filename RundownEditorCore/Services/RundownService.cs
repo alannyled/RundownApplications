@@ -62,15 +62,8 @@ namespace RundownEditorCore.Services
 
         public async Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
         {
-            Console.WriteLine("Adding item to rundown : " +item.Name);
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(item, Newtonsoft.Json.Formatting.Indented);
-            // Udskriver JSON-formateret item til konsollen
-            Console.WriteLine(json);
-
             var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
-            Console.WriteLine("Adding item to rundown.");
-            Console.WriteLine(response.StatusCode);
-            Console.WriteLine(response.ReasonPhrase);
+       
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation($"ADDED Item to Rundown");
@@ -79,8 +72,19 @@ namespace RundownEditorCore.Services
             _logger.LogInformation($"ERROR adding item to rundown: {response.ReasonPhrase}");
             return null;
         }
-        public Task<RundownDTO> AddDetailToItemAsync(string Uuid, ItemDetailDTO.ItemDetail newRundownItem)
+        public async Task<RundownDTO> AddDetailToItemAsync(string rundownId, ItemDetailDTO.ItemDetail itemDetail)
         {
+            var json = JsonConvert.SerializeObject(itemDetail);
+            var detail = JsonConvert.DeserializeObject<DetailDTO>(json);
+
+            var response = await _httpClient.PutAsJsonAsync($"add-detail-to-item/{rundownId}", detail);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation($"ADDED Detail to item");
+                return await response.Content.ReadFromJsonAsync<RundownDTO>();
+            }
+            _logger.LogInformation($"ERROR adding detail to item: {response.ReasonPhrase}");
             return null;
         }
 

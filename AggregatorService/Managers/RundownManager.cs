@@ -127,29 +127,13 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
-        public async Task<Rundown> AddDetailToItemAsync(Guid rundownId, RundownItemDTO itemDto)
+        public async Task<Rundown> AddDetailToItemAsync(Guid rundownId, ItemDetailDTO itemDetailDto)
         {
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
-            var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
-            var rundown = JsonConvert.DeserializeObject<RundownDTO>(existingRundownResponse);
           
-            if (existingRundownResponse is null)
-            {
-                throw new Exception("Rundown not found.");
-            }
-            var item = rundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
-            if (item is null)
-            {
-                throw new Exception("Item not found.");
-            }
-            item.UUID = itemDto.UUID;
-            var detail = itemDto.Details.First();
-            detail.UUID = Guid.NewGuid();
-            item.Details = [detail];
-          
-            // Send opdateringen tilbage til service
-            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-detail-to-rundown/{rundownId}", item);
+            // Send til service
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-detail-to-rundown/{rundownId}", itemDetailDto);
             response.EnsureSuccessStatusCode();
             var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
             return updatedRundown;

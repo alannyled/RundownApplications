@@ -11,7 +11,7 @@
                 <div class="input-group mb-3">
                     <span class="input-group-text @color">Duration</span>
                     <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" disabled="@active">
-                    <button class="btn @color" type="button" @onclick="() => ActivateInput()"><i class="bi @(active ? "bi-pencil-fill" : "bi-save2-fill")"></i></button>
+                    <button class="btn @color" type="button" @onclick="() => ActivateInput()"><i class="bi @(active ? "bi-pencil-fill" : "bi-floppy-fill")"></i></button>
                 </div>
                 <div class="mb-3 fs-6" contenteditable="true">
                 @content

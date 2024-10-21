@@ -1,63 +1,59 @@
-﻿<div>
-<div class="card mb-3 d-inline-block">
-        <div class="card-header list-group-item-warning">
-        Kamera 13/2
-    </div>
-    <div class="card-body d-flex flex-row">
-
-            <div class="fs-3 pe-5 text-danger d-block"><i class="bi bi-camera-video"></i></div>
-
-        <div>
-            En body med content?
-        </div>
-    </div>
-</div>
-</div>
+﻿
 <div>
     <div class="card mb-3 d-inline-block">
-        <div class="card-header list-group-item-danger">
-            SPIB
+        <div class="card-header d-flex justify-content-between @color">
+            @Detail.Title<i class="ms-5 bi @icon"></i>
         </div>
         <div class="card-body d-flex flex-row">
 
-            <div class="fs-3 pe-5 text-danger d-block"><i class="bi bi-card-text"></i></div>
-
             <div>
-               Godaften og velkommen til nyhederne
+                Duration: @Detail.Duration
+                <br />
+                @content
             </div>
         </div>
     </div>
 </div>
 
-<div>
-    <div class="card mb-3 d-inline-block">
-        <div class="card-header list-group-item-success">
-            Kommuner skal spare en helvedes masse penge
-        </div>
-        <div class="card-body d-flex flex-row">
+@code{
+    [Parameter]
+    public DetailDTO Detail { get; set; }
+    public string icon { get; set; }
+    public string color { get; set; }
+    public string content { get; set; }
 
-            <div class="fs-3 pe-5 text-danger d-block"><i class="bi bi-film"></i></div>
+    protected override void OnInitialized()
+    {
+        icon = Detail.Type switch
+        {
+            "Kamera" => "bi-camera-video",
+            "Teleprompter" => "bi-card-text",
+            "Grafik" => "bi-palette",
+            "Video" => "bi-film",
+            "Voiceover" => "bi-badge-vo",
+            "Kommentar" => "bi-chat-right-text",
+            _ => "bi-x-square"
+        };
+        color = Detail.Type switch
+        {
+            "Kamera" => "list-group-item-warning",
+            "Teleprompter" => "list-group-item-danger",
+            "Grafik" => "list-group-item-warning",
+            "Video" => "list-group-item-success",
+            "Voiceover" => "list-group-item-danger",
+            "Kommentar" => "list-group-item-primary",
+            _ => "list-group-item-secondary"
+        };
 
-            <div>
-                En body med content?
-            </div>
-        </div>
-    </div>
-</div>
-
-<div>
-    <div class="card mb-3 d-inline-block">
-        <div class="card-header list-group-item-danger">
-            Voice over
-        </div>
-        <div class="card-body d-flex flex-row">
-
-            <div class="fs-3 pe-5 text-danger d-block"><i class="bi bi-badge-vo"></i></div>
-
-            <div>
-                Der skal spares op mod 12 kroner i viborg Kommune. <br />Borgmesteren er bekymret for om det påvirker fremtidens julefrokoster på rådhuset.
-            </div>
-        </div>
-    </div>
-</div>
-
+        content = Detail.Type switch
+        {
+            "Kamera" => "Kamera",
+            "Teleprompter" => Detail.PrompterText ?? "Prompter text not found",
+            "Grafik" => Detail.GraphicId ?? "Graphic element not found",
+            "Video" => Detail.VideoPath ?? "Videopath not found",
+            "Voiceover" => Detail.PrompterText ??  "Voiceover text not found",
+            "Kommentar" => Detail.Comment ??  "Comment not found",
+            _ => "Ukendt"
+        };
+    }
+}

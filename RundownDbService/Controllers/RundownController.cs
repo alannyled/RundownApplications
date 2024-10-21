@@ -71,7 +71,7 @@ namespace RundownDbService.Controllers
 
 
         [HttpPut("add-item-to-rundown/{id:guid}")]
-        public async Task<IActionResult> AddItemToRundown(Guid id, [FromBody] RundownDTO rundownDto)
+        public async Task<IActionResult> AddItemToRundown(Guid id, [FromBody] RundownItemDTO rundownDto)
         {
             if (rundownDto == null)
             {
@@ -85,18 +85,27 @@ namespace RundownDbService.Controllers
                 return NotFound();
             }
 
-            // Tilføj alle nye items fra rundownDto til eksisterende rundown
-            existingRundown.Items.AddRange(rundownDto.Items.Select(item => new RundownItem
+            Console.WriteLine($"Antal af eksisterende items før tilføjelse: {existingRundown.Items.Count}");
+
+            // Tilføj nyt item fra rundownDto direkte til eksisterende rundown
+            existingRundown.Items.Add(new RundownItem
             {
                 UUID = Guid.NewGuid(),
                 RundownId = id,
-                Name = item.Name,
-                Duration = TimeSpan.Parse(item.Duration),
-                Order = item.Order
-            }));
+                Name = rundownDto.Name,
+                Duration = TimeSpan.Parse(rundownDto.Duration),
+                Order = rundownDto.Order
+            });
+
+            // Log antallet af items efter tilføjelsen
+            Console.WriteLine($"Antal af items efter tilføjelse: {existingRundown.Items.Count}");
+
 
             // Opdater rundown i databasen
-           var updatedRundown = await _rundownService.UpdateRundownAsync(id, existingRundown);
+            var updatedRundown = await _rundownService.UpdateRundownAsync(id, existingRundown);
+
+            // Log resultatet af opdateringen
+            Console.WriteLine($"Antal af items efter opdatering: {updatedRundown.Items.Count}");
 
             return Ok(updatedRundown);
         }

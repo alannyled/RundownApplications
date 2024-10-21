@@ -1,8 +1,7 @@
 ﻿using Confluent.Kafka;
+using Newtonsoft.Json;
 using RundownEditorCore.DTO;
 using RundownEditorCore.Interfaces;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace RundownEditorCore.Services
 {
@@ -21,6 +20,8 @@ namespace RundownEditorCore.Services
         public async Task<RundownDTO> GetRundownAsync(string uuid)
         {
             var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
+            //var json = JsonConvert.SerializeObject(response, Formatting.Indented);
+            //Console.WriteLine("Fetching rundown: " + json);
             _logger.LogInformation($"FETCHED Rundown {response.Name}");
             return response;
         }
@@ -61,6 +62,11 @@ namespace RundownEditorCore.Services
 
         public async Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
         {
+            Console.WriteLine("Adding item to rundown : " +item.Name);
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(item, Newtonsoft.Json.Formatting.Indented);
+            // Udskriver JSON-formateret item til konsollen
+            Console.WriteLine(json);
+
             var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
             Console.WriteLine("Adding item to rundown.");
             Console.WriteLine(response.StatusCode);

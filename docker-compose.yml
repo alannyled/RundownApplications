@@ -33,7 +33,8 @@ services:
       - rundown-mongo-data:/data/db
     #command: mongod --replSet rundown-replica-set --bind_ip_all
     networks:
-      - shared-mongo-net
+    - shared-mongo-net
+
 
   rundown-secondary-database:
     image: mongo
@@ -46,6 +47,17 @@ services:
     #command: mongod --replSet rundown-replica-set --bind_ip_all
     networks:
       - shared-mongo-net
+
+  # rundown-init-replica-set:
+  #   image: mongo:4.4-bionic
+  #   depends_on:
+  #   - rundown-primary-database
+  #   - rundown-secondary-database
+  #   command: >
+  #     bash -c "sleep 10 && mongo --host rundown-primary-database:27027 --eval 'rs.initiate({_id: \"rundown-replica-set\", members: [{_id: 0, host: \"rundown-primary-database:27027\"}, {_id: 1, host: \"rundown-secondary-database:27028\"}]})'"
+  #   networks:
+  #   - shared-mongo-net 
+
 
   template-primary-database:
     image: mongo

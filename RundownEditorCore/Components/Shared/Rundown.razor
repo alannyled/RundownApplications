@@ -40,6 +40,7 @@
 
     private bool showDialog = false;
     private string activeTab = string.Empty;
+    private string openItemId = string.Empty;
 
     private List<TabFragment> menuTabs = new();
     private List<TabFragment> tabPanes = new();
@@ -71,8 +72,9 @@
     {
         RundownState.SelectedItem(item);
         activeTab = item.Name;
+        openItemId = item.UUID.ToString();
 
-        if (!menuTabs.Any(tab => tab.Name == item.Name))
+        if (!menuTabs.Any(tab => tab.ItemId == item.UUID.ToString()))
         {
             AddMenuTab();
         }
@@ -84,6 +86,7 @@
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabItem>(0);
+            builder.AddAttribute(1, "MenuItem", tabName);
             builder.AddAttribute(2, "ActiveTab", activeTab);
             builder.AddAttribute(3, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
             builder.AddAttribute(4, "CloseTab", EventCallback.Factory.Create<string>(this, RemoveTabPane));
@@ -93,6 +96,7 @@
         menuTabs.Add(new TabFragment
             {
                 Name = tabName,
+                ItemId = openItemId,
                 Content = newChild
             });
 
@@ -107,13 +111,16 @@
         {
             builder.OpenComponent<TabPaneRundownItem>(0);
             builder.AddAttribute(1, "ActiveTab", activeTab);
-            builder.AddAttribute(2, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));
+            builder.AddAttribute(2, "ItemId", openItemId);
+            builder.AddAttribute(3, "Name", tabName);
+            builder.AddAttribute(4, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));
             builder.CloseComponent();
         });
 
         tabPanes.Add(new TabFragment
             {
                 Name = tabName,
+                ItemId = openItemId,
                 Content = newChild
             });
 
@@ -143,6 +150,7 @@
     public class TabFragment
     {
         public string? Name { get; set; }
+        public string? ItemId { get; set; }
         public RenderFragment? Content { get; set; }
     }
 

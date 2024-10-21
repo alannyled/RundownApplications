@@ -28,16 +28,16 @@
     [Parameter]
     public EventCallback<string> CloseTab { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if(MenuItem == string.Empty)
-        {
-            MenuItem = RundownState.Item.Name;
-        }
-    }
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     if(MenuItem == string.Empty)
+    //     {
+    //         MenuItem = RundownState.Item.Name;
+    //     }
+    // }
 
     public async Task RemoveTabPane()
     {
-        await CloseTab.InvokeAsync(RundownState.Item.Name);
+        await CloseTab.InvokeAsync(MenuItem);
     }
 }

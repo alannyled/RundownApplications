@@ -4,7 +4,7 @@ using AggregatorService.Factories;
 using AggregatorService.Models;
 using AggregatorService.Services;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace AggregatorService.Managers
 {
@@ -20,10 +20,10 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
             var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi, controlroomId);
-            var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
+            var controlRoom = JsonConvert.DeserializeObject<ControlRoom>(controlRoomData);
 
             var templateData = await templateService.GetByIdAsync($"{_apiUrls.RundownTemplateApi}/{templateId}");
-            var template = JsonSerializer.Deserialize<Rundown>(templateData);
+            var template = JsonConvert.DeserializeObject<Rundown>(templateData);
 
             var newRundown = new Rundown
             {
@@ -53,8 +53,8 @@ namespace AggregatorService.Managers
 
             var rundownData = await rundownService.FetchData(_apiUrls.RundownApi);
 
-            var controlRooms = JsonSerializer.Deserialize<List<ControlRoom>>(controlRoomData);
-            var rundowns = JsonSerializer.Deserialize<List<Rundown>>(rundownData);
+            var controlRooms = JsonConvert.DeserializeObject<List<ControlRoom>>(controlRoomData);
+            var rundowns = JsonConvert.DeserializeObject<List<Rundown>>(rundownData);
 
             foreach (var rundown in rundowns)
             {
@@ -75,10 +75,12 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
             var rundownData = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
-            var rundown = JsonSerializer.Deserialize<Rundown>(rundownData);
+            var rundown = JsonConvert.DeserializeObject<Rundown>(rundownData);
+            //var json = JsonConvert.SerializeObject(rundown, Formatting.Indented);
+            //Console.WriteLine("Fetching rundown: " + json);
 
             var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi, rundown.ControlRoomId.ToString());
-            var controlRoom = JsonSerializer.Deserialize<ControlRoom>(controlRoomData);
+            var controlRoom = JsonConvert.DeserializeObject<ControlRoom>(controlRoomData);
             
             rundown.ControlRoomName = controlRoom.Name;
             
@@ -109,8 +111,7 @@ namespace AggregatorService.Managers
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
             var existingRundownResponse = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
-            var rundown = JsonSerializer.Deserialize<RundownDTO>(existingRundownResponse);
-            Console.WriteLine($"Rundown: {JsonSerializer.Serialize(rundown)}");
+            var rundown = JsonConvert.DeserializeObject<RundownDTO>(existingRundownResponse);
             if (existingRundownResponse is null)
             {
                 throw new Exception("Rundown not found.");
@@ -120,7 +121,7 @@ namespace AggregatorService.Managers
             rundown.Items.Add(itemDto);
        
             // Send opdateringen tilbage til service
-            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-to-rundown/{rundownId}", rundown);
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-to-rundown/{rundownId}", itemDto);
             response.EnsureSuccessStatusCode();
             var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
             return updatedRundown;
@@ -131,7 +132,7 @@ namespace AggregatorService.Managers
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
             var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
-            var rundown = JsonSerializer.Deserialize<RundownDTO>(existingRundownResponse);
+            var rundown = JsonConvert.DeserializeObject<RundownDTO>(existingRundownResponse);
           
             if (existingRundownResponse is null)
             {
@@ -161,7 +162,7 @@ namespace AggregatorService.Managers
         // Hent det eksisterende rundown
         var rundownService = _serviceFactory.GetService<RundownService>();
         var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
-        var rundown = JsonSerializer.Deserialize<RundownDTO>(existingRundownResponse);
+        var rundown = JsonConvert.DeserializeObject<RundownDTO>(existingRundownResponse);
       
         if (existingRundownResponse is null)
         {

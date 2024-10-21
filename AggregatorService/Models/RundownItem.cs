@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using AggregatorService.DTO;
 
 namespace AggregatorService.Models
 {
@@ -20,7 +21,7 @@ namespace AggregatorService.Models
         public int Order { get; set; }
 
         [JsonPropertyName("details")]
-        public List<ItemDetail> Details { get; set; } = new List<ItemDetail>();
+        public List<ItemDetailDTO> Details { get; set; } = new List<ItemDetailDTO>();
 
 
     }

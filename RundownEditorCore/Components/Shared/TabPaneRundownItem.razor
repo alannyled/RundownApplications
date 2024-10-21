@@ -2,10 +2,10 @@
 @inject RundownState RundownState
 @inject FormRenderService FormRenderservice
 
-<div class="tab-pane @(ActiveTab == RundownState.Item.Name ? "show active" : "fade")">
+<div class="tab-pane @(ActiveTab == Name ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
         <div class="card-header d-flex justify-content-between bg-danger text-white">
-            <h5 class="mb-0">@RundownState.Item.Name</h5>
+            <h5 class="mb-0">@Name</h5>
             <h5 class="mb-0" role="button" @onclick="RemoveTabPane"><i class="bi bi-x-square"></i></h5>
         </div>
 
@@ -21,8 +21,10 @@
         </div>
 
         <div class="card-body" contenteditable="true">
-
-            <ItemDetail></ItemDetail>
+            @foreach(DetailDTO detail in RundownItem.Details)
+            {
+                <ItemDetail Detail="detail"></ItemDetail>
+            }          
 
         </div>
 
@@ -31,10 +33,10 @@
 @code {
     [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
-    // [Parameter]
-    // public string Name { get; set; } = "Unknown Name";
-    // [Parameter]
-    // public string ItemID { get; set; }
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+    [Parameter]
+    public string ItemId { get; set; }
 
     [Parameter]
     public EventCallback<string> OnRemove { get; set; } 
@@ -42,9 +44,17 @@
     [Parameter]
     public EventCallback ShowDialog { get; set; }
 
+    public RundownItemDTO RundownItem { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Guid UUID = Guid.Parse(ItemId);
+        RundownItem = RundownState.Rundown.Items.FirstOrDefault(item => item.UUID == UUID);
+    }
+
     public async Task RemoveTabPane()
     {
-        await OnRemove.InvokeAsync(RundownState.Item.Name);
+        await OnRemove.InvokeAsync(Name);
     }
     public void AddSelected(string type)
     {
@@ -61,7 +71,7 @@
 
     public void HandleItemDetailCreated()
     {
-        Console.WriteLine("Detail creating in play here : " + RundownState.Item.UUID);
+        Console.WriteLine("Detail creating in play here : " + ItemId);
     }
 }
 

@@ -16,6 +16,7 @@ namespace RundownEditorCore.States
         }
         public void SelectedRundown(RundownDTO rundown)
         {
+            Console.WriteLine($"SelectedRundown kaldt med Rundown Uuid: {rundown.Uuid}");
             Rundown = rundown;
             NotifyStateChanged();
         }

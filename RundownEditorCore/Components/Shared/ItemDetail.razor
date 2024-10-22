@@ -1,5 +1,6 @@
 ﻿@inject KafkaService KafkaService
 @inject RundownState RundownState
+@inject DetailLockState DetailLockState
 
 <div>
     <div class="card mb-3 d-inline-block">
@@ -9,24 +10,21 @@
         <div class="p-0">
             <div class="input-group">
                 <span class="input-group-text rounded-0 @color">Duration</span>
-                <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" disabled="@active">
-                <button class="btn  rounded-0 @color" type="button" @onclick="() => ActivateInput()"><i class="bi @(active ? "bi-pencil-fill" : "bi-floppy-fill")"></i></button>
+                <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" disabled="@locked">
+                <button class="btn rounded-0 @color" type="button" @onclick="() => ActivateInput()">
+                    <i class="bi @(active ? "bi-pencil-fill" : "bi-floppy-fill")"></i>
+                </button>
             </div>
         </div>
         <div class="card-body py-2 d-flex flex-row">
-
-     
-              
-             
-                <div contenteditable="true">
+            <div contenteditable="true" class="@lockedClass">
                 @content
-             </div>
-          
+            </div>
         </div>
     </div>
 </div>
 
-@code{
+@code {
     [Parameter]
     public DetailDTO Detail { get; set; }
     public string icon { get; set; }
@@ -34,30 +32,7 @@
     public string content { get; set; }
     public bool active = true;
     public bool locked = false;
-
-    protected override Task OnInitializedAsync()
-    {
-        
-        return base.OnInitializedAsync();
-    }
-
-    public void ActivateInput()
-    {
-        active = !active;
-        var messageObject = new
-        {
-            Action = "locked",
-            Locked = !active,
-            Detail = Detail.UUID.ToString(),
-            Rundown = RundownState.Rundown.Uuid.ToString(),
-            Item = Detail.ItemId.ToString()
-
-        };
-        string message = JsonSerializer.Serialize(messageObject);
-        KafkaService.SendMessage("rundown_story", message);
-
-
-    }
+    public string lockedClass = "";
 
     protected override void OnInitialized()
     {
@@ -88,10 +63,53 @@
             "Teleprompter" => Detail.PrompterText ?? "Prompter text not found",
             "Grafik" => Detail.GraphicId ?? "Graphic element not found",
             "Video" => Detail.VideoPath ?? "Videopath not found",
-            "Voiceover" => Detail.PrompterText ??  "Voiceover text not found",
-            "Kommentar" => Detail.Comment ??  "Comment not found",
+            "Voiceover" => Detail.PrompterText ?? "Voiceover text not found",
+            "Kommentar" => Detail.Comment ?? "Comment not found",
             _ => "Ukendt"
         };
-    }    
-  
+
+        // Lyt på DetailLockState for ændringer
+        DetailLockState.OnLockStateChanged += HandleLockStateChanged;
+        locked = DetailLockState.IsLocked(Detail.UUID.ToString());
+        UpdateLockedClass();
+    }
+
+    public void ActivateInput()
+    {
+        active = !active;
+        locked = !active;
+        UpdateLockedClass();
+
+        var messageObject = new
+        {
+            Action = "locked",
+            Locked = locked,
+            Detail = Detail.UUID.ToString(),
+            Rundown = RundownState.Rundown.Uuid.ToString(),
+            Item = Detail.ItemId.ToString()
+        };
+        string message = JsonSerializer.Serialize(messageObject);
+        KafkaService.SendMessage("rundown_story", message);
+    }
+
+    private void HandleLockStateChanged(string detailId, bool isLocked)
+    {
+        if (detailId == Detail.UUID.ToString())
+        {
+            locked = isLocked;
+            UpdateLockedClass();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void UpdateLockedClass()
+    {
+        lockedClass = locked ? "bg-danger" : "";
+    }
+
+    public void Dispose()
+    {
+        // Fjern abonnementet, når komponenten afmonteres
+        DetailLockState.OnLockStateChanged -= HandleLockStateChanged;
+    }
 }

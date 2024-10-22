@@ -52,8 +52,17 @@ builder.Services.AddLogging(loggingBuilder =>
 builder.Services.AddScoped<RundownState>();
 builder.Services.AddScoped<ModalState>();
 builder.Services.AddScoped<ToastState>();
+builder.Services.AddSingleton<DetailLockState>();
 builder.Services.AddScoped<FormRenderService>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    return new KafkaServiceLibrary.KafkaService(configuration);
+});
 builder.Services.AddSingleton<KafkaService>();
+
+builder.Services.AddHostedService<KafkaBackgroundService>();
+
 
 
 

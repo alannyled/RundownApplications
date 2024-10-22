@@ -20,7 +20,10 @@ namespace KafkaServiceLibrary
             {
                 BootstrapServers = _bootstrapServers,
                 AutoOffsetReset = AutoOffsetReset.Latest,
-                EnableAutoCommit = true
+                EnableAutoCommit = true,
+                AutoCommitIntervalMs = 100,
+                FetchMinBytes = 1,        
+                FetchWaitMaxMs = 100
             };
         }
 

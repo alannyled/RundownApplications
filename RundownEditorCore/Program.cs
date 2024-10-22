@@ -52,7 +52,8 @@ builder.Services.AddLogging(loggingBuilder =>
 builder.Services.AddScoped<RundownState>();
 builder.Services.AddScoped<ModalState>();
 builder.Services.AddScoped<ToastState>();
-builder.Services.AddScoped<FormRenderService>(); 
+builder.Services.AddScoped<FormRenderService>();
+builder.Services.AddSingleton<KafkaService>();
 
 
 

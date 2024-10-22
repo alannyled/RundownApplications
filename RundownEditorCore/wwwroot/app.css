@@ -91,7 +91,8 @@ h1:focus {
 .day-header {
     font-size: 12px;
     background-color: #f8f9fa;
-    padding: 10px;
+    padding-top: 10px;
+    padding-bottom:10px;
     border: 1px solid #dee2e6;
     text-align: center;
     white-space: nowrap;
@@ -115,6 +116,25 @@ h1:focus {
     background-color: rgb(220, 53, 69);
     color: white;
     font-weight: bold;
+}
+
+.short-day {
+    display: none;
+}
+
+@media (max-width: 1800px) {
+    .full-day {
+        display: none;
+    }
+
+    .short-day {
+        display: inline;
+    }
+
+    .day {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
 }
 
 .card-body::-webkit-scrollbar {

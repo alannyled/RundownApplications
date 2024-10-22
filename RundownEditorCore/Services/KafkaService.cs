@@ -2,8 +2,6 @@
 using Confluent.Kafka;
 using RundownEditorCore.States;
 using System.Text.Json;
-using static System.Formats.Asn1.AsnWriter;
-using RundownEditorCore.DTO;
 
 
 namespace RundownEditorCore.Services
@@ -36,15 +34,18 @@ namespace RundownEditorCore.Services
 
     public class KafkaBackgroundService : BackgroundService
     {
-
+        
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
         private KafkaConsumerClient _consumerClient;
         private DetailLockState _detailLockState;
+        private readonly ILogger<RundownService> _logger;
 
-        public KafkaBackgroundService(KafkaServiceLibrary.KafkaService kafkaService, DetailLockState detailLockState)
+        public KafkaBackgroundService(KafkaServiceLibrary.KafkaService kafkaService, DetailLockState detailLockState, ILogger<RundownService> logger)
         {
+            
             _kafkaService = kafkaService;
             _detailLockState = detailLockState;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -61,15 +62,12 @@ namespace RundownEditorCore.Services
                     var message = _consumerClient.Consumer.Consume(stoppingToken);
                     if (message != null)
                     {
-
-                        Console.WriteLine($"Modtaget besked fra topic '{message.Topic}': Key={message.Message.Key}, Value={message.Message.Value}");
                         if(message.Topic == "rundown_story")
                         {
                             var messageObject = JsonSerializer.Deserialize<ItemDetailMessage>(message.Message.Value);
-                            Console.WriteLine($"Modtaget besked med Detail ID '{messageObject.Detail}'");
+                            _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail}'");
                             _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked);
-                        }
-                        
+                        }                
 
 
                     }
@@ -77,11 +75,10 @@ namespace RundownEditorCore.Services
             }
             catch (ConsumeException ex)
             {
-                Console.WriteLine($"Fejl ved forbrug af besked: {ex.Error.Reason}");
+                Console.WriteLine($"Fejl ved læsning af besked: {ex.Error.Reason}");
             }
         }
     }
-
 
     public class ItemDetailMessage
     {

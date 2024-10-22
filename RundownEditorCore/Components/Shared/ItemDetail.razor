@@ -10,14 +10,14 @@
         <div class="p-0">
             <div class="input-group">
                 <span class="input-group-text rounded-0 @color">Duration</span>
-                <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" disabled="@locked">
+                <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" disabled="@active">
                 <button class="btn rounded-0 @color" type="button" @onclick="() => ActivateInput()">
                     <i class="bi @(active ? "bi-pencil-fill" : "bi-floppy-fill")"></i>
                 </button>
             </div>
         </div>
         <div class="card-body py-2 d-flex flex-row">
-            <div contenteditable="true" class="@lockedClass">
+            <div contenteditable="@active" class="@lockedClass">
                 @content
             </div>
         </div>
@@ -109,7 +109,7 @@
 
     public void Dispose()
     {
-        // Fjern abonnementet, når komponenten afmonteres
+        // Fjern abonnementet, når komponenten lukkes
         DetailLockState.OnLockStateChanged -= HandleLockStateChanged;
     }
 }

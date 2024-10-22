@@ -30,8 +30,8 @@ namespace RundownDbService.BLL.Services
             var messageObject = new
             {
                 Action = "create",
-                uuid = newRundown.UUID.ToString(),
-                rundown = newRundown.Name
+                Rundown = newRundown.UUID.ToString(),
+                Name = newRundown.Name
             };
             string message = JsonSerializer.Serialize(messageObject);
             _kafkaService.SendMessage("rundown", message);
@@ -43,8 +43,8 @@ namespace RundownDbService.BLL.Services
             var messageObject = new
             {
                 Action = "update",
-                uuid = uuid.ToString(),
-                rundown = updatedRundown.Name 
+                Rundown = uuid.ToString(),
+                Name = rundown.Name
             };
 
             string message = JsonSerializer.Serialize(messageObject);
@@ -58,8 +58,8 @@ namespace RundownDbService.BLL.Services
             var messageObject = new
             {
                 Action = "delete",
-                uuid = uuid.ToString(),
-                rundown = string.Empty
+                Rundown = uuid.ToString(),
+                Name = string.Empty
             };
             string message = JsonSerializer.Serialize(messageObject);
             _kafkaService.SendMessage("rundown", message);

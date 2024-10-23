@@ -88,7 +88,18 @@ namespace RundownEditorCore.Services
             return null;
         }
 
+        public async Task<RundownDTO> UpdateDetailAsync(string rundownId, DetailDTO itemDetail)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"update-detail-in-item/{rundownId}", itemDetail);
 
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation($"UPDATED Detail in item");
+                return await response.Content.ReadFromJsonAsync<RundownDTO>();
+            }
+            _logger.LogInformation($"ERROR updating detail in item: {response.ReasonPhrase}");
+            return null;
+        }
     }
 
 }

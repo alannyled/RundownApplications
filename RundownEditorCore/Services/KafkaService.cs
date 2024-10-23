@@ -2,6 +2,7 @@
 using Confluent.Kafka;
 using RundownEditorCore.States;
 using System.Text.Json;
+using RundownEditorCore.DTO;
 
 
 namespace RundownEditorCore.Services
@@ -65,7 +66,8 @@ namespace RundownEditorCore.Services
                         if(message.Topic == "rundown_story")
                         {
                             var messageObject = JsonSerializer.Deserialize<ItemDetailMessage>(message.Message.Value);
-                            _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail}'");
+                            _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail.UUID.ToString()}'");
+                            //_detailLockState.SetLockState(messageObject.Detail.UUID.ToString(), messageObject.Locked, messageObject.UserName);
                             _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
                         }  
                         
@@ -89,7 +91,7 @@ namespace RundownEditorCore.Services
     public class ItemDetailMessage
     {
         public string? Item { get; set; }
-        public string? Detail { get; set; }
+        public DetailDTO? Detail { get; set; }
         public string? Rundown { get; set; }
         public bool Locked { get; set; }
         public string? Action { get; set; }

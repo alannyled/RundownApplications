@@ -1,4 +1,5 @@
-﻿@inject ApplicationDbContext ApplicationDbContext
+﻿@inject IRundownService RundownService
+@inject ApplicationDbContext ApplicationDbContext
 @inject KafkaService KafkaService
 @inject RundownState RundownState
 @inject DetailLockState DetailLockState
@@ -6,24 +7,28 @@
 @using Microsoft.EntityFrameworkCore
 
 <div>
-    <div class="card mb-3 d-inline-block @(locked && lockedByUser != userName ? "border border-3 border-danger" : "") @(active ? "border border-3 border-success": "")">
+    <div class="card mb-3 d-inline-block
+        @(locked && lockedByUser != userName ? "border border-3 border-danger" : "")
+        @(active ? "border border-3 border-success": "")">
         <div class="card-header d-flex justify-content-between @color">
             @Detail.Title<i class="ms-5 bi @icon"></i>
         </div>
         <div class="p-0">
+       
             <div class="input-group">
                 <span class="input-group-text rounded-0 @color">Duration</span>
-                <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" disabled="@(!active)">
+                <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" @oninput="HandleDurationInput" disabled="@(!active)">
+     
                 <button class="btn rounded-0 @color" type="button" disabled="@(locked && lockedByUser != userName)" @onclick="() => ActivateInput()">
                     <i class="bi @(!active ? "bi-pencil-fill" : "bi-floppy-fill")"></i>
                 </button>
             </div>
         </div>
-        <div class="card-body py-2">
-            <p class="@lockedClass">@(locked && lockedByUser != userName ? $"Locked by {lockedByUser}" : "")</p>
-            <div contenteditable="@(active)">
-                
-                @content
+        <div class="card-body p-0">
+            <p class="@(locked && lockedByUser != userName ? "bg-danger text-white text-center px-5 py-2 m-0" : "d-none")">@(locked && lockedByUser != userName ? $"Låst af {lockedByUser}" : "")</p>
+            <div class="input-group">
+                <textarea class="form-control" rows="4" @bind="content" disabled="@(!active)" style="resize: both;"></textarea>
+            
             </div>
         </div>
     </div>
@@ -43,12 +48,9 @@
 
     protected override async void OnInitialized()
     {
-        // Hent authentication state
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
-        // Få brugerens UserName (typisk e-mailadresse)
-        userName = user.Identity.Name ?? "unknown"; // Få username, som typisk er e-mailadressen
+        userName = user.Identity.Name ?? "Ukendt bruger";
 
         icon = Detail.Type switch
         {
@@ -71,7 +73,70 @@
             _ => "list-group-item-secondary"
         };
 
-        content = Detail.Type switch
+        content = SetContent();
+
+        // Lytter på DetailLockState for ændringer
+        DetailLockState.OnLockStateChanged += HandleLockStateChanged;
+        locked = DetailLockState.IsLocked(Detail.UUID.ToString(), out lockedByUser);
+        active = locked && lockedByUser == userName;
+    }
+
+    private void HandleDurationInput(ChangeEventArgs e)
+    {
+        Detail.Duration = e.Value?.ToString();
+    }
+
+    public async Task ActivateInput()
+    {
+        if (active)
+        {
+            await SaveChanges();            
+        }
+        SetLockOnElement();        
+    }
+
+    private async Task SaveChanges()
+    {
+        var contentType = Detail.Type switch
+        {
+            "Teleprompter" => Detail.PrompterText = content,
+            "Grafik" => Detail.GraphicId = content,
+            "Video" => Detail.VideoPath = content,
+            "Voiceover" => Detail.PrompterText = content,
+            "Kommentar" => Detail.Comment = content,
+            _ => "Noget gik helt galt her??!!"
+        };
+        await RundownService.UpdateDetailAsync(RundownState.Rundown.Uuid, Detail);
+    }
+
+    private void SetLockOnElement()
+    {
+        active = !active;
+        locked = active && lockedByUser != userName;
+        if (locked)
+        {
+            DetailLockState.SetLockState(Detail, true, userName);
+        }
+        else
+        {
+            DetailLockState.SetLockState(Detail, false, userName);
+        }
+
+        var messageObject = new
+        {
+            Action = "locked",
+            Locked = locked,
+            Detail = Detail,
+            Rundown = RundownState.Rundown.Uuid.ToString(),
+            Item = Detail.ItemId.ToString(),
+            UserName = userName
+        };
+        string message = JsonSerializer.Serialize(messageObject);
+        KafkaService.SendMessage("rundown_story", message);
+    }
+    private string SetContent()
+    {
+        return Detail.Type switch
         {
             "Kamera" => "Kamera",
             "Teleprompter" => Detail.PrompterText ?? "Prompter text not found",
@@ -81,66 +146,23 @@
             "Kommentar" => Detail.Comment ?? "Comment not found",
             _ => "Ukendt"
         };
-
-        // Lyt på DetailLockState for ændringer
-        DetailLockState.OnLockStateChanged += HandleLockStateChanged;
-
-        // Tjek om detaljen allerede er låst, og af hvem
-        locked = DetailLockState.IsLocked(Detail.UUID.ToString(), out lockedByUser);
-        UpdateLockedClass();
-
-        active = locked && lockedByUser == userName;
     }
 
-    public async Task ActivateInput()
+    private void HandleLockStateChanged(DetailDTO detail, bool isLocked, string userName)
     {
-        active = !active;
-        locked = active && lockedByUser != userName;
-        UpdateLockedClass();       
-
-        // Forsøg at låse detaljen
-        if (locked)
-        {
-            DetailLockState.SetLockState(Detail.UUID.ToString(), true, userName);
-        }
-        else
-        {
-            DetailLockState.SetLockState(Detail.UUID.ToString(), false, userName);
-        }
-
-        // Bevar Action = "locked", som du havde det før
-        var messageObject = new
-        {
-            Action = "locked",
-            Locked = locked,
-            Detail = Detail.UUID.ToString(),
-            Rundown = RundownState.Rundown.Uuid.ToString(),
-            Item = Detail.ItemId.ToString(),
-            UserName = userName
-        };
-        string message = JsonSerializer.Serialize(messageObject);
-        KafkaService.SendMessage("rundown_story", message);
-    }
-
-    private void HandleLockStateChanged(string detailId, bool isLocked, string userName)
-    {
-        if (detailId == Detail.UUID.ToString())
+        if (detail.UUID == Detail.UUID)
         {
             locked = isLocked;
+            Detail = detail;
             lockedByUser = isLocked ? userName : "";
-            UpdateLockedClass();
+            content = SetContent();
             InvokeAsync(StateHasChanged);
         }
     }
 
-    private void UpdateLockedClass()
-    {
-        lockedClass = locked ? "bg-danger text-white text-center" : "";
-    }
-
     public void Dispose()
     {
-        // Fjern abonnementet, når komponenten lukkes
+        // Lyt ikke længere, når komponenten lukkes
         DetailLockState.OnLockStateChanged -= HandleLockStateChanged;
     }
 }

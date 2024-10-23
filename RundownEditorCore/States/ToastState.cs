@@ -5,7 +5,7 @@
         public event Action OnChange;
         public bool Show { get; private set; } = false;
         public string Message { get; private set; } = string.Empty;
-        public string Color { get; private set; } = "alert-success";
+        public string Color { get; private set; } = "text-bg-success";
 
         public void FireToast(string message, string color)
         {
@@ -20,7 +20,7 @@
         {
             Show = false;
             Message = string.Empty;
-            Color = "alert-success";
+            Color = "text-bg-success";
             NotifyStateChanged();
         }
 

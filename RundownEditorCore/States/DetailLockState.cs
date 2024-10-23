@@ -2,31 +2,48 @@
 {
     public class DetailLockState
     {
-        private readonly HashSet<string> _lockedDetails = [];
+        // Dictionary til at gemme detailId som nøgle og userId som værdi
+        private readonly Dictionary<string, string> _lockedDetails = new Dictionary<string, string>();
 
-        public event Action<string, bool> OnLockStateChanged;
-    
-        public bool IsLocked(string detailId)
+        public event Action<string, bool, string> OnLockStateChanged;
+
+        // Metode til at kontrollere om et detailId er låst, og hvem der har låst det
+        public bool IsLocked(string detailId, out string lockedByUserId)
         {
-            return _lockedDetails.Contains(detailId);
+            return _lockedDetails.TryGetValue(detailId, out lockedByUserId);
         }
-        public void SetLockState(string detailId, bool isLocked)
+
+        // Opdaterer lock state og gemmer, hvem der har låst/unlocked detaljen
+        public bool SetLockState(string detailId, bool isLocked, string userId)
         {
             if (isLocked)
             {
-                if (_lockedDetails.Add(detailId)) 
+                // Kontroller, om det allerede er låst af en anden bruger
+                if (!_lockedDetails.ContainsKey(detailId))
                 {
-                    OnLockStateChanged?.Invoke(detailId, true);
+                    _lockedDetails[detailId] = userId; // Tilføj detailId og userId til dictionary
+                    OnLockStateChanged?.Invoke(detailId, true, userId);
+                    return true; // Låsning lykkedes
+                }
+                else
+                {
+                    return false; // Detalje er allerede låst
                 }
             }
             else
             {
-                if (_lockedDetails.Remove(detailId)) 
+                // Kun brugeren, der har låst detaljen, kan låse den op
+                if (_lockedDetails.TryGetValue(detailId, out var lockedBy) && lockedBy == userId)
                 {
-                    OnLockStateChanged?.Invoke(detailId, false);
+                    _lockedDetails.Remove(detailId);
+                    OnLockStateChanged?.Invoke(detailId, false, userId);
+                    return true; // Låsning fjernet
+                }
+                else
+                {
+                    return false; // Brugeren kan ikke låse denne detalje op, da de ikke er den, der låste den
                 }
             }
         }
     }
-
 }

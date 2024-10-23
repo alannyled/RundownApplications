@@ -66,7 +66,7 @@ namespace RundownEditorCore.Services
                         {
                             var messageObject = JsonSerializer.Deserialize<ItemDetailMessage>(message.Message.Value);
                             _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail}'");
-                            _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked);
+                            _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
                         }  
                         
                         if(message.Topic == "rundown")
@@ -94,5 +94,6 @@ namespace RundownEditorCore.Services
         public bool Locked { get; set; }
         public string? Action { get; set; }
         public string? Name { get; set; }
+        public string? UserName { get; set; }
     }
 }

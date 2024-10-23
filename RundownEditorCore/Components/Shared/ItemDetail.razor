@@ -27,7 +27,15 @@
         <div class="card-body p-0">
             <p class="@(locked && lockedByUser != userName ? "bg-danger text-white text-center px-5 py-2 m-0" : "d-none")">@(locked && lockedByUser != userName ? $"Låst af {lockedByUser}" : "")</p>
             <div class="input-group">
-                <textarea class="form-control" rows="4" @bind="content" disabled="@(!active)" style="resize: both;"></textarea>
+                <textarea 
+                    class="form-control"
+                    rows="@CalculateRows()"
+                    cols="@(Math.Ceiling((double)content.Count()))"
+                    @oninput="HandleContentInput"
+                    disabled="@(!active)" 
+                    style="resize: both;">
+                    @content
+                </textarea>
             
             </div>
         </div>
@@ -85,14 +93,23 @@
     {
         Detail.Duration = e.Value?.ToString();
     }
+    private void HandleContentInput(ChangeEventArgs e)
+    {
+        
+        content = e.Value?.ToString();
+    }
 
     public async Task ActivateInput()
     {
-        if (active)
+        var saveChanges = active;
+       
+        if (saveChanges)
         {
             await SaveChanges();            
         }
-        SetLockOnElement();        
+  
+        SetLockOnElement();      
+        
     }
 
     private async Task SaveChanges()
@@ -107,6 +124,7 @@
             _ => "Noget gik helt galt her??!!"
         };
         await RundownService.UpdateDetailAsync(RundownState.Rundown.Uuid, Detail);
+        
     }
 
     private void SetLockOnElement()
@@ -132,6 +150,7 @@
             UserName = userName
         };
         string message = JsonSerializer.Serialize(messageObject);
+       
         KafkaService.SendMessage("rundown_story", message);
     }
     private string SetContent()
@@ -158,6 +177,14 @@
             content = SetContent();
             InvokeAsync(StateHasChanged);
         }
+    }
+
+    private int CalculateRows()
+    {
+        var lineCount = content.Split('\n').Length;
+        var additionalRows = Math.Ceiling((double)content.Length / 150);
+        // Antal rækker (mindst 1 + antal linjeskift + ekstra rækker)
+        return Math.Max(1, lineCount + (int)additionalRows);
     }
 
     public void Dispose()

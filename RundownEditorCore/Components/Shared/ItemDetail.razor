@@ -27,8 +27,7 @@
         <div class="card-body p-0">
             <p class="@(locked && lockedByUser != userName ? "bg-danger text-white text-center px-5 py-2 m-0" : "d-none")">@(locked && lockedByUser != userName ? $"Låst af {lockedByUser}" : "")</p>
             <div class="input-group">
-                <textarea 
-                    class="form-control"
+                <textarea class="form-control rounded-0 rounded-bottom"
                     rows="@CalculateRows()"
                     cols="@(Math.Ceiling((double)content.Count()))"
                     @oninput="HandleContentInput"

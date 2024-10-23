@@ -63,7 +63,7 @@ builder.Services.AddSingleton(serviceProvider =>
 builder.Services.AddSingleton<KafkaService>();
 
 builder.Services.AddHostedService<KafkaBackgroundService>();
-
+builder.Services.AddScoped<ThemeService>();
 
 
 
@@ -116,6 +116,16 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+// brug cookie til temaet
+app.Use(async (context, next) =>
+{
+    var theme = context.Request.Cookies["theme"] ?? "light"; // Fallback til "light"
+    context.Items["Theme"] = theme;
+
+    await next.Invoke();
+});
+
 
 app.UseHttpsRedirection();
 

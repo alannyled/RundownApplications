@@ -3,16 +3,39 @@
 @attribute [Authorize(Roles = "Administrator")]
 <PageTitle>Online Status</PageTitle>
 
-<div class="container-fluid" style="max-width:1600px">
-<h3>Online Status</h3>
-    @foreach (var db in HealthService.OnlineStatus)
-{
-        <ul class="list-group list-group-horizontal mb-1">
-            <li class="list-group-item w-25 fw-bold">@db.Key</li>
-            <li class="list-group-item text-end @(db.Value ? "list-group-item-success" : "list-group-item-danger")">@(db.Value ? "Online" : "Offline")</li>
-   
-        </ul>
-}
+<div class="container-fluid" style="max-width:1920px">
+    <div class="row">
+        <div class="col-xl-4">
+            <h3>Online Status</h3>
+            @foreach (var db in HealthService.OnlineStatus)
+            {
+                <ul class="list-group list-group-horizontal mb-1">
+                    <li class="list-group-item w-75 fw-bold">@((MarkupString)db.Key)</li>
+                    <li class="list-group-item w-25 text-end @(db.Value ? "list-group-item-success" : "list-group-item-danger")">@(db.Value ? "Online" : "Offline")</li>
+
+                </ul>
+            }
+        </div>
+        <div class="col-xl-8">
+            <a class="nav-link" href="log" target="_blank"><span style="font-size: 1.75rem;">Log </span><small>(klik for at åbne på ny side)</small></a>
+            <table class="table table-striped table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th style="width:8%">Time</th>
+                        <th>Category</th>
+                        <th>Service</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in InMemoryLogger.GetLogs().Reverse())
+                    {
+                        <tr class="font-monospace" style="font-size:12px">@((MarkupString)log)</tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 @code {
     private HealthCheckService HealthService;
@@ -20,34 +43,40 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var databases = new Dictionary<string, string>
+        var services = new Dictionary<string, string>
         {
-            { "Rundown Primary Database", "http://localhost:27027" },
-            { "Rundown Seconday Database", "http://localhost:27028" },
-            {"Template Primary Database", "http://localhost:27037" },
-            {"Template Secondary Database", "http://localhost:27038" },
-            {"ControlRoom Primary Database", "http://localhost:27017" },
-            {"ControlRoom Secondary Database", "http://localhost:27018" },
-            {"Kafka ZooKeeper", "http://localhost:2181" },
-            {"Kafka", "http://localhost:9092" },
-            {"Aggregator SSL", "https://localhost:3010/health" },
-            {"Aggregator", "http://localhost:3011/health" }
+            {"Database Rundown Primary", "http://localhost:27027" },
+            {"Database Rundown Seconday", "http://localhost:27028" },
+            {"Database Template Primary", "http://localhost:27037" },
+            {"Database Template Secondary", "http://localhost:27038" },
+            {"Database ControlRoom Primary", "http://localhost:27017" },
+            {"Database ControlRoom Secondary", "http://localhost:27018" },
+            {"Kafka ZooKeeper", "tcp://localhost:2181" },
+            {"Kafka Message Broker", "tcp://localhost:9092" },
+            {"MicroService Aggregator SSL", "https://localhost:3010/health" },
+            {"MicroService Aggregator", "http://localhost:3011/health" },
+            {"MicroService ControlRoom SSL", "https://localhost:3020/health" },
+            {"MicroService ControlRoom", "http://localhost:3021/health" },
+            {"MicroService Rundown SSL", "https://localhost:3030/health" },
+            {"MicroService Rundown", "http://localhost:3031/health" },
+            {"MicroService Template SSL", "https://localhost:3040/health" },
+            {"MicroService Template", "http://localhost:3041/health" }
         };
 
-        HealthService = new HealthCheckService(databases);
-        await HealthService.CheckDatabaseHealthAsync();
-  
+        HealthService = new HealthCheckService(services);
+        await HealthService.CheckHealthAsync();
 
-    _timer = new System.Threading.Timer(async _ =>
-    {
-        await UpdateDatabaseHealth();
-    }, null, TimeSpan.Zero, TimeSpan.FromSeconds(30)); // Tjek hvert 30. sekund
+
+        _timer = new System.Threading.Timer(async _ =>
+        {
+            await UpdateHealth();
+        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(30)); // Tjek hvert 30. sekund
     }
 
-    private async Task UpdateDatabaseHealth()
+    private async Task UpdateHealth()
     {
-        await HealthService.CheckDatabaseHealthAsync();
-        InvokeAsync(StateHasChanged); 
+        await HealthService.CheckHealthAsync();
+        InvokeAsync(StateHasChanged);
     }
 
 

@@ -72,7 +72,7 @@
                                             <ul>
                                                 @foreach (var hardware in room.HardwareItems)
                                                 {
-                                                    <li><a role="button" class="link-dark" @onclick="() => EditHardware(hardware.Uuid)">@hardware.Name (@hardware.Model)</a></li>
+                                                    <li><a role="button" @onclick="() => EditHardware(hardware.Uuid)">@hardware.Name (@hardware.Model)</a></li>
                                                 }
                                             </ul>
                                         </td>

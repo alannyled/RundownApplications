@@ -9,7 +9,7 @@
     </div> *@
 
     <main>
-        <div class="top-row px-4 bg-danger">
+        <div class="top-row px-4 bg-danger border-0">
             <div class="nav-item">
                 <NavLink class="nav-link text-white" href="" Match="NavLinkMatch.All">
                     <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
@@ -18,11 +18,6 @@
             <div class="nav-item">
                 <NavLink class="nav-link text-white" href="templates">
                     <span class="bi bi-list-check" aria-hidden="true"></span> Templates
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link text-white" href="log">
-                    <span class="bi bi-list-columns-reverse" aria-hidden="true"></span> log
                 </NavLink>
             </div>
             <AuthorizeView Roles="Administrator">
@@ -39,12 +34,16 @@
                     </div>
                     <div class="nav-item">
                         <NavLink class="nav-link text-white" href="status">
-                            <span class="bi bi-database-fill-check" aria-hidden="true"></span> Online Status
+                            <span class="bi bi-database-fill-check" aria-hidden="true"></span> System Status
                         </NavLink>
                     </div>
                 </Authorized>
             </AuthorizeView>
-
+            <div class="nav-item">
+                <div role="button" class="nav-link text-white ms-4">
+                    <span onclick="themeFunctions.toggleTheme()"><i class="bi bi-highlights"></i> Tema</span>
+                </div>
+            </div>
 
             <AuthorizeView>
                 <Authorized>

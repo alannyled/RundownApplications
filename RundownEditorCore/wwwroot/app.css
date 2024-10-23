@@ -11,6 +11,15 @@ html, body {
     font-size: 20px !important;
     vertical-align: 0.36em;
 }*/
+svg .dynamic-text {
+    fill: black;
+}
+
+/* Dark mode styling for SVG text */
+[data-bs-theme="dark"] svg .dynamic-text {
+    fill: white;
+}
+
 .sidebar{
     width:500px !important;
 }
@@ -89,8 +98,7 @@ h1:focus {
 }
 
 .day-header {
-    font-size: 12px;
-    background-color: #f8f9fa;
+    font-size: 12px;    
     padding-top: 10px;
     padding-bottom:10px;
     border: 1px solid #dee2e6;

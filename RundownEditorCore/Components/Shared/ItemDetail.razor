@@ -71,13 +71,13 @@
         };
         color = Detail.Type switch
         {
-            "Kamera" => "list-group-item-warning",
-            "Teleprompter" => "list-group-item-danger",
-            "Grafik" => "list-group-item-warning",
-            "Video" => "list-group-item-success",
-            "Voiceover" => "list-group-item-danger",
-            "Kommentar" => "list-group-item-primary",
-            _ => "list-group-item-secondary"
+            "Kamera" => "text-bg-success",
+            "Teleprompter" => "text-bg-secondary",
+            "Grafik" => "text-bg-warning",
+            "Video" => "text-bg-primary",
+            "Voiceover" => "text-bg-secondary",
+            "Kommentar" => "text-bg-info",
+            _ => "text-bg-danger"
         };
 
         content = SetContent();

@@ -1,0 +1,59 @@
+﻿@page "/status"
+
+@attribute [Authorize(Roles = "Administrator")]
+<PageTitle>Online Status</PageTitle>
+
+<div class="container-fluid" style="max-width:1600px">
+<h3>Online Status</h3>
+    @foreach (var db in HealthService.OnlineStatus)
+{
+        <ul class="list-group list-group-horizontal mb-1">
+            <li class="list-group-item w-25 fw-bold">@db.Key</li>
+            <li class="list-group-item text-end @(db.Value ? "list-group-item-success" : "list-group-item-danger")">@(db.Value ? "Online" : "Offline")</li>
+   
+        </ul>
+}
+</div>
+@code {
+    private HealthCheckService HealthService;
+    private System.Threading.Timer _timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var databases = new Dictionary<string, string>
+        {
+            { "Rundown Primary Database", "http://localhost:27027" },
+            { "Rundown Seconday Database", "http://localhost:27028" },
+            {"Template Primary Database", "http://localhost:27037" },
+            {"Template Secondary Database", "http://localhost:27038" },
+            {"ControlRoom Primary Database", "http://localhost:27017" },
+            {"ControlRoom Secondary Database", "http://localhost:27018" },
+            {"Kafka ZooKeeper", "http://localhost:2181" },
+            {"Kafka", "http://localhost:9092" },
+            {"Aggregator SSL", "https://localhost:3010/health" },
+            {"Aggregator", "http://localhost:3011/health" }
+        };
+
+        HealthService = new HealthCheckService(databases);
+        await HealthService.CheckDatabaseHealthAsync();
+  
+
+    _timer = new System.Threading.Timer(async _ =>
+    {
+        await UpdateDatabaseHealth();
+    }, null, TimeSpan.Zero, TimeSpan.FromSeconds(30)); // Tjek hvert 30. sekund
+    }
+
+    private async Task UpdateDatabaseHealth()
+    {
+        await HealthService.CheckDatabaseHealthAsync();
+        InvokeAsync(StateHasChanged); 
+    }
+
+
+    public void Dispose()
+    {
+        HealthService?.Dispose();
+        _timer?.Dispose();
+    }
+}

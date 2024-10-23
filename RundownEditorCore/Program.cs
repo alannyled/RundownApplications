@@ -53,6 +53,7 @@ builder.Services.AddScoped<RundownState>();
 builder.Services.AddScoped<ModalState>();
 builder.Services.AddScoped<ToastState>();
 builder.Services.AddSingleton<DetailLockState>();
+
 builder.Services.AddScoped<FormRenderService>();
 builder.Services.AddSingleton(serviceProvider =>
 {

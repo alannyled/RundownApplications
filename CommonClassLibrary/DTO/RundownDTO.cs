@@ -7,7 +7,7 @@ namespace CommonClassLibrary.DTO
         public string? Name { get; set; } = null;
         public string? Description { get; set; } = null;
         public string? Type{ get; set; } = null;
-        public DateTimeOffset? BroadcastDate { get; set; } = null;
+        public DateTimeOffset BroadcastDate { get; set; } = new();
         public DateTime? ArchivedDate { get; set; } = null;
         public string? ArchivedBy { get; set; } = null;
         public string? ControlRoomId { get; set; } = null;

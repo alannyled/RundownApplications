@@ -69,6 +69,12 @@ namespace AggregatorService.Controllers
             return Ok(rundown);
         }
 
+        [HttpPut("update-rundown/{rundownId}")]
+        public async Task<IActionResult> UpdateRundown(Guid rundownId, [FromBody] RundownDTO request)
+        {
+            var updatedRundown = await _rundownManager.UpdateRundownAsync(rundownId, request);
+            return Ok(updatedRundown);
+        }
 
 
 

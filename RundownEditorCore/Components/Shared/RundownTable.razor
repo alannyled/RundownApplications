@@ -1,7 +1,7 @@
-﻿
-@using RundownEditorCore.DTO
+﻿@using CommonClassLibrary.DTO
 @using RundownEditorCore.Interfaces
 @inject IRundownService RundownService
+@inject ToastState ToastState
 
 
 @if (isLoading)
@@ -11,51 +11,96 @@
 else
 {
     <div class="table-responsive">
-    <table class="table table-sm table-striped">
-        <thead>
-            <tr>
-                
-                <th>Navn</th>
-                <th>Udsendelses dato</th>
-                <th>Kontrolrum</th>
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
 
-            </tr>
-        </thead>
-        <tbody>
-                @foreach (var rundown in Rundowns.OrderBy(r => r.BroadcastDate))
+                    <th>Navn</th>
+                    <th>Udsendelses dato</th>
+                    <th>Kontrolrum</th>
+                    @if (ShowArchived)
+                    {
+                        <th class="text-center">Arkiveret</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rundown in Rundowns.OrderBy(r => r.BroadcastDate).Reverse())
                 {
-                if(rundown.BroadcastDate.Date >= SelectedDate.Date)
-                {
-                    <tr role="button" @onclick="() => OpenThisRundown(rundown.Uuid.ToString())">
+                    if (rundown.BroadcastDate.Date >= SelectedDate.Date)
+                    {
+                        <tr role="button" @onclick="() => OpenThisRundown(rundown.Uuid.ToString())">
 
                             <td class="text-nowrap">@rundown.Name</td>
                             <td class="text-nowrap">@rundown.BroadcastDate.ToLocalTime().ToString("dddd d. MMMM yyyy")</td>
                             <td class="text-nowrap">@rundown.ControlRoomName</td>
-                   
+                            @if (ShowArchived)
+                            {
+                                <td class="text-center" @onclick="() => HandleCheckBoxChange(rundown)">
+                                    <input type="checkbox" checked="@(()=> IsArchived(rundown.ArchivedDate.ToString()))" @onchange="() => HandleCheckBoxChange(rundown)" />
+                                </td>
+                            }
 
-                    </tr>
+
+                        </tr>
+                    }
                 }
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     </div>
 }
 
 @code {
-    [Parameter]
-    public EventCallback<string> OpenRundown { get; set; }
-    [Parameter]
-    public List<RundownDTO>? Rundowns { get; set; }
-    [Parameter]
-    public DateTime SelectedDate { get; set; }
+        [Parameter]
+        public EventCallback<string> OpenRundown { get; set; }
+        [Parameter]
+        public List<RundownDTO>? Rundowns { get; set; }
+        [Parameter]
+        public DateTime SelectedDate { get; set; }
+        [Parameter]
+        public bool ShowArchived { get; set; } = false;
 
-   // private List<RundownDTO>? rundowns;
+    // private List<RundownDTO>? rundowns;
     private bool isLoading = true;
     private string? errorMessage;
 
     public async Task OpenThisRundown(string uuid)
     {
         await OpenRundown.InvokeAsync(uuid);
+    }
+
+    public bool IsArchived(string archived)
+    {
+        if (string.IsNullOrEmpty(archived))
+        {
+            return false;
+        }
+        return true;
+
+    }
+
+
+    public async Task<RundownDTO> HandleCheckBoxChange(RundownDTO rundown)
+    {
+       // RundownDTO updatedRundown = new RundownDTO();
+        var date = DateTime.Now;
+        string message = "";
+        Console.WriteLine("Rundown DATE before:" + rundown.ArchivedDate);
+        if (string.IsNullOrEmpty(rundown.ArchivedDate.ToString())){
+            rundown.ArchivedDate = date;
+            message = "Rækkefølge er arkiveret";
+        }
+        else
+        {
+            rundown.ArchivedDate = null;
+            message = "Rækkefølge er aktiveret igen";
+        }
+        Console.WriteLine("Rundown updated 1 " + rundown.ArchivedDate);
+        rundown = await RundownService.UpdateRundownAsync(rundown.Uuid, rundown);
+
+        Console.WriteLine("Rundown updated 2 " + rundown.ArchivedDate);
+        ToastState.FireToast(message, "text-bg-success");
+        return rundown;
     }
 
     protected override async Task OnInitializedAsync()
@@ -65,7 +110,7 @@ else
         try
         {
             Rundowns = await RundownService.GetActiveRundowsAsync();
-    
+
 
         }
         catch (HttpRequestException httpEx)
@@ -81,7 +126,7 @@ else
             isLoading = false;
         }
     }
-   
+
 
 
 }

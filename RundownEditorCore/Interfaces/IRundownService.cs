@@ -12,5 +12,6 @@ namespace RundownEditorCore.Interfaces
         Task<RundownDTO> AddDetailToItemAsync(string rundownId, ItemDetailDTO.ItemDetail itemDetail);
         Task<RundownDTO> UpdateDetailAsync(string rundownId, DetailDTO itemDetail);
         Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item);
+        Task<RundownDTO> UpdateRundownAsync(string rundownId, RundownDTO rundown);
     }
 }

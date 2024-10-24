@@ -34,16 +34,16 @@ namespace AggregatorService.Managers
                 Name = template.Name,
                 Items = template.Items
             };
-          
+
             var response = await rundownService.PostAsJsonAsync(_apiUrls.RundownApi, newRundown);
             response.EnsureSuccessStatusCode();
-            
+
             var createdRundown = await response.Content.ReadFromJsonAsync<Rundown>();
             createdRundown.ControlRoomName = controlRoom.Name;
             return createdRundown;
         }
-        
-        
+
+
         public async Task<List<Rundown>> FetchRundownsWithControlRoomData()
         {
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
@@ -62,7 +62,7 @@ namespace AggregatorService.Managers
                     .FirstOrDefault(c => c.Uuid == rundown.ControlRoomId);
                 if (controlRoom != null)
                 {
-                    rundown.ControlRoomName = controlRoom.Name; 
+                    rundown.ControlRoomName = controlRoom.Name;
                 }
             }
 
@@ -81,9 +81,9 @@ namespace AggregatorService.Managers
 
             var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi, rundown.ControlRoomId.ToString());
             var controlRoom = JsonConvert.DeserializeObject<ControlRoom>(controlRoomData);
-            
+
             rundown.ControlRoomName = controlRoom.Name;
-            
+
 
             return rundown;
         }
@@ -119,7 +119,7 @@ namespace AggregatorService.Managers
             itemDto.UUID = Guid.NewGuid();
             // Tilføj det nye item til eksisterende liste
             rundown.Items.Add(itemDto);
-       
+
             // Send opdateringen tilbage til service
             var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-to-rundown/{rundownId}", itemDto);
             response.EnsureSuccessStatusCode();
@@ -131,7 +131,7 @@ namespace AggregatorService.Managers
         {
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
-          
+
             // Send til service
             var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-item-detail-to-rundown/{rundownId}", itemDetailDto);
             response.EnsureSuccessStatusCode();
@@ -141,42 +141,51 @@ namespace AggregatorService.Managers
 
 
 
-    public async Task<Rundown> UpdateItemDetailAsync(Guid rundownId, ItemDetailDTO itemDetailDto)
-    {
-        // Hent det eksisterende rundown
-        var rundownService = _serviceFactory.GetService<RundownService>();
-        var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
-        var rundown = JsonConvert.DeserializeObject<RundownDTO>(existingRundownResponse);
-      
-        if (existingRundownResponse is null)
+        public async Task<Rundown> UpdateItemDetailAsync(Guid rundownId, ItemDetailDTO itemDetailDto)
         {
-            throw new Exception("Rundown not found.");
+            // Hent det eksisterende rundown
+            var rundownService = _serviceFactory.GetService<RundownService>();
+            var existingRundownResponse = await rundownService.GetByIdAsync($"{_apiUrls.RundownApi}/{rundownId}");
+            var rundown = JsonConvert.DeserializeObject<RundownDTO>(existingRundownResponse);
+
+            if (existingRundownResponse is null)
+            {
+                throw new Exception("Rundown not found.");
+            }
+            var item = rundown.Items.FirstOrDefault(i => i.UUID == itemDetailDto.ItemId);
+            if (item is null)
+            {
+                throw new Exception("Item not found.");
+            }
+            var detail = item.Details.FirstOrDefault(d => d.UUID == itemDetailDto.UUID);
+            if (detail is null)
+            {
+                throw new Exception("Detail not found.");
+            }
+            detail.UUID = itemDetailDto.UUID;
+            detail.ItemId = itemDetailDto.ItemId;
+            detail.Title = itemDetailDto.Title;
+            detail.Type = itemDetailDto.Type;
+            detail.Order = itemDetailDto.Order;
+            detail.Duration = itemDetailDto.Duration;
+            detail.PrompterText = itemDetailDto.PrompterText ?? null;
+            detail.VideoPath = itemDetailDto.VideoPath ?? null;
+            detail.GraphicId = itemDetailDto.GraphicId ?? null;
+            detail.Comment = itemDetailDto.Comment ?? null;
+            // Send opdateringen tilbage til service
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/edit-item-detail-in-rundown/{rundownId}", detail);
+            response.EnsureSuccessStatusCode();
+            var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            return updatedRundown;
         }
-        var item = rundown.Items.FirstOrDefault(i => i.UUID == itemDetailDto.ItemId);
-        if (item is null)
+
+        public async Task<Rundown> UpdateRundownAsync(Guid rundownId, RundownDTO request)
         {
-            throw new Exception("Item not found.");
+            var rundownService = _serviceFactory.GetService<RundownService>();
+            var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}", request);
+            response.EnsureSuccessStatusCode();
+            var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
+            return updatedRundown;
         }
-        var detail = item.Details.FirstOrDefault(d => d.UUID == itemDetailDto.UUID);
-        if (detail is null)
-        {
-            throw new Exception("Detail not found.");
-        }
-        detail.UUID = itemDetailDto.UUID;
-        detail.ItemId = itemDetailDto.ItemId;
-        detail.Title = itemDetailDto.Title;
-        detail.Type = itemDetailDto.Type;
-        detail.Order = itemDetailDto.Order;
-        detail.Duration = itemDetailDto.Duration;
-        detail.PrompterText = itemDetailDto.PrompterText ?? null;
-        detail.VideoPath = itemDetailDto.VideoPath ?? null;
-        detail.GraphicId = itemDetailDto.GraphicId ?? null;
-        detail.Comment = itemDetailDto.Comment ?? null;
-        // Send opdateringen tilbage til service
-        var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/edit-item-detail-in-rundown/{rundownId}", detail);
-        response.EnsureSuccessStatusCode();
-        var updatedRundown = await response.Content.ReadFromJsonAsync<Rundown>();
-        return updatedRundown;
     }
-}
 }

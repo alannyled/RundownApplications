@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using RundownEditorCore.Components.Forms;
+using CommonClassLibrary.DTO;
 using RundownEditorCore.DTO;
 
 namespace RundownEditorCore.Services

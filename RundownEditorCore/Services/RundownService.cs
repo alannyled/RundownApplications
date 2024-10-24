@@ -11,12 +11,14 @@ namespace RundownEditorCore.Services
         private readonly HttpClient _httpClient = httpClient;
         private readonly ILogger<RundownService> _logger = logger;
 
-        public async Task<List<RundownDTO>> GetActiveRundowsAsync()
+        public async Task<List<RundownDTO>> GetRundownsAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-active-rundowns-with-controlrooms");
-            _logger.LogInformation($"FETCHED Rundowns");
+            var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-rundowns-with-controlrooms");
+            _logger.LogInformation($"FETCHED All Rundowns");
             return response;
         }
+
+       
 
         public async Task<RundownDTO> GetRundownAsync(string uuid)
         {
@@ -29,8 +31,6 @@ namespace RundownEditorCore.Services
 
         public async Task<RundownDTO> CreateRundownFromTemplate(string templateId, string controlroomId, DateTimeOffset date)
         {
-
-            Console.WriteLine("Creating rundown from template on date: " + date.ToString());
             var request = new RundownDTO
             {
                 ControlRoomId = controlroomId,

@@ -21,12 +21,12 @@ namespace AggregatorService.Controllers
         }
         
         
-        [HttpGet("fetch-active-rundowns-with-controlrooms")]
+        [HttpGet("fetch-rundowns-with-controlrooms")]
         public async Task<IActionResult> FetchRundownsWithControlRooms()
         {
             var data = await _rundownManager.FetchRundownsWithControlRoomData();
             return Ok(data);
-        }
+        }       
 
         [HttpGet("fetch-rundown/{rundownId}")]
         public async Task<IActionResult> FetchSelectedRundown(string rundownId)

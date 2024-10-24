@@ -105,20 +105,27 @@
 
     //private RundownDTO selectedRundown = new();
     private List<ControlRoomDTO> controlRooms = new();
+    private List<RundownDTO> AllRundowns = new();
     private List<RundownDTO> ActiveRundowns = new();
     private List<TemplateDTO> AllTemplates = new();
 
     protected override async Task OnInitializedAsync()
     {
         controlRooms = await ControlRoomService.GetControlRoomsAsync();
-        ActiveRundowns = await RundownService.GetActiveRundowsAsync();
         AllTemplates = await TemplateService.GetAllTemplatesAsync();
+        await GetAndFilterRundowns();
 
+    }
+
+    private async Task GetAndFilterRundowns()
+    {
+        AllRundowns = await RundownService.GetRundownsAsync();
+        ActiveRundowns = AllRundowns.Where(r => r.ArchivedDate == null).ToList();
     }
 
     private async Task UpdateRundownListOnControlRoomChange()
     {
-        ActiveRundowns = await RundownService.GetActiveRundowsAsync();
+        await GetAndFilterRundowns();
         await UpdateSelectedRundown();
         StateHasChanged();
     }
@@ -214,37 +221,6 @@
         RundownState.SelectedRundown(result.SelectedRundown);
         ModalState.Close();
     }
-
-    // private async Task SaveRundownItemForm()
-    // {
-
-    //     // if (string.IsNullOrEmpty(ItemName))
-    //     // {
-    //     //     validationMessage = "Navnet må ikke være tomt.";
-    //     //     return;
-    //     // }
-
-    //     // var newRundownItem = new RundownItemDTO
-    //     //     {
-    //     //         UUID = Guid.NewGuid(),
-    //     //         RundownId = selectedRundown.Uuid,
-    //     //         Name = ItemName,
-    //     //         Duration = Duration,
-    //     //         Order = selectedRundown.Items.Count // + 1  eller *10?
-        //     //     };
-
-    //   //  await RundownService.AddItemToRundownAsync(selectedRundown.Uuid, newRundownItem);
-    //     // kan denne ikke komme som svar på ovenstående, i stedet for at kalde igen
-    //   //  await UpdateSelectedRundown();
-    //     showDialog = false;
-    //     // nulstil alle felter
-    //     // ItemName = string.Empty;
-    //     // Duration = "00:00:00";
-    //     // Category = string.Empty;
-    //     validationMessage = string.Empty;
-
-    // }
-
 
 
     // private ClaimsPrincipal user;

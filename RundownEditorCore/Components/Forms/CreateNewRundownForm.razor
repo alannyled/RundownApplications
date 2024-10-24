@@ -60,7 +60,7 @@
     {
         // Lav rundown og hent aktive rundowns
         var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
-        var activeRundowns = await RundownService.GetActiveRundowsAsync();
+        var activeRundowns = await RundownService.GetRundownsAsync();
 
         // Indstil værdier og send resultatet til moderkomponenten
         var result = new CreateRundownResultDTO

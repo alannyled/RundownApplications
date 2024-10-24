@@ -1,6 +1,17 @@
 ﻿@page "/rundowns"
+@inject IRundownService RundownService
 
 <Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
-    <RundownTable ShowArchived="true" />
+    <RundownTable Rundowns="AllRundowns" ShowArchived="true" />
 </div>
+
+@code{
+
+    private List<RundownDTO> AllRundowns = new();
+
+    protected override async Task OnInitializedAsync()
+    {       
+          AllRundowns = await RundownService.GetRundownsAsync();
+    }
+}

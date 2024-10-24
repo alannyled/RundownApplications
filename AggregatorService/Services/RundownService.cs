@@ -33,7 +33,7 @@ namespace AggregatorService.Services
         public override async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T payload)
         {
             var json = JsonSerializer.Serialize(payload);
-
+            Console.WriteLine($"Updating rundown: {json}");
             var response = await _httpClient.PutAsJsonAsync(url, payload);
             response.EnsureSuccessStatusCode();
             return response;

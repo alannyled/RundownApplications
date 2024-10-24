@@ -179,7 +179,7 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
-        public async Task<Rundown> UpdateRundownAsync(Guid rundownId, RundownDTO request)
+        public async Task<Rundown> UpdateRundownAsync(Guid rundownId, Rundown request)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
             var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}", request);

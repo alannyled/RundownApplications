@@ -1,4 +1,5 @@
 ﻿using AggregatorService.DTO;
+using AggregatorService.Models;
 using AggregatorService.Managers;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -70,7 +71,7 @@ namespace AggregatorService.Controllers
         }
 
         [HttpPut("update-rundown/{rundownId}")]
-        public async Task<IActionResult> UpdateRundown(Guid rundownId, [FromBody] RundownDTO request)
+        public async Task<IActionResult> UpdateRundown(Guid rundownId, [FromBody] Rundown request)
         {
             var updatedRundown = await _rundownManager.UpdateRundownAsync(rundownId, request);
             return Ok(updatedRundown);

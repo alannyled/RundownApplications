@@ -36,8 +36,8 @@ else
                             <td class="text-nowrap">@rundown.ControlRoomName</td>
                             @if (ShowArchived)
                             {
-                                <td class="text-center" @onclick="() => HandleCheckBoxChange(rundown)">
-                                    <input type="checkbox" checked="@(()=> IsArchived(rundown.ArchivedDate.ToString()))" @onchange="() => HandleCheckBoxChange(rundown)" />
+                                <td class="text-center">
+                                    <input type="checkbox" checked="@(@IsArchived(rundown.ArchivedDate))" @onchange="() => HandleCheckBoxChange(rundown)" />
                                 </td>
                             }
 
@@ -69,13 +69,9 @@ else
         await OpenRundown.InvokeAsync(uuid);
     }
 
-    public bool IsArchived(string archived)
+    public bool IsArchived(DateTime? archivedDate)
     {
-        if (string.IsNullOrEmpty(archived))
-        {
-            return false;
-        }
-        return true;
+        return archivedDate.HasValue;
 
     }
 
@@ -99,6 +95,8 @@ else
         rundown = await RundownService.UpdateRundownAsync(rundown.Uuid, rundown);
 
         Console.WriteLine("Rundown updated 2 " + rundown.ArchivedDate);
+        if(ToastState.Show)
+            ToastState.Close();
         ToastState.FireToast(message, "text-bg-success");
         return rundown;
     }

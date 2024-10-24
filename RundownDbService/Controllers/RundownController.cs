@@ -52,19 +52,14 @@ namespace RundownDbService.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> Update(Guid id, [FromBody] RundownDTO dto)
         {
-            if (dto == null || string.IsNullOrEmpty(dto.ControlRoomId) || !Guid.TryParse(dto.ControlRoomId, out var parsedControlRoomId))
-            {
-                return BadRequest("A valid controlRoomId is required.");
-            }
-
             var rundown = await _rundownService.GetRundownByIdAsync(id);
             if (rundown == null)
             {
                 return NotFound();
             }
-
-            // Opdater controlRoomId i rundown objektet
-            rundown.ControlRoomId = parsedControlRoomId;
+            // Opdater felter i rundown objektet
+            rundown.ControlRoomId = Guid.Parse(dto.ControlRoomId);
+            rundown.ArchivedDate = dto.ArchivedDate;
             await _rundownService.UpdateRundownAsync(id, rundown);
 
             return Ok(rundown);

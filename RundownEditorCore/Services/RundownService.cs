@@ -104,11 +104,11 @@ namespace RundownEditorCore.Services
 
         public async Task<RundownDTO> UpdateRundownAsync(string rundownId, RundownDTO rundown)
         {
-            var response = await _httpClient.PutAsJsonAsync($"update-rundown/{rundownId}", rundown);
+            var response = await _httpClient.PutAsJsonAsync($"update-rundown/{rundownId}", rundown);            
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"UPDATED Rundown");
+                _logger.LogInformation($"UPDATED {rundown.Name}");
                 return await response.Content.ReadFromJsonAsync<RundownDTO>();
             }
             _logger.LogInformation($"ERROR updating rundown: {response.ReasonPhrase}");

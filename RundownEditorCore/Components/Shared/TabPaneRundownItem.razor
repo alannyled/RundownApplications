@@ -1,6 +1,8 @@
 ﻿@inject ModalState ModalState
 @inject RundownState RundownState
 @inject FormRenderService FormRenderservice
+@inject KafkaService KafkaService
+@inject SharedStates SharedStates
 
 <div class="tab-pane @(ActiveTab == Name ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
@@ -21,15 +23,14 @@
         </div>
 
         <div class="card-body">
-            @foreach(DetailDTO detail in RundownItem.Details)
+            @foreach (DetailDTO detail in RundownItem.Details)
             {
                 <ItemDetail Detail="detail"></ItemDetail>
-            }          
-
+            }
         </div>
-
     </div>
 </div>
+
 @code {
     [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
@@ -37,34 +38,44 @@
     public string Name { get; set; } = string.Empty;
     [Parameter]
     public string ItemId { get; set; }
-
     [Parameter]
-    public EventCallback<string> OnRemove { get; set; } 
+    public EventCallback<string> OnRemove { get; set; }
 
-    // [Parameter]
-    // public EventCallback ShowDialog { get; set; }
-
-    public RundownItemDTO RundownItem { get; set; }
+    public RundownItemDTO RundownItem { get; set; } = new();
 
     protected override void OnInitialized()
     {
         Guid UUID = Guid.Parse(ItemId);
         RundownItem = RundownState.Rundown.Items.FirstOrDefault(item => item.UUID == UUID);
+
+        // Abonner på ændringer i SharedStates
+        SharedStates.OnChange += HandleSharedStateChange;
+    }
+
+    private void HandleSharedStateChange()
+    {
+        // Opdater RundownItem, hvis det ændres i SharedStates
+        if (SharedStates.Item.UUID == RundownItem.UUID)
+        {
+            RundownItem = SharedStates.Item;
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     public async Task RemoveTabPane()
     {
         await OnRemove.InvokeAsync(Name);
     }
+
     public void AddSelected(string type)
     {
         var content = new RenderFragment(builder =>
-       {
-           builder.AddContent(0, FormRenderservice.RenderItemDetailForm(
-               type,
-               EventCallback.Factory.Create<RundownDTO>(this, HandleItemDetailCreated)
-           ));
-       });
+        {
+            builder.AddContent(0, FormRenderservice.RenderItemDetailForm(
+                type,
+                EventCallback.Factory.Create<RundownDTO>(this, HandleItemDetailCreated)
+            ));
+        });
 
         ModalState.SetContent(content, $"Opret {type} element");
     }
@@ -74,7 +85,21 @@
         ModalState.Close();
         RundownItem = rundown.Items.FirstOrDefault(i => i.UUID == RundownItem.UUID);
         RundownState.SelectedItem(RundownItem);
+
+        var messageObject = new
+        {
+            Action = "new_detail",
+            Rundown = RundownState.Rundown.Uuid.ToString(),
+            Item = RundownItem,
+        };
+        string message = JsonSerializer.Serialize(messageObject);
+
+        KafkaService.SendMessage("rundown_story", message);
     }
 
+    public void Dispose()
+    {
+        // Fjern abonnementet for at undgå memory leaks
+        SharedStates.OnChange -= HandleSharedStateChange;
+    }
 }
-

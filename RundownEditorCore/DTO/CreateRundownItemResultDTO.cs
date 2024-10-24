@@ -1,4 +1,4 @@
-﻿
+﻿using CommonClassLibrary.DTO;
 
 namespace RundownEditorCore.DTO
 {

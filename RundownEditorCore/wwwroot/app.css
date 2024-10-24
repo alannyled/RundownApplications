@@ -1,21 +1,12 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-/*.bi::before {*/ /* Imødekommer bootstrap Icons i navmenuen */  
-    /*position: relative;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.75rem;
-    top: -1px;
-    background-size: cover;
-    font-size: 20px !important;
-    vertical-align: 0.36em;
-}*/
+
 svg .dynamic-text {
     fill: black;
 }
 
-/* Dark mode styling for SVG text */
+/* Dark mode SVG text */
 [data-bs-theme="dark"] svg .dynamic-text {
     fill: white;
 }

@@ -1,4 +1,5 @@
-﻿using RundownEditorCore.DTO;
+﻿using CommonClassLibrary.DTO;
+using RundownEditorCore.DTO;
 using RundownEditorCore.Services;
 
 namespace RundownEditorCore.States

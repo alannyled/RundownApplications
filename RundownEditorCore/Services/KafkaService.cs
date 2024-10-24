@@ -2,6 +2,7 @@
 using Confluent.Kafka;
 using RundownEditorCore.States;
 using System.Text.Json;
+using CommonClassLibrary.DTO;
 using RundownEditorCore.DTO;
 
 
@@ -63,21 +64,32 @@ namespace RundownEditorCore.Services
                     var message = _consumerClient.Consumer.Consume(stoppingToken);
                     if (message != null)
                     {
-                        if(message.Topic == "rundown_story")
+                        try
                         {
-                            var messageObject = JsonSerializer.Deserialize<ItemDetailMessage>(message.Message.Value);
-                            _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail.UUID.ToString()}'");
-                            //_detailLockState.SetLockState(messageObject.Detail.UUID.ToString(), messageObject.Locked, messageObject.UserName);
-                            _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
-                        }  
-                        
-                        if(message.Topic == "rundown")
-                        {
-                            var messageObject = JsonSerializer.Deserialize<ItemDetailMessage>(message.Message.Value);
-                            _logger.LogInformation($"MESSAGE: {messageObject.Action} Rundown Id '{messageObject.Rundown}'");
+                            if (message.Topic == "rundown_story")
+                            {
+                                var messageObject = JsonSerializer.Deserialize<ItemDetailMessage>(message.Message.Value);
+                                if (messageObject != null)
+                                {
+                                    _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail?.UUID.ToString()}'");
+                                    _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
+                                }
+                            }
+
+                            if (message.Topic == "rundown")
+                            {
+                                var messageObject = JsonSerializer.Deserialize<ItemDetailMessage>(message.Message.Value);
+                                if (messageObject != null)
+                                {
+                                    _logger.LogInformation($"MESSAGE: {messageObject.Action} Rundown Id '{messageObject.Rundown}'");
+                                }
+                            }
                         }
-
-
+                        catch (JsonException ex)
+                        {
+                            _logger.LogError($"Fejl ved deserialisering af JSON: {ex.Message}");
+                            _logger.LogError($"Modtaget besked: {message.Message.Value}");
+                        }
                     }
                 }
             }
@@ -86,6 +98,7 @@ namespace RundownEditorCore.Services
                 Console.WriteLine($"Fejl ved læsning af besked: {ex.Error.Reason}");
             }
         }
+
     }
 
     public class ItemDetailMessage

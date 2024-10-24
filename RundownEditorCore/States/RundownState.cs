@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using RundownEditorCore.DTO;
+using CommonClassLibrary.DTO;
 
 namespace RundownEditorCore.States
 {

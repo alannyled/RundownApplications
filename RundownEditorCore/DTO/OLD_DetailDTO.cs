@@ -2,7 +2,7 @@
 
 namespace RundownEditorCore.DTO
 {
-    public class DetailDTO
+    public class OLD_DetailDTO
     {
         //[JsonPropertyName("uuid")]
         public Guid UUID { get; set; } = Guid.NewGuid();

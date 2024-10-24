@@ -1,6 +1,6 @@
 ﻿namespace RundownDbService.DTO
 {
-    public class ItemDetailDTO
+    public class OLD_ItemDetailDTO
     {
         public Guid UUID { get; set; }
         public Guid ItemId { get; set; }

@@ -1,4 +1,5 @@
 ﻿using RundownEditorCore.DTO;
+using CommonClassLibrary.DTO;
 
 namespace RundownEditorCore.Interfaces
 {

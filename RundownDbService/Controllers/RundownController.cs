@@ -2,6 +2,7 @@
 using RundownDbService.BLL.Interfaces;
 using RundownDbService.BLL.Services;
 using RundownDbService.DTO;
+using CommonClassLibrary.DTO;
 using RundownDbService.Models;
 using System.Text.Json;
 
@@ -84,10 +85,6 @@ namespace RundownDbService.Controllers
             {
                 return NotFound();
             }
-
-            Console.WriteLine($"Antal af eksisterende items før tilføjelse: {existingRundown.Items.Count}");
-
-            // Tilføj nyt item fra rundownDto direkte til eksisterende rundown
             existingRundown.Items.Add(new RundownItem
             {
                 UUID = Guid.NewGuid(),
@@ -96,23 +93,15 @@ namespace RundownDbService.Controllers
                 Duration = TimeSpan.Parse(rundownDto.Duration),
                 Order = rundownDto.Order
             });
-
-            // Log antallet af items efter tilføjelsen
-            Console.WriteLine($"Antal af items efter tilføjelse: {existingRundown.Items.Count}");
-
-
-            // Opdater rundown i databasen
+      
             var updatedRundown = await _rundownService.UpdateRundownAsync(id, existingRundown);
-
-            // Log resultatet af opdateringen
-            Console.WriteLine($"Antal af items efter opdatering: {updatedRundown.Items.Count}");
 
             return Ok(updatedRundown);
         }
 
 
         [HttpPut("add-item-detail-to-rundown/{rundownId:guid}")]
-        public async Task<IActionResult> AddItemDetailToRundown(Guid rundownId, [FromBody] ItemDetailDTO itemDetailDto)
+        public async Task<IActionResult> AddItemDetailToRundown(Guid rundownId, [FromBody] DetailDTO itemDetailDto)
         {
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
             if (existingRundown == null)
@@ -167,7 +156,7 @@ namespace RundownDbService.Controllers
 
 
         [HttpPut("edit-item-detail-in-rundown/{rundownId:guid}")]
-        public async Task<IActionResult> EditItemDetailInRundown(Guid rundownId, [FromBody] ItemDetailDTO detailDto)
+        public async Task<IActionResult> EditItemDetailInRundown(Guid rundownId, [FromBody] DetailDTO detailDto)
         {
             // Hent det eksisterende rundown baseret på ID
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
@@ -175,21 +164,18 @@ namespace RundownDbService.Controllers
             {
                 return NotFound("Rundown ikke fundet.");
             }
-
             // Find det item, som har den detail, der skal opdateres
             var existingItem = existingRundown.Items.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailDto.UUID));
             if (existingItem == null)
             {
                 return NotFound("Item der indeholder detail ikke fundet.");
             }
-
             // Find den specifikke detail i itemet og opdater den
             var existingDetail = existingItem.Details.FirstOrDefault(d => d.UUID == detailDto.UUID);
             if (existingDetail == null)
             {
                 return NotFound($"ItemDetail med UUID {detailDto.UUID} blev ikke fundet.");
             }
-
             // Opdater de generelle felter for det specifikke detail
             existingDetail.Title = detailDto.Title;
             existingDetail.Duration = TimeSpan.Parse(detailDto.Duration);

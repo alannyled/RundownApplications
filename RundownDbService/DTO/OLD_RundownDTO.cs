@@ -1,6 +1,8 @@
-﻿namespace RundownDbService.DTO
+﻿using CommonClassLibrary.DTO;
+
+namespace RundownDbService.DTO
 {
-    public class RundownDTO
+    public class OLD_RundownDTO
     {
         public string? Uuid { get; set; }
         public string? ControlRoomId { get; set; }

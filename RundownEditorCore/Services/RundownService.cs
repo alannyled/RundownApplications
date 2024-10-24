@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Newtonsoft.Json;
 using RundownEditorCore.DTO;
+using CommonClassLibrary.DTO;
 using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services

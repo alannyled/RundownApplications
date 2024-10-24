@@ -5,6 +5,7 @@
 @inject DetailLockState DetailLockState
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.EntityFrameworkCore
+@using CommonClassLibrary.DTO;
 
 <div>
     <div class="card mb-3 d-inline-block
@@ -43,10 +44,10 @@
 
 @code {
     [Parameter]
-    public DetailDTO Detail { get; set; }
-    public string icon { get; set; }
-    public string color { get; set; }
-    public string content { get; set; }
+    public DetailDTO? Detail { get; set; }
+    public string? icon { get; set; }
+    public string? color { get; set; }
+    public string? content { get; set; }
     public bool active = true;
     public bool locked = false;
     public string userName = "";

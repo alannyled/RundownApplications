@@ -1,8 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using CommonClassLibrary.DTO;
 
 namespace RundownEditorCore.DTO
 {
-    public class RundownItemDTO
+    public class OLD_RundownItemDTO
     {       
         public Guid UUID { get; set; }
         public string RundownId { get; set; }

@@ -1,5 +1,6 @@
 ﻿@page "/rundowns"
 @inject IRundownService RundownService
+@inject SharedStates SharedStates
 
 <Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
@@ -12,6 +13,22 @@
 
     protected override async Task OnInitializedAsync()
     {       
-          AllRundowns = await RundownService.GetRundownsAsync();
+        AllRundowns = await RundownService.GetRundownsAsync();
+        SharedStates.OnChange += HandleSharedStateChange;
+    }
+
+    private async void HandleSharedStateChange(SharedStates.StateAction action)
+    {
+        if (action == SharedStates.StateAction.NewRundownAdded)
+        {
+            AllRundowns = await RundownService.GetRundownsAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        // Fjern abonnementet for at undgå memory leaks
+        SharedStates.OnChange -= HandleSharedStateChange;
     }
 }

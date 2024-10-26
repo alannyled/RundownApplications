@@ -1,13 +1,15 @@
 ﻿using RundownDbService.BLL.Interfaces;
 using RundownDbService.DAL.Interfaces;
+using RundownDbService.DAL.Repositories;
 using RundownDbService.Models;
+using Newtonsoft.Json;
 
 namespace RundownDbService.BLL.Services
 {
-    public class ItemDetailService : IItemDetailService
+    public class ItemDetailService(IRundownRepository rundownRepository, IKafkaService kafkaService) : IItemDetailService
     {
-        private readonly IItemDetailRepository _itemDetailRepository;
-
+        private readonly IRundownRepository _rundownRepository = rundownRepository;
+        private readonly IKafkaService _kafkaService = kafkaService;
         public ItemDetail? GetModel(string type)
         {
             return type switch
@@ -20,36 +22,38 @@ namespace RundownDbService.BLL.Services
                 _ => new ItemDetail()
 
             };
-        }
-        public ItemDetailService(IItemDetailRepository itemDetailRepository)
+        }      
+
+        public async Task<RundownItem> CreateItemDetailAsync(Guid rundownId, RundownItem existingItem)
         {
-            _itemDetailRepository = itemDetailRepository;
+            await _rundownRepository.UpdateItemAsync(rundownId, existingItem);
+            var messageObject = new
+            {
+                Action = "new_detail",
+                Item = existingItem
+            };
+            string message = JsonConvert.SerializeObject(messageObject);
+            Console.WriteLine($"Sending message to TOPIC STORY: {message}");
+            _kafkaService.SendMessage("story", message);
+
+            return existingItem;
         }
 
-        public async Task<List<ItemDetail>> GetAllItemDetailsAsync()
-        {
-            return await _itemDetailRepository.GetAllAsync();
-        }
 
-        public async Task<ItemDetail> GetItemDetailByIdAsync(Guid uuid)
-        {
-            return await _itemDetailRepository.GetByIdAsync(uuid);
-        }
 
-        public async Task CreateItemDetailAsync(ItemDetail newItemDetail)
-        {
-            // Eventuel forretningslogik
-            await _itemDetailRepository.CreateAsync(newItemDetail);
-        }
+        //public async Task DeleteItemDetailAsync(Guid uuid)
+        //{
+        //    await _itemDetailRepository.DeleteAsync(uuid);
+        //}
 
-        public async Task UpdateItemDetailAsync(Guid uuid, ItemDetail updatedItemDetail)
-        {
-            await _itemDetailRepository.UpdateAsync(uuid, updatedItemDetail);
-        }
+        //public async Task<List<ItemDetail>> GetAllItemDetailsAsync()
+        //{
+        //    return await _itemDetailRepository.GetAllAsync();
+        //}
 
-        public async Task DeleteItemDetailAsync(Guid uuid)
-        {
-            await _itemDetailRepository.DeleteAsync(uuid);
-        }
+        //public async Task<ItemDetail> GetItemDetailByIdAsync(Guid uuid)
+        //{
+        //    return await _itemDetailRepository.GetByIdAsync(uuid);
+        //}
     }
 }

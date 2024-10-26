@@ -26,16 +26,16 @@ namespace RundownDbService.DAL.Repositories
             return await _rundownCollection.Find(rundown => rundown.UUID == uuid).FirstOrDefaultAsync();
         }
 
-        public async Task CreateAsync(Rundown newRundown)
+        public async Task<Rundown> CreateAsync(Rundown newRundown)
         {
             await _rundownCollection.InsertOneAsync(newRundown);
+            return newRundown;
         }
 
         public async Task<Rundown> UpdateAsync(Guid uuid, Rundown updatedRundown)
         {
             await _rundownCollection.ReplaceOneAsync(rundown => rundown.UUID == uuid, updatedRundown);
             var rundown = await GetByIdAsync(uuid);
-            Console.WriteLine($"Updated rundown: {rundown.Name}");
             return rundown;
         }
 
@@ -50,8 +50,6 @@ namespace RundownDbService.DAL.Repositories
 
             await _rundownCollection.UpdateOneAsync(filter, update);
         }
-
-
         public async Task DeleteAsync(Guid uuid)
         {
             await _rundownCollection.DeleteOneAsync(rundown => rundown.UUID == uuid);

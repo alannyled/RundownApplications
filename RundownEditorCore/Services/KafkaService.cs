@@ -1,15 +1,16 @@
 ﻿using KafkaServiceLibrary;
 using Confluent.Kafka;
 using RundownEditorCore.States;
-using System.Text.Json;
+using RundownEditorCore.Interfaces;
 using CommonClassLibrary.DTO;
-using System.Composition;
+using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 
 namespace RundownEditorCore.Services
 {
-    public class KafkaService
+    public class KafkaService : IKafkaService
     {
 
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
@@ -26,21 +27,16 @@ namespace RundownEditorCore.Services
             _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
 
         }
-
         public virtual void SendMessage(string topic, string message)
-        {
-            try
-            {
-                _producerClient.Producer.Produce(topic, new Message<string, string> { Key = Guid.NewGuid().ToString(), Value = message });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"KAFKA SendMessage: Error - {ex.Message}");
-            }
+        {           
+            string key = Guid.NewGuid().ToString();
+            _producerClient.Producer.Produce(topic, new Message<string, string> { Key = key, Value = message });                 
         }
 
 
+
     }
+
 
     public class KafkaBackgroundService : BackgroundService
     {
@@ -67,7 +63,7 @@ namespace RundownEditorCore.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            string[] topics = { "rundown_story", "rundown_detail", "rundown" };
+            string[] topics = { "rundown", "detail_lock", "story" };
             _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "Gruppe_id", topics);
 
             await Task.Yield();
@@ -81,19 +77,19 @@ namespace RundownEditorCore.Services
                     {
                         try
                         {
-                            if (message.Topic == "rundown_detail")
+                            if (message.Topic == "detail_lock")
                             {
-                                var messageObject = JsonSerializer.Deserialize<DetailMessage>(message.Message.Value);
+                                var messageObject = JsonConvert.DeserializeObject<DetailMessage>(message.Message.Value);
                                 if (messageObject != null)
                                 {
                                     _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail?.UUID.ToString()}'");
                                     _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
                                 }
                             }
-
-                            if (message.Topic == "rundown_story")
+                            if (message.Topic == "story")
                             {
-                                var messageObject = JsonSerializer.Deserialize<ItemMessage>(message.Message.Value);
+                                Console.WriteLine($"Received message from TOPIC: {message.Topic}, KEY: {message.Message.Key}, VALUE: {message.Message.Value}");
+                                var messageObject = JsonConvert.DeserializeObject<ItemMessage>(message.Message.Value);
                                 if (messageObject != null)
                                 {
                                     _logger.LogInformation($"MESSAGE: Ny detail tilføjet {messageObject.Item.Name}");
@@ -105,7 +101,7 @@ namespace RundownEditorCore.Services
 
                             if (message.Topic == "rundown")
                             {
-
+                                HandleRundownMessage(message);
                             }
                         }
                         catch (JsonException ex)
@@ -122,16 +118,36 @@ namespace RundownEditorCore.Services
             }
         }
 
+        public void HandleRundownMessage(ConsumeResult<string, string> message)
+        {
+            var messageObject = JsonConvert.DeserializeObject<RundownMessage>(message.Message.Value);
+            if (messageObject.Action == "update")
+            {
+                _logger.LogInformation($"MESSAGE: Rundown opdateret UUID = {messageObject.Rundown.UUID}");
+                _sharedStates.SharedRundown(messageObject.Rundown);
+            }
+            if (messageObject.Action == "create")
+            {
+                _logger.LogInformation($"MESSAGE: Ny Rundown oprettet {messageObject.Rundown.Name}");
+                _sharedStates.SharedNewRundown(messageObject.Rundown);
+            }
+        }
+
     }
 
     public class ItemMessage
     {
-        public string? Action { get; set; }
-        public RundownItemDTO? Item { get; set; }
-        public string? Rundown { get; set; }
+        public RundownItemDTO Item { get; set; }
     }
 
-    public class DetailMessage : ItemMessage
+    public class RundownMessage
+    {
+        public string? Action { get; set; }
+        public RundownItemDTO? Item { get; set; }
+        public RundownDTO? Rundown { get; set; }
+    }
+
+    public class DetailMessage : RundownMessage
     {
         public DetailDTO? Detail { get; set; }
         public string? ItemId { get; set; }

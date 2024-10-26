@@ -60,7 +60,8 @@ builder.Services.AddSingleton(serviceProvider =>
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     return new KafkaServiceLibrary.KafkaService(configuration);
 });
-builder.Services.AddSingleton<KafkaService>();
+builder.Services.AddSingleton<IKafkaService, KafkaService>();
+builder.Services.AddSingleton<IMessageBuilderService, MessageBuilderService>();
 
 builder.Services.AddHostedService<KafkaBackgroundService>();
 builder.Services.AddScoped<ThemeService>();

@@ -1,17 +1,14 @@
 ﻿using RundownDbService.BLL.Interfaces;
 using RundownDbService.DAL.Interfaces;
 using RundownDbService.Models;
-using RundownDbService.BLL.Services;
-using Confluent.Kafka;
-using System.Text.Json;
-using System;
+using Newtonsoft.Json;
 
 namespace RundownDbService.BLL.Services
 {
-    public class RundownService(IRundownRepository rundownRepository, KafkaService kafkaService) : IRundownService
+    public class RundownService(IRundownRepository rundownRepository, IKafkaService kafkaService) : IRundownService
     {
         private readonly IRundownRepository _rundownRepository = rundownRepository;
-        private readonly KafkaService _kafkaService = kafkaService;
+        private readonly IKafkaService _kafkaService = kafkaService;
 
         public async Task<List<Rundown>> GetAllRundownsAsync()
         {
@@ -25,15 +22,14 @@ namespace RundownDbService.BLL.Services
 
         public async Task CreateRundownAsync(Rundown newRundown)
         {
-            
-            await _rundownRepository.CreateAsync(newRundown);
+            var rundown = await _rundownRepository.CreateAsync(newRundown);
             var messageObject = new
             {
                 Action = "create",
-                Rundown = newRundown.UUID.ToString(),
-                Name = newRundown.Name
+                Rundown = rundown
             };
-            string message = JsonSerializer.Serialize(messageObject);
+            string message = JsonConvert.SerializeObject(messageObject);
+
             _kafkaService.SendMessage("rundown", message);
         }
 
@@ -43,11 +39,10 @@ namespace RundownDbService.BLL.Services
             var messageObject = new
             {
                 Action = "update",
-                Rundown = uuid.ToString(),
-                Name = rundown.Name
+                Rundown = rundown
             };
+            string message = JsonConvert.SerializeObject(messageObject);
 
-            string message = JsonSerializer.Serialize(messageObject);
             _kafkaService.SendMessage("rundown", message);
             return rundown;
         }
@@ -55,14 +50,6 @@ namespace RundownDbService.BLL.Services
         public async Task DeleteRundownAsync(Guid uuid)
         {
             await _rundownRepository.DeleteAsync(uuid);
-            var messageObject = new
-            {
-                Action = "delete",
-                Rundown = uuid.ToString(),
-                Name = string.Empty
-            };
-            string message = JsonSerializer.Serialize(messageObject);
-            _kafkaService.SendMessage("rundown", message);
         }
     }
 }

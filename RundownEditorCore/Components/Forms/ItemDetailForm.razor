@@ -112,7 +112,7 @@
                 commentItem.Comment = Text;
                 break;
         }      
-        var rundown = await RundownService.AddDetailToItemAsync(RundownState.Rundown.Uuid.ToString(), newRundownItem);     
+        var rundown = await RundownService.AddDetailToItemAsync(RundownState.Rundown.UUID, newRundownItem);
         await OnItemDetailCreated.InvokeAsync(rundown);
     }
 }

@@ -8,15 +8,9 @@
 @inject ModalState ModalState
 @inject ToastState ToastState
 @inject RundownState RundownState
+@inject SharedStates SharedStates
 @using Microsoft.AspNetCore.Authorization
 @using CommonClassLibrary.DTO
-@* @using Microsoft.AspNetCore.Identity
-@using System.Security.Claims
-@inject UserManager<ApplicationUser> UserManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
-
-@inject UserManager<ApplicationUser> UserManager
-@inject AuthenticationStateProvider AuthenticationStateProvider *@
 
 @attribute [Authorize(Roles = "User,Administrator")]
 
@@ -115,6 +109,17 @@
         AllTemplates = await TemplateService.GetAllTemplatesAsync();
         await GetAndFilterRundowns();
 
+        SharedStates.OnChange += HandleSharedStateChange;
+
+    }
+
+    private async void HandleSharedStateChange(SharedStates.StateAction action)
+    {
+        if (action == SharedStates.StateAction.NewRundownAdded || action == SharedStates.StateAction.RundownUpdated)
+        {
+            await GetAndFilterRundowns();
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task GetAndFilterRundowns()
@@ -132,7 +137,7 @@
 
     private async Task UpdateSelectedRundown()
     {
-        var selectedRundown = await RundownService.GetRundownAsync(RundownState.Rundown.Uuid.ToString());
+        var selectedRundown = await RundownService.GetRundownAsync(RundownState.Rundown.UUID.ToString());
         RundownState.SelectedRundown(selectedRundown);
         StateHasChanged();
     }
@@ -217,29 +222,16 @@
     /// </summary>
     private void HandleRundownCreated(CreateRundownResultDTO result)
     {
-        ActiveRundowns = result.ActiveRundowns;
+        //ActiveRundowns = result.ActiveRundowns;
         RundownState.SelectedRundown(result.SelectedRundown);
         ModalState.Close();
     }
 
-
-    // private ClaimsPrincipal user;
-    // private ApplicationUser currentUser;
-    // private List<string> userRoles = new List<string>();
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-    //     user = authState.User;
-
-    //     if (user.Identity != null && user.Identity.IsAuthenticated)
-    //     {
-    //         currentUser = await UserManager.GetUserAsync(user);
-
-    //         // Hent rollerne for den aktuelle bruger
-    //         userRoles = (await UserManager.GetRolesAsync(currentUser)).ToList();
-    //     }
-    // }
+    public void Dispose()
+    {
+        // Fjern abonnementet for at undgå memory leaks
+        SharedStates.OnChange -= HandleSharedStateChange;
+    }
 
 }
 

@@ -3,25 +3,47 @@ using Microsoft.Extensions.Logging.Console;
 
 namespace RundownEditorCore.States
 {
+    /// <summary>
+    /// Modtager beskeder fra KafkaConsumerClient og opdaterer SharedStates
+    /// Begge er singletons,
+    /// så det er for at have et sted at gemme data der skal deles mellem flere scoped services
+    /// </summary>
     public class SharedStates
     {
-        public event Action OnChange;
-        public RundownItemDTO Item { get; private set; } = new();
-        public RundownDTO Rundown { get; private set; } = new();
+
+        public enum StateAction
+        {
+            ItemUpdated,
+            RundownUpdated,
+            NewRundownAdded
+        }
+
+        public event Action<StateAction> OnChange;
+        public RundownItemDTO ItemUpdated { get; private set; } = new();
+        public RundownDTO RundownUpdated { get; private set; } = new();
+
+        public RundownDTO NewRundown { get; private set; } = new();
 
         public void SharedItem(RundownItemDTO item)
         {
-            Item = item;
-            NotifyStateChanged();
+            ItemUpdated = item;
+            NotifyStateChanged(StateAction.ItemUpdated);
         }
         public void SharedRundown(RundownDTO rundown)
         {
-            Rundown = rundown;
-            NotifyStateChanged();
+            RundownUpdated = rundown;
+            NotifyStateChanged(StateAction.RundownUpdated);
         }
-        private void NotifyStateChanged()
+
+        public void SharedNewRundown(RundownDTO rundown)
         {
-            OnChange?.Invoke();
+            NewRundown = rundown;
+            NotifyStateChanged(StateAction.NewRundownAdded);
+        }
+
+        private void NotifyStateChanged(StateAction action)
+        {
+            OnChange?.Invoke(action);
         }
     }
 }

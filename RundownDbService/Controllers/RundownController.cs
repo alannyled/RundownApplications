@@ -145,7 +145,7 @@ namespace RundownDbService.Controllers
             // Tilføj itemDetail til existingItem's detaljer
             existingItem.Details.Add(itemDetail);
 
-            await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
+            await _itemDetailService.CreateItemDetailAsync(existingRundown.UUID, existingItem);
             return Ok(existingRundown);
         }
 
@@ -195,7 +195,7 @@ namespace RundownDbService.Controllers
             }
 
             // Gem ændringerne
-            await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
+            await _itemDetailService.CreateItemDetailAsync(existingRundown.UUID, existingItem);
 
             return Ok(existingRundown);
         }

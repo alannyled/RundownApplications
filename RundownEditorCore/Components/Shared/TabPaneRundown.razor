@@ -1,5 +1,6 @@
 ﻿@inject IRundownService RundownService
 @inject RundownState RundownState
+@inject SharedStates SharedStates
 
 <div class="tab-pane @(ActiveTab == RundownState.Rundown.Name && !string.IsNullOrEmpty(ActiveTab) && !string.IsNullOrEmpty(RundownState.Rundown.Name) ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
@@ -66,24 +67,34 @@
     public EventCallback<RundownItemDTO> OpenTabPane { get; set; }
     [Parameter]
     public EventCallback UpdateRundownList { get; set; }
-    // [Parameter]
-    // public RundownDTO SelectedRundown { get; set; } = new();
     [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; }
     [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
     [Parameter]
-    public List<RundownObjects> CurrentObjects { get; set; } = [];
-  
-    //private string selectedControlRoomId = string.Empty;
+    public List<RundownObjects> CurrentObjects { get; set; } = []; // skal anvendes til Drag'n'Drop
 
     private string? draggedChildId;
 
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-       // selectedControlRoomId = RundownState.Rundown.ControlRoomId;
+        SharedStates.OnChange += HandleSharedStateChange;
     }
-
+    /// <summary>
+    /// Håndterer ændringer i SharedStates forårsaget af Kafka beskeder
+    /// Hvis det påvirker den aktuelle (Scoped) Rundown, opdateres denne
+    /// </summary>
+    private async void HandleSharedStateChange(SharedStates.StateAction action)
+    {
+        if (action == SharedStates.StateAction.RundownUpdated)
+        {
+            if (RundownState.Rundown.UUID == SharedStates.RundownUpdated.UUID)
+            {
+                RundownState.SelectedRundown(SharedStates.RundownUpdated);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
     private string FormatDateWithCapitalDay(DateTimeOffset date)
     {
         var formattedDate = date.ToString("dddd d. MMMM yyyy", new System.Globalization.CultureInfo("da-DK"));
@@ -93,7 +104,7 @@
     private async Task OnControlRoomChange(ChangeEventArgs e)
     {
         var selectedControlRoomUuid = e.Value.ToString();
-        await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.Uuid, selectedControlRoomUuid);
+        await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);
         await UpdateRundownList.InvokeAsync();    
     }
 
@@ -125,5 +136,11 @@
         draggedChildId = null;
     }
 
+
+    public void Dispose()
+    {
+        // Fjern abonnementet for at undgå memory leaks
+        SharedStates.OnChange -= HandleSharedStateChange;
+    }
 
 }

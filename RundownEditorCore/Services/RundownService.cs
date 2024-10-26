@@ -6,10 +6,12 @@ using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services
 {
-    public class RundownService(HttpClient httpClient, ILogger<RundownService> logger) : IRundownService
+    public class RundownService(HttpClient httpClient, ILogger<RundownService> logger, IKafkaService kafkaService, IMessageBuilderService messageBuilderService) : IRundownService
     {
         private readonly HttpClient _httpClient = httpClient;
         private readonly ILogger<RundownService> _logger = logger;
+        private readonly IKafkaService _kafkaService = kafkaService;
+        private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
 
         public async Task<List<RundownDTO>> GetRundownsAsync()
         {
@@ -18,7 +20,7 @@ namespace RundownEditorCore.Services
             return response;
         }
 
-       
+
 
         public async Task<RundownDTO> GetRundownAsync(string uuid)
         {
@@ -64,11 +66,12 @@ namespace RundownEditorCore.Services
         public async Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
         {
             var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
-       
+
             if (response.IsSuccessStatusCode)
             {
+                var responseContent = await response.Content.ReadAsStringAsync();
                 _logger.LogInformation($"ADDED Item to Rundown");
-                return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                return  await response.Content.ReadFromJsonAsync<RundownDTO>();
             }
             _logger.LogInformation($"ERROR adding item to rundown: {response.ReasonPhrase}");
             return null;
@@ -104,7 +107,7 @@ namespace RundownEditorCore.Services
 
         public async Task<RundownDTO> UpdateRundownAsync(string rundownId, RundownDTO rundown)
         {
-            var response = await _httpClient.PutAsJsonAsync($"update-rundown/{rundownId}", rundown);            
+            var response = await _httpClient.PutAsJsonAsync($"update-rundown/{rundownId}", rundown);
 
             if (response.IsSuccessStatusCode)
             {

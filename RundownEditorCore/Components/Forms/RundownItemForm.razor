@@ -1,4 +1,6 @@
 ﻿@using CommonClassLibrary.DTO
+@inject IRundownService RundownService
+@inject RundownState RundownState
 @inject ToastState ToastState
 
 <form @onsubmit="HandleSubmit">
@@ -26,8 +28,6 @@
 </form>
 
 @code {
-    [Inject]
-    private IRundownService RundownService { get; set; }
 
     [Parameter]
     public List<string> Templates { get; set; } = new List<string>();
@@ -51,14 +51,15 @@
         var newRundownItem = new RundownItemDTO
             {
                 UUID = Guid.NewGuid(),
-                RundownId = SelectedRundown.Uuid,
+                RundownId = SelectedRundown.UUID,
                 Name = ItemName,
                 Duration = Duration.ToString("HH:mm:ss"),
                 Order = SelectedRundown.Items.Count // + 1  eller *10?
             };
 
 
-        SelectedRundown = await RundownService.AddItemToRundownAsync(SelectedRundown.Uuid, newRundownItem);
+        SelectedRundown = await RundownService.AddItemToRundownAsync(SelectedRundown.UUID, newRundownItem);
+        //RundownState.SelectedRundown(SelectedRundown);
         await OnItemCreated.InvokeAsync(SelectedRundown);
     }
 

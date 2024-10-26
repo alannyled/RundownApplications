@@ -1,6 +1,7 @@
 ﻿@inject IRundownService RundownService
 @inject ApplicationDbContext ApplicationDbContext
-@inject KafkaService KafkaService
+@inject IKafkaService KafkaService
+@inject IMessageBuilderService MessageBuilderService
 @inject RundownState RundownState
 @inject DetailLockState DetailLockState
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -82,8 +83,6 @@
         };
 
         content = SetContent();
-
-        // Lytter på DetailLockState for ændringer
         DetailLockState.OnLockStateChanged += HandleLockStateChanged;
         locked = DetailLockState.IsLocked(Detail.UUID.ToString(), out lockedByUser);
         active = locked && lockedByUser == userName;
@@ -95,21 +94,21 @@
     }
     private void HandleContentInput(ChangeEventArgs e)
     {
-        
+
         content = e.Value?.ToString();
     }
 
     public async Task ActivateInput()
     {
         var saveChanges = active;
-       
+
         if (saveChanges)
         {
             await SaveChanges();            
         }
-  
+
         SetLockOnElement();      
-        
+
     }
 
     private async Task SaveChanges()
@@ -123,8 +122,8 @@
             "Kommentar" => Detail.Comment = content,
             _ => "Noget gik helt galt her??!!"
         };
-        await RundownService.UpdateDetailAsync(RundownState.Rundown.Uuid, Detail);
-        
+        await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
+
     }
 
     private void SetLockOnElement()
@@ -139,19 +138,8 @@
         {
             DetailLockState.SetLockState(Detail, false, userName);
         }
-
-        var messageObject = new
-        {
-            Action = "locked",
-            Locked = locked,
-            Detail = Detail,
-            Rundown = RundownState.Rundown.Uuid.ToString(),
-            ItemId = Detail.ItemId.ToString(),
-            UserName = userName
-        };
-        string message = JsonSerializer.Serialize(messageObject);
-       
-        KafkaService.SendMessage("rundown_detail", message);
+        var message = MessageBuilderService.BuildDetailLockMessage(Detail, locked, userName);
+        KafkaService.SendMessage("detail_lock", message);
     }
     private string SetContent()
     {

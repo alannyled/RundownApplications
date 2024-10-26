@@ -15,8 +15,6 @@
 
     <TabPaneRundown ControlRooms="ControlRooms"
                     ActiveTab="@activeTab"
-                    UpdateRundownList="ControlRoomChange"
-                    ShowDialog="OpenModal"
                     OpenTabPane="OpenTabPane"
                     CurrentObjects="RundownObjects" />
 
@@ -28,13 +26,7 @@
 
 @code {
     [Parameter]
-    public EventCallback OpenModal { get; set; }
-    [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; }
-    [Parameter]
-    public EventCallback UpdateRundownList { get; set; }
-    [Parameter]
-    public EventCallback UpdateSelectedRundown { get; set; }
 
     private bool showDialog = false;
     private string activeTab = string.Empty;
@@ -45,22 +37,20 @@
     // anvendes ved drag n drop lige nu - en anden logik måske?
     public List<RundownObjects> RundownObjects { get; set; } = new List<RundownObjects>(); // brug RundownItemsDTO i stedet for??
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
     {
-        if (RundownState.Rundown != null && activeTab != RundownState.Rundown.Name && !string.IsNullOrEmpty(RundownState.Rundown.Name))
+        RundownState.OnChange += HandleRundownStateChange;
+    }
+
+    private void HandleRundownStateChange()
+    {
+        if (activeTab != RundownState.Item.Name && activeTab != RundownState.Rundown.Name)
         {
-            activeTab = RundownState.Rundown.Name;
+            activeTab = RundownState.Rundown.Name ?? "Unknown";
             menuTabs = [];
             tabPanes = [];
         }
     }
-
-    private async Task ControlRoomChange()
-    {
-        await UpdateRundownList.InvokeAsync();
-        StateHasChanged();
-    }
-
     private void SelectTab(string tabName)
     {
         activeTab = tabName;

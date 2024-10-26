@@ -66,7 +66,7 @@
         <div class="col-xl-9">
             <div class="row">
                 <div class="col-xl-10">
-                    <Rundown ControlRooms="controlRooms" OpenModal="ShowRundownItemForm" UpdateRundownList="UpdateRundownListOnControlRoomChange" UpdateSelectedRundown="UpdateSelectedRundown" />
+                    <Rundown ControlRooms="controlRooms" />
 
                 </div>
 
@@ -96,8 +96,6 @@
 
     public DateTime SelectedDate = DateTime.Now.ToLocalTime();
     private string activeTab = "Aktive rækkefølger";
-
-    //private RundownDTO selectedRundown = new();
     private List<ControlRoomDTO> controlRooms = new();
     private List<RundownDTO> AllRundowns = new();
     private List<RundownDTO> ActiveRundowns = new();
@@ -109,10 +107,12 @@
         AllTemplates = await TemplateService.GetAllTemplatesAsync();
         await GetAndFilterRundowns();
 
-        SharedStates.OnChange += HandleSharedStateChange;
+        SharedStates.OnChange += HandleSharedStateChange;   
 
     }
-
+    /// <summary>
+    /// Håndtere ændringer i SharedStates forårsaget af Kafka beskeder
+    /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
         if (action == SharedStates.StateAction.NewRundownAdded || action == SharedStates.StateAction.RundownUpdated)
@@ -121,28 +121,18 @@
             await InvokeAsync(StateHasChanged);
         }
     }
-
+    /// <summary>
+    /// Henter alle rundowns og filtrerer de deaktiverede fra
+    /// </summary>
     private async Task GetAndFilterRundowns()
     {
         AllRundowns = await RundownService.GetRundownsAsync();
         ActiveRundowns = AllRundowns.Where(r => r.ArchivedDate == null).ToList();
     }
 
-    private async Task UpdateRundownListOnControlRoomChange()
-    {
-        await GetAndFilterRundowns();
-        await UpdateSelectedRundown();
-        StateHasChanged();
-    }
-
-    private async Task UpdateSelectedRundown()
-    {
-        var selectedRundown = await RundownService.GetRundownAsync(RundownState.Rundown.UUID.ToString());
-        RundownState.SelectedRundown(selectedRundown);
-        StateHasChanged();
-    }
-
-
+    /// <summary>
+    /// Åbner en rundown ved klik på listen med aktive rundowns
+    /// </summary>
     private async Task OpenRundown(string uuid)
     {
         try
@@ -161,7 +151,6 @@
     /// <summary>
     /// Sætter og åbner den aktive tabpane ved klik på tab
     /// </summary>
-    /// <param name="tabName"></param>
     private void SelectTab(string tabName)
     {
         activeTab = tabName;
@@ -172,24 +161,6 @@
         SelectedDate = date.ToLocalTime();
     }
 
-    List<string> Templates = ["Template1", "Template2", "Template3"];
-    /// <summary>
-    /// Kalder rending af Modal med RundownItemForm
-    /// </summary>
-    private void ShowRundownItemForm()
-    {
-        var content = new RenderFragment(builder =>
-        {
-            builder.AddContent(0, FormRenderservice.RenderRundownItemForm(
-            Templates,
-            RundownState.Rundown,
-            EventCallback.Factory.Create<RundownDTO>(this, HandleRundownItemCreated)
-        ));
-        });
-
-        ModalState.SetContent(content, "Opret ny historie");
-
-    }
     ///<summary>
     /// Kalder rending af Modal med CreateNewRundownForm
     /// </summary>
@@ -200,36 +171,18 @@
             builder.AddContent(0, FormRenderservice.RenderNewRundownForm(
                 AllTemplates,
                 controlRooms,
-                SelectedDate,
-                EventCallback.Factory.Create<CreateRundownResultDTO>(this, HandleRundownCreated)
+                SelectedDate
             ));
         });
 
         ModalState.SetContent(content, "Opret ny rækkefølge");
 
     }
-
     /// <summary>
-    /// Sætter values efter gem rundownItem og lukker modal
+    /// Fjerner abonnementet for at undgå memory leaks
     /// </summary>
-    private void HandleRundownItemCreated(RundownDTO result)
-    {
-        RundownState.SelectedRundown(result);
-        ModalState.Close();
-    }
-    /// <summary>
-    /// Sætter values efter gem Rundown og lukker modal
-    /// </summary>
-    private void HandleRundownCreated(CreateRundownResultDTO result)
-    {
-        //ActiveRundowns = result.ActiveRundowns;
-        RundownState.SelectedRundown(result.SelectedRundown);
-        ModalState.Close();
-    }
-
     public void Dispose()
     {
-        // Fjern abonnementet for at undgå memory leaks
         SharedStates.OnChange -= HandleSharedStateChange;
     }
 

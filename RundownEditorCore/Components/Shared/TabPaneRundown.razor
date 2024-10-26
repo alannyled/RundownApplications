@@ -1,6 +1,8 @@
 ﻿@inject IRundownService RundownService
 @inject RundownState RundownState
 @inject SharedStates SharedStates
+@inject ModalState ModalState
+@inject FormRenderService FormRenderservice
 
 <div class="tab-pane @(ActiveTab == RundownState.Rundown.Name && !string.IsNullOrEmpty(ActiveTab) && !string.IsNullOrEmpty(RundownState.Rundown.Name) ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
@@ -19,7 +21,7 @@
                         }
                     </select>
                 </div>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="() => ShowDialog.InvokeAsync()"><i class="bi bi-plus"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="ShowRundownItemForm"><i class="bi bi-plus"></i></button>
               
 
             </div>
@@ -62,11 +64,7 @@
 @code {
 
     [Parameter]
-    public EventCallback ShowDialog { get; set; }
-    [Parameter]
     public EventCallback<RundownItemDTO> OpenTabPane { get; set; }
-    [Parameter]
-    public EventCallback UpdateRundownList { get; set; }
     [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; }
     [Parameter]
@@ -104,8 +102,25 @@
     private async Task OnControlRoomChange(ChangeEventArgs e)
     {
         var selectedControlRoomUuid = e.Value.ToString();
-        await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);
-        await UpdateRundownList.InvokeAsync();    
+        var rundown = await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);
+        SharedStates.SharedRundown(rundown);   
+    }
+
+    List<string> Templates = ["Template1", "Template2", "Template3"];
+    /// <summary>
+    /// Kalder rending af Modal med RundownItemForm
+    /// </summary>
+    private void ShowRundownItemForm()
+    {
+        var content = new RenderFragment(builder =>
+        {
+            builder.AddContent(0, FormRenderservice.RenderRundownItemForm(
+            Templates
+        ));
+        });
+
+        ModalState.SetContent(content, "Opret ny historie");
+
     }
 
     private void OnDragStart(DragEventArgs e, string childId)

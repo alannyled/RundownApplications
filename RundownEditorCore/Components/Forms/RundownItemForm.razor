@@ -2,6 +2,7 @@
 @inject IRundownService RundownService
 @inject RundownState RundownState
 @inject ToastState ToastState
+@inject ModalState ModalState
 
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
@@ -31,10 +32,6 @@
 
     [Parameter]
     public List<string> Templates { get; set; } = new List<string>();
-    [Parameter]
-    public RundownDTO SelectedRundown { get; set; }
-    [Parameter]
-    public EventCallback<RundownDTO> OnItemCreated { get; set; }
 
     public string ItemName { get; set; } = string.Empty;
     public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
@@ -42,6 +39,7 @@
 
     private async Task HandleSubmit()
     {
+        var selectedRundown = RundownState.Rundown;
         if (string.IsNullOrEmpty(ItemName))
         {
             ToastState.FireToast("Du skal angive en titel", "text-bg-warning");
@@ -51,16 +49,16 @@
         var newRundownItem = new RundownItemDTO
             {
                 UUID = Guid.NewGuid(),
-                RundownId = SelectedRundown.UUID,
+                RundownId = selectedRundown.UUID,
                 Name = ItemName,
                 Duration = Duration.ToString("HH:mm:ss"),
-                Order = SelectedRundown.Items.Count // + 1  eller *10?
+                Order = selectedRundown.Items.Count // + 1  eller *10?
             };
 
 
-        SelectedRundown = await RundownService.AddItemToRundownAsync(SelectedRundown.UUID, newRundownItem);
-        //RundownState.SelectedRundown(SelectedRundown);
-        await OnItemCreated.InvokeAsync(SelectedRundown);
+        var rundown = await RundownService.AddItemToRundownAsync(selectedRundown.UUID, newRundownItem);
+        RundownState.SelectedRundown(rundown);
+        ModalState.Close();
     }
 
 

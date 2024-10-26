@@ -2,6 +2,7 @@
 @inject IRundownService RundownService
 @inject RundownState RundownState
 @inject ToastState ToastState
+@inject ModalState ModalState
 
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
@@ -48,10 +49,6 @@
 @code {
     [Parameter]
     public string DetailType { get; set; } = string.Empty;
-    [Parameter]
-    public EventCallback<RundownDTO> OnItemDetailCreated { get; set; }
-
-    //public RundownDTO SelectedRundown { get; set; }
 
     public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
     public string Title { get; set; } = string.Empty;
@@ -113,6 +110,6 @@
                 break;
         }      
         var rundown = await RundownService.AddDetailToItemAsync(RundownState.Rundown.UUID, newRundownItem);
-        await OnItemDetailCreated.InvokeAsync(rundown);
+        ModalState.Close();
     }
 }

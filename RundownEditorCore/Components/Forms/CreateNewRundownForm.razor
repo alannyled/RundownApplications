@@ -1,5 +1,8 @@
 ﻿@using RundownEditorCore.DTO
 @using RundownEditorCore.Interfaces
+@inject IRundownService RundownService
+@inject RundownState RundownState
+@inject ModalState ModalState
 
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
@@ -37,8 +40,6 @@
 </form>
 
 @code {
-    [Inject]
-    private IRundownService RundownService { get; set; }
 
     [Parameter]
     public List<TemplateDTO> Templates { get; set; } = new List<TemplateDTO>();
@@ -46,29 +47,15 @@
     public List<ControlRoomDTO> ControlRooms { get; set; } = new List<ControlRoomDTO>();
     [Parameter]
     public DateTime BroadcastDate { get; set; } = DateTime.Now;
-    [Parameter]
-    public EventCallback<CreateRundownResultDTO> OnRundownCreated { get; set; }
-
-
 
     public string Template { get; set; } = string.Empty;
     public string ControlRoom { get; set; } = string.Empty;
 
-  
-
     private async Task HandleSubmit()
     {
-        // Lav rundown og hent aktive rundowns
         var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
+        RundownState.SelectedRundown(rundown);
+        ModalState.Close();
         var activeRundowns = await RundownService.GetRundownsAsync();
-
-        // Indstil værdier og send resultatet til moderkomponenten
-        var result = new CreateRundownResultDTO
-            {
-                ActiveRundowns = activeRundowns,
-                SelectedRundown = rundown
-            };
-
-        await OnRundownCreated.InvokeAsync(result);
     }
 }

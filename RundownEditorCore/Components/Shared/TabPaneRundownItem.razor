@@ -47,7 +47,7 @@
     protected override void OnInitialized()
     {
         Guid UUID = Guid.Parse(ItemId);
-        RundownItem = RundownState.Item;//RundownState.Rundown.Items.FirstOrDefault(item => item.UUID == UUID);
+        RundownItem = RundownState.Item;
         SharedStates.OnChange += HandleSharedStateChange;
     }
     /// <summary>
@@ -63,38 +63,37 @@
             {
                 RundownState.SelectedItem(SharedStates.ItemUpdated);
                 RundownItem = RundownState.Item;
-                //RundownItem = SharedStates.ItemUpdated;
                 InvokeAsync(StateHasChanged);
             }
         }
     }
-
+    /// <summary>
+    /// Kalder callback for at fjerne lukket items tabpane fra UI
+    /// </summary>
     public async Task RemoveTabPane()
     {
         await OnRemove.InvokeAsync(Name);
     }
-
+    /// <summary>
+    /// Renderer formen til at oprette en ny detail og åbner modalen
+    /// </summary>
     public void AddSelected(string type)
     {
         var content = new RenderFragment(builder =>
         {
             builder.AddContent(0, FormRenderservice.RenderItemDetailForm(
-                type,
-                EventCallback.Factory.Create<RundownDTO>(this, HandleItemDetailCreated)
+                type
             ));
         });
 
         ModalState.SetContent(content, $"Opret {type} element");
     }
-   
-    public void HandleItemDetailCreated(RundownDTO rundown)
-    {
-        ModalState.Close();
-    }
 
+    /// <summary>
+    /// Fjerne abonnementet for at undgå memory leaks
+    /// </summary>
     public void Dispose()
     {
-        // Fjern abonnementet for at undgå memory leaks
         SharedStates.OnChange -= HandleSharedStateChange;
     }
 }

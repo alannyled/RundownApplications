@@ -10,7 +10,7 @@
             @foreach (var db in HealthService.OnlineStatus)
             {
                 <ul class="list-group list-group-horizontal mb-1">
-                    <li class="list-group-item w-75 fw-bold">@((MarkupString)db.Key)</li>
+                    <li class="list-group-item w-75 fw-bold">@(db.Key)</li>
                     <li class="list-group-item w-25 text-end @(db.Value ? "list-group-item-success" : "list-group-item-danger")">@(db.Value ? "Online" : "Offline")</li>
 
                 </ul>
@@ -53,6 +53,7 @@
             {"Database ControlRoom Secondary", "http://localhost:27018" },
             {"Kafka ZooKeeper", "tcp://localhost:2181" },
             {"Kafka Message Broker", "tcp://localhost:9092" },
+            {"API Gateway", "tcp://localhost:3000" },
             {"MicroService Aggregator SSL", "https://localhost:3010/health" },
             {"MicroService Aggregator", "http://localhost:3011/health" },
             {"MicroService ControlRoom SSL", "https://localhost:3020/health" },

@@ -15,29 +15,23 @@ using RundownEditorCore.States;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add named HttpClients for different APIs
-builder.Services.AddHttpClient("TemplatesAPI", client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7247/api/");
-});
-
 // Add services to the container.
 builder.Services.AddHttpClient<IRundownService, RundownService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Rundown/"); // ikke APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/Rundown/"); // APIGateway adresse!
 });
 
 builder.Services.AddHttpClient<IHardwareService, HardwareService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Hardware/"); // ikke APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/Hardware/"); // APIGateway adresse!
 });
 builder.Services.AddHttpClient<IControlRoomService, ControlRoomService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/ControlRoom/"); // ikke APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/ControlRoom/"); // APIGateway adresse!
 });
 builder.Services.AddHttpClient<ITemplateService, TemplateService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3010/api/Template/"); // ikke APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/Template/"); // APIGateway adresse!
 });
 
 builder.Services.AddLogging(loggingBuilder =>

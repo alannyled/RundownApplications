@@ -84,7 +84,7 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action == SharedStates.StateAction.RundownUpdated)
+        if (action == SharedStates.StateAction.RundownUpdated || action == SharedStates.StateAction.ItemUpdated)
         {
             if (RundownState.Rundown.UUID == SharedStates.RundownUpdated.UUID)
             {
@@ -151,10 +151,11 @@
         draggedChildId = null;
     }
 
-
+    /// <summary>
+    /// Fjerner abonnementet for at undgå memory leaks
+    /// </summary>
     public void Dispose()
     {
-        // Fjern abonnementet for at undgå memory leaks
         SharedStates.OnChange -= HandleSharedStateChange;
     }
 

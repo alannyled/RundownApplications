@@ -9,6 +9,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Pa55w0rd")) // vi elsker hardkodning af passwords
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Pa55w0rd"))
         };
     });
 
@@ -38,76 +39,73 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rute til gateway
+///<summary>
+/// Middleware til at buffer Request Body som String
+/// </summary>
+app.Use(async (context, next) =>
+{
+    context.Request.EnableBuffering(); // Tillad at læse body'en flere gange
+
+    if (context.Request.ContentLength > 0 || context.Request.Headers.ContainsKey("Transfer-Encoding"))
+    {
+        using var reader = new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true);
+        string bodyContent = await reader.ReadToEndAsync();
+        // Reset stream-positionen for at tillade efterfølgende læsning
+        context.Request.Body.Position = 0;
+    }
+    // Gå videre til næste middleware
+    await next.Invoke();
+});
+
+///<summary>
+/// API Gateway, der videresender alle requests til en aggregator
+/// </summary> 
 app.Map("/{**path}", async (HttpContext context, IHttpClientFactory httpClientFactory) =>
 {
-    // Check om brugeren er godkendt
-    //if (!context.User.Identity?.IsAuthenticated ?? true)
-    //{
-    //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-    //    return;
-    //}
-
-    // Den nye URL der skal sendes til Aggregator
     var path = context.Request.Path.ToString();
     var queryString = context.Request.QueryString.Value;
-    var targetUrl = $"https://localhost:3010{path}{queryString}"; // aggregator URL
+    var targetUrl = $"https://localhost:3010{path}{queryString}";
 
-    Console.WriteLine($"Forwarding request to {targetUrl}");
+    Console.WriteLine($"Videresender til {targetUrl}");
 
     var client = httpClientFactory.CreateClient();
     var requestMessage = new HttpRequestMessage(new HttpMethod(context.Request.Method), targetUrl);
 
-    // Kopier HTTP headers
+    // Kopier alle headers undtagen Transfer-Encoding
     foreach (var header in context.Request.Headers)
     {
-        if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()))
-        {
-            requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
-        }
+        if (header.Key.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase)) continue;
+        requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
     }
 
-    // Kopier body (hvis der er nogen)
-    if (context.Request.ContentLength > 0)
+    // Buffer hele request body for videresendelse, hvis der er en
+    if (context.Request.ContentLength > 0 || context.Request.Headers.ContainsKey("Transfer-Encoding"))
     {
-        // Hvis der er indhold i body, kopier det
-        requestMessage.Content = new StreamContent(context.Request.Body);
-        if (!requestMessage.Content.Headers.Contains("Content-Type"))
-        {
-            requestMessage.Content.Headers.Add("Content-Type", "application/json");
-        }
+        using var reader = new StreamReader(context.Request.Body);
+        var incomingBody = await reader.ReadToEndAsync();
+        // Opret body-content med korrekt content type
+        requestMessage.Content = new StringContent(incomingBody, Encoding.UTF8, "application/json");
     }
-    else
-    {
-        // Hvis der ikke er indhold, fjern Transfer-Encoding: chunked
-        requestMessage.Headers.TransferEncodingChunked = false; // Dette sikrer, at chunking ikke bruges, når der ikke er indhold
-    }
-
     var response = await client.SendAsync(requestMessage);
-
-    // Returner svaret til klienten
     context.Response.StatusCode = (int)response.StatusCode;
 
-    // Kopier HTTP-headere fra svaret til klienten
+    // Kopier alle response headers
     foreach (var header in response.Headers)
     {
         context.Response.Headers[header.Key] = header.Value.ToArray();
     }
 
-    // Kopier Content-Headers (som Content-Type) korrekt
     foreach (var contentHeader in response.Content.Headers)
     {
         context.Response.Headers[contentHeader.Key] = contentHeader.Value.ToArray();
     }
 
-    // Fjern Transfer-Encoding header, hvis det ikke er nødvendigt
     context.Response.Headers.Remove("Transfer-Encoding");
 
     if (response.Content != null)
     {
         await response.Content.CopyToAsync(context.Response.Body);
     }
-
 });
 
 app.Run();

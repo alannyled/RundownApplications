@@ -1,0 +1,21 @@
+﻿@page "/reset-data"
+@inject ToastState ToastState
+
+<Toast></Toast>
+<div class="container-fluid" style="max-width:1600px">
+    <h3>Reset Data</h3>
+    <div class="row mt-2">
+        <div class="col-xl-12">
+            <p>Reset data er en funktion der sletter alt data i databasen og opretter demo data.<br />Dette er en irreversible handling og kan ikke fortrydes.</p>
+            <button class="btn btn-danger" @onclick="ResetDataAsync">Reset Data</button>
+            </div>
+            </div>
+            </div>
+@code {
+
+    public async Task ResetDataAsync()
+    {
+        ToastState.FireToast("Data er blevet nulstillet", "text-bg-success");
+        await Task.CompletedTask;
+    }
+}

@@ -15,7 +15,16 @@
 
     public async Task ResetDataAsync()
     {
-        ToastState.FireToast("Data er blevet nulstillet", "text-bg-success");
-        await Task.CompletedTask;
+        using var httpClient = new HttpClient();
+        var response = await httpClient.PostAsync("https://localhost:3030/api/DataSeed/reset-data", null);
+        if (response.IsSuccessStatusCode)
+        {
+            ToastState.FireToast("Nulstilling af data lykkedes", "text-bg-success");
+        }
+        else
+        {
+            ToastState.FireToast("Nulstilling af data mislykkedes", "text-bg-warning");
+        }
     }
+
 }

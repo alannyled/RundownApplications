@@ -16,15 +16,27 @@
     public async Task ResetDataAsync()
     {
         using var httpClient = new HttpClient();
-        var response = await httpClient.PostAsync("https://localhost:3030/api/DataSeed/reset-data", null);
-        if (response.IsSuccessStatusCode)
+
+        var response1 = await httpClient.PostAsync("https://localhost:3020/api/DataSeed/reset-data", null);
+
+        if (response1.IsSuccessStatusCode)
         {
-            ToastState.FireToast("Nulstilling af data lykkedes", "text-bg-success");
+            var response2 = await httpClient.PostAsync("https://localhost:3030/api/DataSeed/reset-data", null);
+
+            if (response2.IsSuccessStatusCode)
+            {
+                ToastState.FireToast("Nulstilling af data lykkedes", "text-bg-success");
+            }
+            else
+            {
+                ToastState.FireToast("Anden nulstilling af data mislykkedes", "text-bg-warning");
+            }
         }
         else
         {
-            ToastState.FireToast("Nulstilling af data mislykkedes", "text-bg-warning");
+            ToastState.FireToast("Første nulstilling af data mislykkedes", "text-bg-warning");
         }
     }
+
 
 }

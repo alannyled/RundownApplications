@@ -2,9 +2,11 @@
 
 @inject IControlRoomService ControlRoomService
 @inject IHardwareService HardwareService
+@inject ToastState ToastState
 
 @attribute [Authorize(Roles = "Administrator")]
 <PageTitle>Kontrolrum</PageTitle>
+<Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
     <h3>Kontrolrum og Hardware</h3>
     <div class="row mt-2">
@@ -116,12 +118,20 @@
         editingHardware = null;
     }
 
-    private async Task CreateControlRoomAsync()
-    {   
+    private async Task<bool> CreateControlRoomAsync()
+    {
+        if (string.IsNullOrEmpty(newControlRoom.Name) || string.IsNullOrEmpty(newControlRoom.Location))
+        {
+            ToastState.FireToast("Udfyld Navn og Lokation", "text-bg-warning");
+            return false;
+        }
+
         await ControlRoomService.CreateControlRoomAsync(newControlRoom);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
-        newControlRoom = new ControlRoomDTO(); 
+        controlRooms = await ControlRoomService.GetControlRoomsAsync();
+        newControlRoom = new ControlRoomDTO();
+        return true;
     }
+
     /// <summary>
     /// Lukker åbne forms og viser redigeringsform for det valgte kontrolrum
     /// </summary>

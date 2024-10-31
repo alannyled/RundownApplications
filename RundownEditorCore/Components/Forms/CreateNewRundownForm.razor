@@ -3,6 +3,7 @@
 @inject IRundownService RundownService
 @inject RundownState RundownState
 @inject ModalState ModalState
+@inject ToastState ToastState
 
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
@@ -51,11 +52,22 @@
     public string Template { get; set; } = string.Empty;
     public string ControlRoom { get; set; } = string.Empty;
 
-    private async Task HandleSubmit()
+    private async Task<bool> HandleSubmit()
     {
+        if (string.IsNullOrEmpty(Template))
+        {
+            ToastState.FireToast("Vælg Skabelon", "text-bg-warning");
+            return false;
+        }
+        if (string.IsNullOrEmpty(ControlRoom))
+        {
+            ToastState.FireToast("Vælg Kontrolrum", "text-bg-warning");
+            return false;
+        }
         var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
         RundownState.SelectedRundown(rundown);
         ModalState.Close();
         var activeRundowns = await RundownService.GetRundownsAsync();
+        return true;
     }
 }

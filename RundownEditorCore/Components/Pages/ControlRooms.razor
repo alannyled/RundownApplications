@@ -3,6 +3,7 @@
 @inject IControlRoomService ControlRoomService
 @inject IHardwareService HardwareService
 @inject ToastState ToastState
+@inject SharedStates SharedStates
 
 @attribute [Authorize(Roles = "Administrator")]
 <PageTitle>Kontrolrum</PageTitle>
@@ -106,7 +107,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        controlRooms = await ControlRoomService.GetControlRoomsAsync();
+        if (SharedStates.ControlRooms.Any())
+        {
+            Console.WriteLine("Using shared control rooms");
+            controlRooms = SharedStates.ControlRooms;
+          
+        }
+        else{
+            Console.WriteLine("Fetching control rooms from API");
+            controlRooms = await ControlRoomService.GetControlRoomsAsync();
+            SharedStates.SharedControlRoom(controlRooms);
+        }
+    
+       // controlRooms = await ControlRoomService.GetControlRoomsAsync();
     }
     /// <summary>
     /// Nulstiller og lukker alle åbne forms

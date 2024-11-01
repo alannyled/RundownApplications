@@ -4,7 +4,6 @@ using RundownEditorCore.States;
 using RundownEditorCore.Interfaces;
 using CommonClassLibrary.DTO;
 using Newtonsoft.Json;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 
@@ -63,7 +62,7 @@ namespace RundownEditorCore.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            string[] topics = { "rundown", "detail_lock", "story" };
+            string[] topics = { "rundown", "detail_lock", "story", "controlroom" };
             _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "Gruppe_id", topics);
 
             await Task.Yield();
@@ -98,10 +97,15 @@ namespace RundownEditorCore.Services
                                 }
 
                             }
-
                             if (message.Topic == "rundown")
                             {
                                 HandleRundownMessage(message);
+                            }
+                            if(message.Topic == "controlroom")
+                            {
+                                _logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
+                                var messageObject = JsonConvert.DeserializeObject<ControlRoomMessage>(message.Message.Value);
+                                _sharedStates.SharedControlRoom(messageObject.ConrolRooms);
                             }
                         }
                         catch (JsonException ex)
@@ -135,6 +139,10 @@ namespace RundownEditorCore.Services
 
     }
 
+    public class ControlRoomMessage
+    {
+        public List<ControlRoomDTO>? ConrolRooms { get; set; }
+    }
     public class ItemMessage
     {
         public RundownItemDTO Item { get; set; }

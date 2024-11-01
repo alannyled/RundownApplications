@@ -1,5 +1,4 @@
 ﻿using CommonClassLibrary.DTO;
-using Microsoft.Extensions.Logging.Console;
 
 namespace RundownEditorCore.States
 {
@@ -15,14 +14,16 @@ namespace RundownEditorCore.States
         {
             ItemUpdated,
             RundownUpdated,
-            NewRundownAdded
+            NewRundownAdded,
+            ControlRoomUpdated
         }
 
         public event Action<StateAction> OnChange;
         public RundownItemDTO ItemUpdated { get; private set; } = new();
         public RundownDTO RundownUpdated { get; private set; } = new();
-
         public RundownDTO NewRundown { get; private set; } = new();
+        public List<ControlRoomDTO> ControlRooms { get; private set; } = [];
+
 
         public void SharedItem(RundownItemDTO item)
         {
@@ -39,6 +40,12 @@ namespace RundownEditorCore.States
         {
             NewRundown = rundown;
             NotifyStateChanged(StateAction.NewRundownAdded);
+        }
+
+        public void SharedControlRoom(List<ControlRoomDTO> controlRoom)
+        {
+            ControlRooms = controlRoom;
+            NotifyStateChanged(StateAction.ControlRoomUpdated);
         }
 
         private void NotifyStateChanged(StateAction action)

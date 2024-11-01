@@ -1,9 +1,13 @@
 ﻿using ControlRoomDbService.DAL;
 using ControlRoomDbService.Models;
+using ControlRoomDbService.BLL.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Newtonsoft.Json;
+using ControlRoomDbService.BLL.Services;
+using CommonClassLibrary.DTO;
 
 namespace ControlRoomDbService.Controllers
 {
@@ -13,6 +17,7 @@ namespace ControlRoomDbService.Controllers
     {
         private readonly IMongoCollection<ControlRoom> _controlroomCollection;
         private readonly IMongoCollection<Hardware> _hardwareCollection;
+        private readonly IKafkaService _kafkaService;
 
         public DataSeedController(IOptions<MongoDBSettings> mongoDBSettings)
         {
@@ -20,6 +25,7 @@ namespace ControlRoomDbService.Controllers
             var mongoDatabase = mongoClient.GetDatabase(mongoDBSettings.Value.DatabaseName);
             _controlroomCollection = mongoDatabase.GetCollection<ControlRoom>("ControlRoom");
             _hardwareCollection = mongoDatabase.GetCollection<Hardware>("Hardware");
+            _kafkaService = new KafkaService();
 
         }
 
@@ -40,12 +46,19 @@ namespace ControlRoomDbService.Controllers
                     new() { UUID = Guid.NewGuid() ,Name = "PK20", Location = "DR Århus", CreatedDate = now},
                     new() { UUID = Guid.NewGuid() ,Name = "PK5", Location = "DR Byen", CreatedDate = now},
                     new() { UUID = Guid.NewGuid() ,Name = "PK6", Location = "DR Byen", CreatedDate = now},
-                    new() { UUID = Guid.NewGuid() ,Name = "PK01", Location = "DR Byen", CreatedDate = now},
+                    new() { UUID = Guid.NewGuid() ,Name = "PK01", Location = "Koncerthuset", CreatedDate = now},
 
                 };
 
                 await _controlroomCollection.InsertManyAsync(controlrooms);
+                var messageObject = new
+                {
+                    Action = "reset",
+                    ControlRooms = controlrooms
+                };
+                string message = JsonConvert.SerializeObject(messageObject);
 
+                _kafkaService.SendMessage("controlroom", message);
                 return Ok("ControlRoom data nulstillet og seedet.");
             }
             catch (Exception ex)

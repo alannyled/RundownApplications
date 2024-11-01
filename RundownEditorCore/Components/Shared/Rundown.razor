@@ -1,4 +1,5 @@
-﻿@inject IRundownService RundownService
+﻿@using CommonClassLibrary.DTO
+@inject IRundownService RundownService
 @inject RundownState RundownState
 
 @if (!string.IsNullOrEmpty(RundownState.Rundown.Name))

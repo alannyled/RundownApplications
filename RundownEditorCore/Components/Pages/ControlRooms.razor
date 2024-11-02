@@ -105,7 +105,7 @@
     private HardwareDTO newHardware = new HardwareDTO();
     private HardwareDTO? editingHardware;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         if (SharedStates.ControlRooms.Any())
         {

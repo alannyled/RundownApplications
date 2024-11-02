@@ -2,22 +2,20 @@
 
 namespace RundownEditorCore.Services
 {
-    public class InMemoryLogger : ILogger
+    public class InMemoryLogger(string name) : ILogger
     {
-        private readonly string _name;
+        private readonly string _name = name;
         private static readonly ConcurrentQueue<string> _logs = new();
         private static readonly ConcurrentQueue<string> _simpleLogs = new();
 
-        public InMemoryLogger(string name)
+        IDisposable? ILogger.BeginScope<TState>(TState state)
         {
-            _name = name;
+            return null;
         }
-
-        public IDisposable BeginScope<TState>(TState state) => null;
 
         public bool IsEnabled(LogLevel logLevel) => true;
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception, string> formatter)
         {
             if (formatter != null)
             {

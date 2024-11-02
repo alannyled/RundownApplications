@@ -77,7 +77,7 @@
     private async Task UpdateHealth()
     {
         await HealthService.CheckHealthAsync();
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
     }
 
 

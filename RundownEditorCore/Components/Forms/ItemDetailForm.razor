@@ -71,7 +71,7 @@
 
     };
 
-    private async Task<bool> ValidateInput()
+    private bool ValidateInput()
     {
         if (string.IsNullOrEmpty(Title))
         {
@@ -81,9 +81,10 @@
         return true;
     }
 
+
     private async Task HandleSubmit()
     {
-        if (!await ValidateInput())
+        if (!ValidateInput())
         {
             return;
         }

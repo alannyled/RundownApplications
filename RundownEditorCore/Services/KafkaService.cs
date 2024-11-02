@@ -32,31 +32,21 @@ namespace RundownEditorCore.Services
     }
 
 
-    public class KafkaBackgroundService : BackgroundService
+    public class KafkaBackgroundService(
+        KafkaServiceLibrary.KafkaService kafkaService,
+        DetailLockState detailLockState,
+        SharedStates sharedStates,
+        ILogger<RundownService> logger,
+        IControlRoomService controlRoomService
+            ) : BackgroundService
     {
 
-        private readonly KafkaServiceLibrary.KafkaService _kafkaService;
+        private readonly KafkaServiceLibrary.KafkaService _kafkaService = kafkaService;
         private KafkaConsumerClient _consumerClient;
-        private DetailLockState _detailLockState;
-        private SharedStates _sharedStates;
-        private readonly ILogger<RundownService> _logger;
-        private readonly IControlRoomService _controlRoomService;
-
-        public KafkaBackgroundService(
-            KafkaServiceLibrary.KafkaService kafkaService,
-            DetailLockState detailLockState,
-            SharedStates sharedStates,
-            ILogger<RundownService> logger,
-            IControlRoomService controlRoomService
-            )
-        {
-
-            _kafkaService = kafkaService;
-            _detailLockState = detailLockState;
-            _sharedStates = sharedStates;
-            _logger = logger;
-            _controlRoomService = controlRoomService;
-        }
+        private readonly DetailLockState _detailLockState = detailLockState;
+        private readonly SharedStates _sharedStates = sharedStates;
+        private readonly ILogger<RundownService> _logger = logger;
+        private readonly IControlRoomService _controlRoomService = controlRoomService;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -124,15 +114,15 @@ namespace RundownEditorCore.Services
         public void HandleRundownMessage(ConsumeResult<string, string> message)
         {
             var messageObject = JsonConvert.DeserializeObject<RundownMessage>(message.Message.Value);
-            if (messageObject.Action == "update")
+            if (messageObject?.Action == "update")
             {
-                _logger.LogInformation($"MESSAGE: Rundown opdateret UUID = {messageObject.Rundown.UUID}");
-                _sharedStates.SharedRundown(messageObject.Rundown);
+                _logger.LogInformation($"MESSAGE: Rundown opdateret UUID = {messageObject?.Rundown?.UUID}");
+                _sharedStates.SharedRundown(messageObject?.Rundown ?? new());
             }
-            if (messageObject.Action == "create")
+            if (messageObject?.Action == "create")
             {
-                _logger.LogInformation($"MESSAGE: Ny Rundown oprettet {messageObject.Rundown.Name}");
-                _sharedStates.SharedNewRundown(messageObject.Rundown);
+                _logger.LogInformation($"MESSAGE: Ny Rundown oprettet {messageObject?.Rundown?.Name}");
+                _sharedStates.SharedNewRundown(messageObject?.Rundown ?? new());
             }
         }
 
@@ -144,7 +134,7 @@ namespace RundownEditorCore.Services
     }
     public class ItemMessage
     {
-        public RundownItemDTO Item { get; set; }
+        public RundownItemDTO? Item { get; set; }
     }
 
     public class RundownMessage

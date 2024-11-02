@@ -29,7 +29,7 @@
     [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; }
 
-    private bool showDialog = false;
+    //private bool showDialog = false;
     private string activeTab = string.Empty;
     private string openItemId = string.Empty;
 
@@ -38,7 +38,7 @@
     // anvendes ved drag n drop lige nu - en anden logik måske?
     public List<RundownObjects> RundownObjects { get; set; } = new List<RundownObjects>(); // brug RundownItemsDTO i stedet for??
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         RundownState.OnChange += HandleRundownStateChange;
     }

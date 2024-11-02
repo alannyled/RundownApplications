@@ -9,10 +9,10 @@ namespace RundownDbService.DAL.Repositories
     {
         private readonly IMongoCollection<Rundown> _rundownCollection;
 
-        public RundownRepository(IOptions<MongoDBSettings> mongoDBSettings)
+        public RundownRepository(MongoDBSettings mongoDBSettings)
         {
-            var mongoClient = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var mongoDatabase = mongoClient.GetDatabase(mongoDBSettings.Value.DatabaseName);
+            var mongoClient = new MongoClient(mongoDBSettings.ConnectionString);
+            var mongoDatabase = mongoClient.GetDatabase(mongoDBSettings.DatabaseName);
             _rundownCollection = mongoDatabase.GetCollection<Rundown>("Rundowns");
         }
 

@@ -8,7 +8,7 @@ namespace CommonClassLibrary.DTO
 {
     public class HardwareDTO
     {
-        public string Uuid { get; set; }
+        public string Uuid { get; set; } = string.Empty;
         public string? ControlRoomId { get; set; }
         public string? Name { get; set; }
         public string? Vendor { get; set; }

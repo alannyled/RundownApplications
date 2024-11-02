@@ -12,7 +12,7 @@ namespace RundownDbService.Models
         public Guid UUID { get; set; }
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [BsonElement("description")]
         public string? Description { get; set; }
@@ -33,6 +33,6 @@ namespace RundownDbService.Models
         public string? ArchivedBy { get; set; }
 
         [BsonElement("items")]
-        public List<RundownItem> Items { get; set; } = new List<RundownItem>();
+        public List<RundownItem> Items { get; set; } = [];
     }
 }

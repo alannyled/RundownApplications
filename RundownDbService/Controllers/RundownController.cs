@@ -77,12 +77,17 @@ namespace RundownDbService.Controllers
             {
                 return NotFound();
             }
+
+            TimeSpan duration = !string.IsNullOrEmpty(rundownDto.Duration)
+                ? TimeSpan.Parse(rundownDto.Duration)
+                : TimeSpan.Zero;
+
             existingRundown.Items.Add(new RundownItem
             {
                 UUID = Guid.NewGuid(),
                 RundownId = id,
                 Name = rundownDto.Name,
-                Duration = TimeSpan.Parse(rundownDto.Duration),
+                Duration = duration,
                 Order = rundownDto.Order
             });
       
@@ -107,7 +112,6 @@ namespace RundownDbService.Controllers
                 return NotFound("Item ikke fundet.");
             }
 
-            // Brug GetModel() til at oprette den korrekte itemDetail instans baseret på typen
             var itemDetail = _itemDetailService.GetModel(itemDetailDto.Type);
             if (itemDetail == null)
             {

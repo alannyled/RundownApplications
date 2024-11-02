@@ -16,7 +16,7 @@ namespace RundownDbService.Models
         public Guid RundownId { get; set; }
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [BsonElement("duration")]
         public TimeSpan Duration { get; set; } // eller string?
@@ -25,6 +25,6 @@ namespace RundownDbService.Models
         public int Order { get; set; }
 
         [BsonElement("details")]
-        public List<ItemDetail> Details { get; set; } = new List<ItemDetail>();
+        public List<ItemDetail> Details { get; set; } = [];
     }
 }

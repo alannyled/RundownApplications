@@ -16,10 +16,10 @@ namespace RundownDbService.Models
         public Guid ItemId { get; set; }
 
         [BsonElement("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [BsonElement("title")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [BsonElement("duration")]
         public TimeSpan Duration { get; set; }
@@ -32,10 +32,10 @@ namespace RundownDbService.Models
     public class ItemDetailTeleprompter : ItemDetail
     {
         [BsonElement("prompterText")]
-        public string PrompterText { get; set; }
+        public string? PrompterText { get; set; }
 
         [BsonElement("detailType")]
-        public string DetailType { get; set; } = "ItemDetailTeleprompter";
+        public string? DetailType { get; set; } = "ItemDetailTeleprompter";
     }
 
     [BsonDiscriminator("ItemDetailVideo")]
@@ -43,29 +43,29 @@ namespace RundownDbService.Models
     {
 
         [BsonElement("videoPath")]
-        public string VideoPath { get; set; }
+        public string? VideoPath { get; set; }
 
         [BsonElement("detailType")]
-        public string DetailType { get; set; } = "ItemDetailVideo";
+        public string? DetailType { get; set; } = "ItemDetailVideo";
     }
 
     [BsonDiscriminator("ItemDetailGraphic")]
     public class ItemDetailGraphic : ItemDetail
     {
         [BsonElement("graphicId")]
-        public string GraphicId { get; set; }
+        public string? GraphicId { get; set; }
 
         [BsonElement("detailType")]
-        public string DetailType { get; set; } = "ItemDetailGraphic";
+        public string? DetailType { get; set; } = "ItemDetailGraphic";
     }
 
     [BsonDiscriminator("ItemDetailComment")]
     public class ItemDetailComment : ItemDetail
     {
         [BsonElement("comment")]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         [BsonElement("detailType")]
-        public string DetailType { get; set; } = "ItemDetailComment";
+        public string? DetailType { get; set; } = "ItemDetailComment";
     }
 }

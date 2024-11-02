@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 
 namespace RundownEditorCore.Services
 {
+    /// <summary>
+    /// Kafka producer service og implementering af IKafkaService Sendmessage
+    /// </summary>  
     public class KafkaService : IKafkaService
     {
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
@@ -31,7 +34,9 @@ namespace RundownEditorCore.Services
         }
     }
 
-
+    /// <summary>
+    /// Baggrundsservice til at lytte på Kafka beskeder
+    /// </summary>
     public class KafkaBackgroundService(
         KafkaServiceLibrary.KafkaService kafkaService,
         DetailLockState detailLockState,
@@ -41,12 +46,22 @@ namespace RundownEditorCore.Services
             ) : BackgroundService
     {
 
-        private readonly KafkaServiceLibrary.KafkaService _kafkaService = kafkaService;
-        private KafkaConsumerClient _consumerClient;
+        private readonly KafkaServiceLibrary.KafkaService _kafkaService = kafkaService;        
         private readonly DetailLockState _detailLockState = detailLockState;
         private readonly SharedStates _sharedStates = sharedStates;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IControlRoomService _controlRoomService = controlRoomService;
+
+        private KafkaConsumerClient? _consumerClient;
+
+        /// <summary>
+        /// Deserialiserer Kafka besked til JSON
+        /// </summary>
+        /// <returns>JSON</returns>
+        private static T? ConvertMessageToJson<T>(ConsumeResult<string, string> message)
+        {
+            return JsonConvert.DeserializeObject<T>(message.Message.Value);
+        }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -66,7 +81,7 @@ namespace RundownEditorCore.Services
                         {
                             if (message.Topic == "detail_lock")
                             {
-                                var messageObject = JsonConvert.DeserializeObject<DetailMessage>(message.Message.Value);
+                                var messageObject = ConvertMessageToJson<DetailMessage>(message);
                                 if (messageObject != null)
                                 {
                                     _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail?.UUID.ToString()}'");
@@ -75,8 +90,7 @@ namespace RundownEditorCore.Services
                             }
                             if (message.Topic == "story")
                             {
-                                Console.WriteLine($"Received message from TOPIC: {message.Topic}, KEY: {message.Message.Key}, VALUE: {message.Message.Value}");
-                                var messageObject = JsonConvert.DeserializeObject<ItemMessage>(message.Message.Value);
+                                var messageObject = ConvertMessageToJson<ItemMessage>(message);
                                 if (messageObject != null)
                                 {
                                     _logger.LogInformation($"MESSAGE: Ny detail tilføjet {messageObject.Item.Name}");
@@ -92,7 +106,7 @@ namespace RundownEditorCore.Services
                             if(message.Topic == "controlroom")
                             {
                                 _logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
-                                var messageObject = JsonConvert.DeserializeObject<ControlRoomMessage>(message.Message.Value);
+                                var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 var controlrooms = await _controlRoomService.GetControlRoomsAsync();
                                 _sharedStates.SharedControlRoom(controlrooms);
                             }
@@ -113,19 +127,18 @@ namespace RundownEditorCore.Services
 
         public void HandleRundownMessage(ConsumeResult<string, string> message)
         {
-            var messageObject = JsonConvert.DeserializeObject<RundownMessage>(message.Message.Value);
+            var messageObject = ConvertMessageToJson<RundownMessage>(message);
             if (messageObject?.Action == "update")
             {
                 _logger.LogInformation($"MESSAGE: Rundown opdateret UUID = {messageObject?.Rundown?.UUID}");
-                _sharedStates.SharedRundown(messageObject?.Rundown ?? new());
+                _sharedStates.SharedRundown(messageObject?.Rundown);
             }
             if (messageObject?.Action == "create")
             {
                 _logger.LogInformation($"MESSAGE: Ny Rundown oprettet {messageObject?.Rundown?.Name}");
-                _sharedStates.SharedNewRundown(messageObject?.Rundown ?? new());
+                _sharedStates.SharedNewRundown(messageObject?.Rundown);
             }
         }
-
     }
 
     public class ControlRoomMessage

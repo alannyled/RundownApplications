@@ -5,7 +5,7 @@ namespace RundownDbService.BLL.Interfaces
     public interface IRundownService
     {
         Task<List<Rundown>> GetAllRundownsAsync();
-        Task<Rundown> GetRundownByIdAsync(Guid uuid);
+        Task<Rundown?> GetRundownByIdAsync(Guid uuid);
         Task CreateRundownAsync(Rundown newRundown);
         Task<Rundown> UpdateRundownAsync(Guid uuid, Rundown updatedRundown);
         Task DeleteRundownAsync(Guid uuid);

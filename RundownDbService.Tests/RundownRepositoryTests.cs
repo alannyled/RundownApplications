@@ -26,7 +26,7 @@ namespace RundownDbService.Tests.DAL.Repositories
                 DatabaseName = "RundownDb"
             });
 
-            _rundownRepository = new RundownRepository(mongoDBSettings.Value);
+            _rundownRepository = new RundownRepository(mongoDBSettings);
         }
 
         public void Dispose()

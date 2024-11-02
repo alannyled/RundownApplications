@@ -5,7 +5,7 @@ namespace RundownEditorCore.States
     /// <summary>
     /// Modtager beskeder fra KafkaConsumerClient og opdaterer SharedStates
     /// Begge er singletons,
-    /// så det er for at have et sted at gemme data der skal deles mellem flere scoped services
+    /// For at have et sted at gemme data der skal deles mellem flere scoped services
     /// </summary>
     public class SharedStates
     {
@@ -15,15 +15,22 @@ namespace RundownEditorCore.States
             ItemUpdated,
             RundownUpdated,
             NewRundownAdded,
-            ControlRoomUpdated
+            ControlRoomsUpdated,
+            TemplatesUpdated
         }
 
-        public event Action<StateAction> OnChange;
+        public event Action<StateAction>? OnChange;
         public RundownItemDTO ItemUpdated { get; private set; } = new();
         public RundownDTO RundownUpdated { get; private set; } = new();
         public RundownDTO NewRundown { get; private set; } = new();
         public List<ControlRoomDTO> ControlRooms { get; private set; } = [];
+        public List<TemplateDTO> Templates { get; private set; } = [];
 
+
+        private void NotifyStateChanged(StateAction action)
+        {
+            OnChange?.Invoke(action);
+        }
 
         public void SharedItem(RundownItemDTO item)
         {
@@ -42,15 +49,18 @@ namespace RundownEditorCore.States
             NotifyStateChanged(StateAction.NewRundownAdded);
         }
 
-        public void SharedControlRoom(List<ControlRoomDTO> controlRoom)
+        public void SharedControlRoom(List<ControlRoomDTO> controlRooms)
         {
-            ControlRooms = controlRoom;
-            NotifyStateChanged(StateAction.ControlRoomUpdated);
+            ControlRooms = controlRooms;
+            NotifyStateChanged(StateAction.ControlRoomsUpdated);
         }
 
-        private void NotifyStateChanged(StateAction action)
+        public void SharedTemplates(List<TemplateDTO> templates)
         {
-            OnChange?.Invoke(action);
+            Templates = templates;
+            NotifyStateChanged(StateAction.TemplatesUpdated);
         }
+
+       
     }
 }

@@ -23,7 +23,7 @@ namespace RundownEditorCore.Services
                 return null;
             }
         }
-        public async Task<ControlRoomDTO?> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
+        public async Task<ControlRoomDTO> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
         {
             try
             {            

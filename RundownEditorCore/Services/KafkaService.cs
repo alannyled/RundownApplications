@@ -11,9 +11,8 @@ namespace RundownEditorCore.Services
 {
     public class KafkaService : IKafkaService
     {
-
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
-        private readonly KafkaProducerClient _producerClient;
+        private readonly KafkaProducerClient _producerClient;        
 
         public KafkaService()
         {
@@ -23,17 +22,13 @@ namespace RundownEditorCore.Services
                 .Build();
 
             _kafkaService = new KafkaServiceLibrary.KafkaService(configuration);
-            _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
-
+            _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");   
         }
         public virtual void SendMessage(string topic, string message)
         {           
             string key = Guid.NewGuid().ToString();
             _producerClient.Producer.Produce(topic, new Message<string, string> { Key = key, Value = message });                 
         }
-
-
-
     }
 
 
@@ -45,12 +40,14 @@ namespace RundownEditorCore.Services
         private DetailLockState _detailLockState;
         private SharedStates _sharedStates;
         private readonly ILogger<RundownService> _logger;
+        private readonly IControlRoomService _controlRoomService;
 
         public KafkaBackgroundService(
             KafkaServiceLibrary.KafkaService kafkaService,
             DetailLockState detailLockState,
             SharedStates sharedStates,
-            ILogger<RundownService> logger
+            ILogger<RundownService> logger,
+            IControlRoomService controlRoomService
             )
         {
 
@@ -58,6 +55,7 @@ namespace RundownEditorCore.Services
             _detailLockState = detailLockState;
             _sharedStates = sharedStates;
             _logger = logger;
+            _controlRoomService = controlRoomService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -105,7 +103,8 @@ namespace RundownEditorCore.Services
                             {
                                 _logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
                                 var messageObject = JsonConvert.DeserializeObject<ControlRoomMessage>(message.Message.Value);
-                                _sharedStates.SharedControlRoom(messageObject.ConrolRooms);
+                                var controlrooms = await _controlRoomService.GetControlRoomsAsync();
+                                _sharedStates.SharedControlRoom(controlrooms);
                             }
                         }
                         catch (JsonException ex)
@@ -141,7 +140,7 @@ namespace RundownEditorCore.Services
 
     public class ControlRoomMessage
     {
-        public List<ControlRoomDTO>? ConrolRooms { get; set; }
+        public string? Action { get; set; }
     }
     public class ItemMessage
     {

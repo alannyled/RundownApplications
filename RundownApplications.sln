@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemplateDbService", "Templa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownDbService.Tests", "RundownDbService.Tests\RundownDbService.Tests.csproj", "{CC76A1A5-E86F-49C9-A24E-25D83643F9C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AggregatorService.Tests", "AggregatorService.Tests\AggregatorService.Tests.csproj", "{37690E74-723E-4D02-A85F-F0CF5E3165EF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonClassLibrary", "CommonClassLibrary\CommonClassLibrary.csproj", "{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}"
 EndProject
 Global
@@ -73,10 +71,6 @@ Global
 		{CC76A1A5-E86F-49C9-A24E-25D83643F9C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC76A1A5-E86F-49C9-A24E-25D83643F9C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC76A1A5-E86F-49C9-A24E-25D83643F9C8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{37690E74-723E-4D02-A85F-F0CF5E3165EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37690E74-723E-4D02-A85F-F0CF5E3165EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37690E74-723E-4D02-A85F-F0CF5E3165EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{37690E74-723E-4D02-A85F-F0CF5E3165EF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}.Release|Any CPU.ActiveCfg = Release|Any CPU

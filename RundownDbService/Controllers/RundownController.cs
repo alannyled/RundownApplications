@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RundownDbService.BLL.Interfaces;
-using RundownDbService.BLL.Services;
-using RundownDbService.DTO;
 using CommonClassLibrary.DTO;
 using RundownDbService.Models;
-using System.Text.Json;
 
 namespace RundownDbService.Controllers
 {

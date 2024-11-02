@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace RundownEditorCore.DTO
+﻿namespace CommonClassLibrary.DTO
 {
     public class TemplateDTO
     {

@@ -51,14 +51,9 @@ namespace ControlRoomDbService.Controllers
                 };
 
                 await _controlroomCollection.InsertManyAsync(controlrooms);
-                var messageObject = new
-                {
-                    Action = "reset",
-                    ControlRooms = controlrooms
-                };
-                string message = JsonConvert.SerializeObject(messageObject);
-
+                string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = "reset" });
                 _kafkaService.SendMessage("controlroom", message);
+
                 return Ok("ControlRoom data nulstillet og seedet.");
             }
             catch (Exception ex)

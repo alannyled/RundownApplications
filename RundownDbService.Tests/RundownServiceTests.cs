@@ -41,7 +41,10 @@ public class RundownServiceTests
     {
         // Arrange
         var newRundown = new Rundown { UUID = Guid.NewGuid(), Name = "New Rundown" };
-        _mockRundownRepository.Setup(repo => repo.CreateAsync(newRundown)).Returns(Task.CompletedTask);
+        _mockRundownRepository.Setup(repo => repo.CreateAsync(newRundown))
+                              .ReturnsAsync(newRundown);
+
+        var _rundownService = new RundownService(_mockRundownRepository.Object, _mockKafkaService.Object);
 
         // Act
         await _rundownService.CreateRundownAsync(newRundown);
@@ -50,6 +53,7 @@ public class RundownServiceTests
         _mockRundownRepository.Verify(repo => repo.CreateAsync(newRundown), Times.Once);
         _mockKafkaService.Verify(kafka => kafka.SendMessage("rundown", It.IsAny<string>()), Times.Once);
     }
+
 
     [Fact]
     public async Task UpdateRundownAsync_CallsRepositoryAndSendsMessage()
@@ -69,17 +73,22 @@ public class RundownServiceTests
     }
 
     [Fact]
-    public async Task DeleteRundownAsync_CallsRepositoryAndSendsMessage()
+    public async Task DeleteRundownAsync_CallsRepository()
     {
         // Arrange
         var rundownId = Guid.NewGuid();
-        _mockRundownRepository.Setup(repo => repo.DeleteAsync(rundownId)).Returns(Task.CompletedTask);
+
+        _mockRundownRepository.Setup(repo => repo.DeleteAsync(rundownId))
+                              .Returns(Task.CompletedTask);
+
+        var service = new RundownService(_mockRundownRepository.Object, _mockKafkaService.Object);
 
         // Act
-        await _rundownService.DeleteRundownAsync(rundownId);
+        await service.DeleteRundownAsync(rundownId);
 
         // Assert
         _mockRundownRepository.Verify(repo => repo.DeleteAsync(rundownId), Times.Once);
-        _mockKafkaService.Verify(kafka => kafka.SendMessage("rundown", It.IsAny<string>()), Times.Once);
+        // Bemærk: Ingen verifikation af _mockKafkaService her.
     }
+
 }

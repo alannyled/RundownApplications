@@ -98,29 +98,48 @@
 </div>
 
 @code {
-    private List<ControlRoomDTO> controlRooms;
+    private List<ControlRoomDTO>? controlRooms;
     private ControlRoomDTO newControlRoom = new ControlRoomDTO();
-    private ControlRoomDTO editingControlRoom;
-    private ControlRoomDTO addingHardwareToRoom;
+    private ControlRoomDTO? editingControlRoom;
+    private ControlRoomDTO? addingHardwareToRoom;
     private HardwareDTO newHardware = new HardwareDTO();
-    private HardwareDTO editingHardware;
+    private HardwareDTO? editingHardware;
 
     protected override async Task OnInitializedAsync()
     {
         if (SharedStates.ControlRooms.Any())
         {
-            Console.WriteLine("Using shared control rooms");
             controlRooms = SharedStates.ControlRooms;
-          
         }
-        else{
-            Console.WriteLine("Fetching control rooms from API");
-            controlRooms = await ControlRoomService.GetControlRoomsAsync();
-            SharedStates.SharedControlRoom(controlRooms);
+        else
+        {
+            FetchControlRooms();
         }
-    
-       // controlRooms = await ControlRoomService.GetControlRoomsAsync();
+
+        SharedStates.OnChange += HandleSharedStateChange;
     }
+
+    /// <summary>
+    /// Håndtere ændringer i SharedStates forårsaget af Kafka beskeder
+    /// </summary>
+    private async void HandleSharedStateChange(SharedStates.StateAction action)
+    {
+        if (action == SharedStates.StateAction.ControlRoomsUpdated)
+        {
+            controlRooms = SharedStates.ControlRooms;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    /// <summary>
+    /// Henter ControlRooms fra API og gemmer dem i SharedStates,
+    /// hvis de ikke allerede findes der
+    /// </summary>
+    private void FetchControlRooms(){
+        controlRooms = ControlRoomService.GetControlRoomsAsync().Result;
+        SharedStates.SharedControlRoom(controlRooms);
+    }
+
     /// <summary>
     /// Nulstiller og lukker alle åbne forms
     /// </summary>
@@ -140,7 +159,6 @@
         }
 
         await ControlRoomService.CreateControlRoomAsync(newControlRoom);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync();
         newControlRoom = new ControlRoomDTO();
         return true;
     }
@@ -148,7 +166,6 @@
     /// <summary>
     /// Lukker åbne forms og viser redigeringsform for det valgte kontrolrum
     /// </summary>
-    /// <param name="id"></param>
     private void EditControlRoom(string id)
     {
         CancelEdit();
@@ -158,30 +175,28 @@
     private async Task UpdateControlRoomAsync()
     {
         await ControlRoomService.UpdateControlRoomAsync(editingControlRoom.Uuid.ToString(), editingControlRoom);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
         editingControlRoom = null; 
     }    
 
     private async Task DeleteControlRoom(string id)
     {
         await ControlRoomService.DeleteControlRoomAsync(id);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
         editingControlRoom = null;
     }
+
     /// <summary>
     /// Lukker åbne forms og viser form til at tilføje hardware til et kontrolrum
     /// </summary>
-    /// <param name="controlRoomId"></param>
     private void AddHardware(string controlRoomId)
     {
         CancelEdit();
         addingHardwareToRoom = controlRooms.FirstOrDefault(room => room.Uuid.ToString() == controlRoomId);
         newHardware = new HardwareDTO { ControlRoomId = controlRoomId };
     }
+
     /// <summary>
     /// Lukker åbne forms og viser form til at redigere hardware
     /// </summary>
-    /// <param name="id"></param>
     private void EditHardware(string id)
     {
         CancelEdit();
@@ -191,7 +206,6 @@
     private async Task CreateHardwareAsync()
     {
         await HardwareService.AddHardwareAsync(newHardware);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
         newHardware = new HardwareDTO(); 
         addingHardwareToRoom = null;
     }
@@ -199,14 +213,20 @@
     private async Task UpdateHardwareAsync()
     {
         await HardwareService.UpdateHardwareAsync(editingHardware.Uuid, editingHardware);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync(); 
         editingHardware = null; 
     }
 
     private async Task DeleteHardware(string id)
     {
         await HardwareService.DeleteHardwareAsync(id);
-        controlRooms = await ControlRoomService.GetControlRoomsAsync();
         editingHardware = null; 
+    }
+
+    /// <summary>
+    /// Fjerner abonnementet for at undgå memory leaks
+    /// </summary>
+    public void Dispose()
+    {
+        SharedStates.OnChange -= HandleSharedStateChange;
     }
 }

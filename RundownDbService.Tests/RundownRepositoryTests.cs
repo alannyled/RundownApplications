@@ -1,42 +1,47 @@
 ﻿//using Xunit;
 //using Moq;
 //using MongoDB.Driver;
-//using Microsoft.Extensions.Options;
 //using RundownDbService.DAL.Repositories;
 //using RundownDbService.Models;
-//using RundownDbService.DAL;
-//using System.Threading.Tasks;
+//using Microsoft.Extensions.Options;
 //using System;
 //using System.Collections.Generic;
 //using System.Threading;
+//using System.Threading.Tasks;
+
+//namespace RundownDbService.DAL
+//{
+//    public class MongoDBSettings
+//    {
+//        public string ConnectionString { get; set; } = string.Empty;
+//        public string DatabaseName { get; set; } = string.Empty;
+//    }
+//}
 
 //public class RundownRepositoryTests
 //{
 //    private readonly Mock<IMongoCollection<Rundown>> _mockRundownCollection;
-//    private readonly Mock<IOptions<MongoDBSettings>> _mockMongoSettings;
-//    private readonly Mock<IMongoClient> _mockMongoClient;
 //    private readonly Mock<IMongoDatabase> _mockMongoDatabase;
+//    private readonly Mock<IOptions<RundownDbService.DAL.MongoDBSettings>> _mockMongoDBSettings;
 //    private readonly RundownRepository _rundownRepository;
 
 //    public RundownRepositoryTests()
 //    {
 //        _mockRundownCollection = new Mock<IMongoCollection<Rundown>>();
-//        _mockMongoSettings = new Mock<IOptions<MongoDBSettings>>();
-//        _mockMongoClient = new Mock<IMongoClient>();
 //        _mockMongoDatabase = new Mock<IMongoDatabase>();
+//        _mockMongoDBSettings = new Mock<IOptions<RundownDbService.DAL.MongoDBSettings>>();
 
-//        _mockMongoSettings.Setup(s => s.Value).Returns(new MongoDBSettings
-//        {
-//            ConnectionString = "mongodb://localhost:27017",
-//            DatabaseName = "TestDatabase"
-//        });
-
-//        _mockMongoClient.Setup(c => c.GetDatabase("TestDatabase", null))
-//                        .Returns(_mockMongoDatabase.Object);
 //        _mockMongoDatabase.Setup(db => db.GetCollection<Rundown>("Rundowns", null))
 //                          .Returns(_mockRundownCollection.Object);
 
-//        _rundownRepository = new RundownRepository(_mockMongoSettings.Object);
+//        var mongoSettings = new RundownDbService.DAL.MongoDBSettings
+//        {
+//            ConnectionString = "mongodb://localhost:27017",
+//            DatabaseName = "RundownDb"
+//        };
+//        _mockMongoDBSettings.Setup(s => s.Value).Returns(mongoSettings);
+
+//        _rundownRepository = new RundownRepository(_mockMongoDBSettings.Object);
 //    }
 
 //    [Fact]
@@ -61,7 +66,7 @@
 
 //        // Assert
 //        Assert.NotNull(result);
-//        Assert.Equal(2, result.Count);
+//        Assert.Equal(mockRundowns.Count, result.Count);
 //    }
 
 //    [Fact]
@@ -76,10 +81,10 @@
 //        cursor.Setup(_ => _.Current).Returns(new List<Rundown> { mockRundown });
 
 //        _mockRundownCollection
-//            .Setup(x => x.FindAsync(It.IsAny<FilterDefinition<Rundown>>(),
+//            .Setup(x => x.FindSync(It.IsAny<FilterDefinition<Rundown>>(),
 //                                    It.IsAny<FindOptions<Rundown>>(),
 //                                    It.IsAny<CancellationToken>()))
-//            .ReturnsAsync(cursor.Object);
+//            .Returns(cursor.Object);
 
 //        // Act
 //        var result = await _rundownRepository.GetByIdAsync(mockRundown.UUID);
@@ -87,26 +92,6 @@
 //        // Assert
 //        Assert.NotNull(result);
 //        Assert.Equal(mockRundown.UUID, result.UUID);
-//    }
-
-//    [Fact]
-//    public async Task DeleteAsync_DeletesRundown()
-//    {
-//        // Arrange
-//        var rundownId = Guid.NewGuid();
-
-//        _mockRundownCollection
-//            .Setup(x => x.DeleteOneAsync(It.IsAny<FilterDefinition<Rundown>>(),
-//                                         It.IsAny<CancellationToken>()))
-//            .ReturnsAsync(DeleteResult.acknowledged(1));
-
-//        // Act
-//        await _rundownRepository.DeleteAsync(rundownId);
-
-//        // Assert
-//        _mockRundownCollection.Verify(x => x.DeleteOneAsync(It.Is<FilterDefinition<Rundown>>(f => f.ToString().Contains(rundownId.ToString())),
-//                                                            It.IsAny<CancellationToken>()),
-//                                      Times.Once);
 //    }
 
 //    [Fact]
@@ -124,5 +109,23 @@
 //                                                            It.IsAny<CancellationToken>()),
 //                                      Times.Once);
 //    }
-//}
 
+//    [Fact]
+//    public async Task UpdateAsync_UpdatesRundown()
+//    {
+//        // Arrange
+//        var rundownId = Guid.NewGuid();
+//        var updatedRundown = new Rundown { UUID = rundownId, ControlRoomId = Guid.NewGuid() };
+
+//        // Act
+//        await _rundownRepository.UpdateAsync(rundownId, updatedRundown);
+
+//        // Assert
+//        _mockRundownCollection.Verify(x => x.ReplaceOneAsync(
+//            It.Is<FilterDefinition<Rundown>>(f => f != null),
+//            updatedRundown,
+//            It.IsAny<ReplaceOptions>(),
+//            It.IsAny<CancellationToken>()),
+//            Times.Once);
+//    }
+//}

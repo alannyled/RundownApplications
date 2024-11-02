@@ -13,7 +13,8 @@ namespace AggregatorService.Services
         public override async Task<string> FetchData(string url)
         {
             var cachedData = await _cacheService.GetDataAsync<string>(ControlRoomCacheKey);
-            if (cachedData != null) return cachedData;
+            // cache er slået fra pt. fordi den konflikter med DataSeed til demo, som er lidt "chrash kode" der på sigt ikke skal bruges
+            //if (cachedData != null) return cachedData;
        
             var response = await _httpClient.GetStringAsync(url);
             _cacheService.SetData(ControlRoomCacheKey, response, TimeSpan.FromHours(3));

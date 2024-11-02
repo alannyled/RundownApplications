@@ -76,6 +76,7 @@
 
     protected override void OnInitialized()
     {
+        ControlRooms = SharedStates.ControlRooms;
         SharedStates.OnChange += HandleSharedStateChange;
     }
     /// <summary>

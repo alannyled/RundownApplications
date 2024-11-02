@@ -21,6 +21,8 @@ builder.Services.AddScoped<IHardwareRepository, HardwareRepository>();
 builder.Services.AddScoped<IControlRoomService, ControlRoomService>();
 builder.Services.AddScoped<IHardwareService, HardwareService>();
 
+builder.Services.AddSingleton<IKafkaService, KafkaService>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

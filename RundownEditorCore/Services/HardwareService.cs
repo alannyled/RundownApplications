@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using CommonClassLibrary.DTO;
 using RundownEditorCore.Interfaces;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace RundownEditorCore.Services
 {
@@ -11,9 +12,11 @@ namespace RundownEditorCore.Services
 
         public async Task<List<HardwareDTO>> GetHardwareAsync()
         {
-            throw new NotImplementedException();
+            return await Task.FromResult(new List<HardwareDTO>());
         }
-        public async Task<HardwareDTO?> AddHardwareAsync(HardwareDTO newHardware)
+
+
+        public async Task<HardwareDTO> AddHardwareAsync(HardwareDTO newHardware)
         {
             try
             {

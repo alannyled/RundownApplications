@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging.Console;
-using RundownEditorCore.DTO;
+using CommonClassLibrary.DTO;
 using RundownEditorCore.Interfaces;
 
 namespace RundownEditorCore.Services

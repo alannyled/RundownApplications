@@ -105,6 +105,7 @@
     {
         controlRooms = await ControlRoomService.GetControlRoomsAsync();
         AllTemplates = await TemplateService.GetAllTemplatesAsync();
+        SharedStates.SharedControlRoom(controlRooms);
         await GetAndFilterRundowns();
 
         SharedStates.OnChange += HandleSharedStateChange;   
@@ -112,6 +113,7 @@
     }
     /// <summary>
     /// Håndtere ændringer i SharedStates forårsaget af Kafka beskeder
+    /// og bestemte StateActions
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
@@ -162,7 +164,7 @@
     }
 
     ///<summary>
-    /// Kalder rending af Modal med CreateNewRundownForm
+    /// Kalder rendering af Modal med CreateNewRundownForm
     /// </summary>
     private void ShowCreateNewRundownForm()
     {

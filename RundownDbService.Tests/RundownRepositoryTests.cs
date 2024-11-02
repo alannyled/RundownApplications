@@ -9,10 +9,10 @@ namespace RundownDbService.Tests.DAL.Repositories
 {
     public class RundownRepositoryTests : IDisposable
     {
-        private MongoDbRunner _runner;
-        private IMongoClient _client;
-        private IMongoDatabase _database;
-        private RundownRepository _rundownRepository;
+        private readonly MongoDbRunner _runner;
+        private readonly MongoClient _client;
+        private readonly IMongoDatabase _database;
+        private readonly RundownRepository _rundownRepository;
 
         public RundownRepositoryTests()
         {
@@ -39,7 +39,7 @@ namespace RundownDbService.Tests.DAL.Repositories
         {
             // Arrange
             var collection = _database.GetCollection<Rundown>("Rundowns");
-            var expectedRundowns = new List<Rundown> { new Rundown { UUID = Guid.NewGuid() }, new Rundown { UUID = Guid.NewGuid() } };
+            var expectedRundowns = new List<Rundown> { new() { UUID = Guid.NewGuid() }, new() { UUID = Guid.NewGuid() } };
             await collection.InsertManyAsync(expectedRundowns);
 
             // Act

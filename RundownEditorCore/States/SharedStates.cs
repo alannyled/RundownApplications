@@ -16,7 +16,8 @@ namespace RundownEditorCore.States
             RundownUpdated,
             NewRundownAdded,
             ControlRoomsUpdated,
-            TemplatesUpdated
+            TemplatesUpdated,
+            OnlineStatusUpdated
         }
 
         public event Action<StateAction>? OnChange;
@@ -25,9 +26,10 @@ namespace RundownEditorCore.States
         public RundownDTO NewRundown { get; private set; } = new();
         public List<ControlRoomDTO> ControlRooms { get; private set; } = [];
         public List<TemplateDTO> Templates { get; private set; } = [];
+        public Dictionary<string, bool> OnlineStatus { get; private set; } = [];
 
 
-        private void NotifyStateChanged(StateAction action)
+        internal void NotifyStateChanged(StateAction action)
         {
             OnChange?.Invoke(action);
         }
@@ -59,6 +61,12 @@ namespace RundownEditorCore.States
         {
             Templates = templates;
             NotifyStateChanged(StateAction.TemplatesUpdated);
+        }
+
+        public void SharedOnlineStatus(Dictionary<string, bool> onlineStatus)
+        {
+            OnlineStatus = onlineStatus;
+            NotifyStateChanged(StateAction.OnlineStatusUpdated);
         }
 
        

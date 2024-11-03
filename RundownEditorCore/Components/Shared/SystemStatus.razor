@@ -1,0 +1,56 @@
+﻿<div class="card-body border-top border-bottom">
+    <h3>System status</h3>
+
+    @if (systemsUp)
+    {
+        <ul class="list-group">
+            <li class="list-group-item list-group-item-success mb-1">Alle services er online</li>
+        </ul>
+    }
+    else
+    {
+        <p>Følgende services er nede:</p>
+        <ul class="list-group">
+            @foreach (var service in offlineSystems)
+            {
+                <li class="list-group-item list-group-item-danger mb-1">@(service)</li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Inject] private SharedStates SharedStates { get; set; } = default!;
+    private bool systemsUp = true;
+    private List<string> offlineSystems = new();
+
+    protected override void OnInitialized()
+    {
+        SharedStates.OnChange += HandleStateChange;
+        UpdateSystemStatus();
+    }
+
+    private void HandleStateChange(SharedStates.StateAction action)
+    {
+        if (action == SharedStates.StateAction.OnlineStatusUpdated)
+        {
+            UpdateSystemStatus();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void UpdateSystemStatus()
+    {
+        offlineSystems = SharedStates.OnlineStatus
+            .Where(s => !s.Value)
+            .Select(s => s.Key)
+            .ToList();
+
+        systemsUp = offlineSystems.Count == 0;
+    }
+
+    public void Dispose()
+    {
+        SharedStates.OnChange -= HandleStateChange;
+    }
+}

@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownDbService.Tests", "R
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonClassLibrary", "CommonClassLibrary\CommonClassLibrary.csproj", "{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaRelationDialogApp", "MediaRelationDialogApp\MediaRelationDialogApp.csproj", "{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaRelationDialogApp", "MediaRelationDialogApp\MediaRelationDialogApp.csproj", "{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace CommonClassLibrary.DTO
+﻿namespace CommonClassLibrary.DTO
 {
     public class DetailDTO
     {

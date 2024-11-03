@@ -1,28 +1,41 @@
 ﻿using System.Net.Sockets;
+using Microsoft.Extensions.Hosting;
+using RundownEditorCore.States;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RundownEditorCore.Services
 {
-    public class HealthCheckService : IDisposable
+    public class HealthCheckService : BackgroundService, IDisposable
     {
         private readonly Dictionary<string, string> _services;
-        public Dictionary<string, bool> OnlineStatus { get; private set; }
+        private readonly SharedStates _sharedStates;
         private readonly HttpClient _httpClient;
 
-        public HealthCheckService(Dictionary<string, string> services)
+        public HealthCheckService(Dictionary<string, string> services, SharedStates sharedStates)
         {
             _services = services;
-            OnlineStatus = new Dictionary<string, bool>();
+            _sharedStates = sharedStates;
             _httpClient = new HttpClient();
-            foreach (var s in services)
+            _sharedStates.SharedOnlineStatus(_services.ToDictionary(s => s.Key, _ => false)); // Init alle som offline
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
             {
-                OnlineStatus[s.Key] = false; // Init alle som offline
+                var updatedStatus = await CheckHealthAsync();
+                _sharedStates.SharedOnlineStatus(updatedStatus);
+                _sharedStates.NotifyStateChanged(SharedStates.StateAction.OnlineStatusUpdated);
+
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // Kør hvert 30. sekund
             }
         }
-        /// <summary>
-        /// Tjekker sundheden af både HTTP og TCP-baserede tjenester i listen.
-        /// </summary>
-        public async Task CheckHealthAsync()
+
+        public async Task<Dictionary<string, bool>> CheckHealthAsync()
         {
+            var updatedStatus = new Dictionary<string, bool>();
+
             foreach (var s in _services)
             {
                 try
@@ -32,27 +45,21 @@ namespace RundownEditorCore.Services
                     if (uri.Scheme == "http" || uri.Scheme == "https")
                     {
                         var response = await _httpClient.GetAsync(uri);
-                        OnlineStatus[s.Key] = response.IsSuccessStatusCode;
+                        updatedStatus[s.Key] = response.IsSuccessStatusCode;
                     }
                     else
-                    {   // TCP eller andre ikke-HTTP tjenester
-                        OnlineStatus[s.Key] = await PingHostAsync(uri.Host, uri.Port);
+                    {
+                        updatedStatus[s.Key] = await PingHostAsync(uri.Host, uri.Port);
                     }
                 }
-                catch (HttpRequestException)
+                catch
                 {
-                    OnlineStatus[s.Key] = false;
-                }
-                catch (Exception)
-                {
-                    OnlineStatus[s.Key] = false;
+                    updatedStatus[s.Key] = false;
                 }
             }
+            return updatedStatus;
         }
 
-        /// <summary>
-        /// Metode til at tjekke om en TCP port er åben (Feks. Kafka/ZooKeeper)
-        /// </summary>
         private async Task<bool> PingHostAsync(string host, int port)
         {
             try
@@ -69,9 +76,10 @@ namespace RundownEditorCore.Services
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             _httpClient.Dispose();
+            base.Dispose();
         }
     }
 }

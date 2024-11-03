@@ -60,6 +60,31 @@ builder.Services.AddSingleton<IMessageBuilderService, MessageBuilderService>();
 builder.Services.AddHostedService<KafkaBackgroundService>();
 builder.Services.AddScoped<ThemeService>();
 
+builder.Services.AddHostedService(provider =>
+    new HealthCheckService(
+        new Dictionary<string, string>
+        {
+            {"Database Rundown Primary", "http://localhost:27027" },
+            {"Database Rundown Seconday", "http://localhost:27028" },
+            {"Database Template Primary", "http://localhost:27037" },
+            {"Database Template Secondary", "http://localhost:27038" },
+            {"Database ControlRoom Primary", "http://localhost:27017" },
+            {"Database ControlRoom Secondary", "http://localhost:27018" },
+            {"Kafka ZooKeeper", "tcp://localhost:2181" },
+            {"Kafka Message Broker", "tcp://localhost:9092" },
+            {"API Gateway", "tcp://localhost:3000" },
+            {"MicroService Aggregator SSL", "https://localhost:3010/health" },
+            {"MicroService Aggregator", "http://localhost:3011/health" },
+            {"MicroService ControlRoom SSL", "https://localhost:3020/health" },
+            {"MicroService ControlRoom", "http://localhost:3021/health" },
+            {"MicroService Rundown SSL", "https://localhost:3030/health" },
+            {"MicroService Rundown", "http://localhost:3031/health" },
+            {"MicroService Template SSL", "https://localhost:3040/health" },
+            {"MicroService Template", "http://localhost:3041/health" }
+        },
+        provider.GetRequiredService<SharedStates>()
+    ));
+
 
 
 builder.Services.AddRazorPages();

@@ -1,4 +1,5 @@
 ﻿@page "/status"
+@inject RundownEditorCore.States.SharedStates SharedStates
 
 @attribute [Authorize(Roles = "Administrator")]
 <PageTitle>Online Status</PageTitle>
@@ -7,12 +8,11 @@
     <div class="row">
         <div class="col-xl-4">
             <h3>Online Status</h3>
-            @foreach (var db in HealthService.OnlineStatus)
+            @foreach (var db in SharedStates.OnlineStatus)
             {
                 <ul class="list-group list-group-horizontal mb-1">
                     <li class="list-group-item w-75 fw-bold">@(db.Key)</li>
                     <li class="list-group-item w-25 text-end @(db.Value ? "list-group-item-success" : "list-group-item-danger")">@(db.Value ? "Online" : "Offline")</li>
-
                 </ul>
             }
         </div>
@@ -37,53 +37,23 @@
         </div>
     </div>
 </div>
+
 @code {
-    private HealthCheckService HealthService;
-    private System.Threading.Timer _timer;
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var services = new Dictionary<string, string>
-        {
-            {"Database Rundown Primary", "http://localhost:27027" },
-            {"Database Rundown Seconday", "http://localhost:27028" },
-            {"Database Template Primary", "http://localhost:27037" },
-            {"Database Template Secondary", "http://localhost:27038" },
-            {"Database ControlRoom Primary", "http://localhost:27017" },
-            {"Database ControlRoom Secondary", "http://localhost:27018" },
-            {"Kafka ZooKeeper", "tcp://localhost:2181" },
-            {"Kafka Message Broker", "tcp://localhost:9092" },
-            {"API Gateway", "tcp://localhost:3000" },
-            {"MicroService Aggregator SSL", "https://localhost:3010/health" },
-            {"MicroService Aggregator", "http://localhost:3011/health" },
-            {"MicroService ControlRoom SSL", "https://localhost:3020/health" },
-            {"MicroService ControlRoom", "http://localhost:3021/health" },
-            {"MicroService Rundown SSL", "https://localhost:3030/health" },
-            {"MicroService Rundown", "http://localhost:3031/health" },
-            {"MicroService Template SSL", "https://localhost:3040/health" },
-            {"MicroService Template", "http://localhost:3041/health" }
-        };
-
-        HealthService = new HealthCheckService(services);
-        await HealthService.CheckHealthAsync();
-
-
-        _timer = new System.Threading.Timer(async _ =>
-        {
-            await UpdateHealth();
-        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(30)); // Tjek hvert 30. sekund
+        SharedStates.OnChange += HandleStateChange;
     }
 
-    private async Task UpdateHealth()
+    private void HandleStateChange(SharedStates.StateAction action)
     {
-        await HealthService.CheckHealthAsync();
-        await InvokeAsync(StateHasChanged);
+        if (action == SharedStates.StateAction.OnlineStatusUpdated)
+        {
+            InvokeAsync(StateHasChanged); 
+        }
     }
-
 
     public void Dispose()
     {
-        HealthService?.Dispose();
-        _timer?.Dispose();
+        SharedStates.OnChange -= HandleStateChange;
     }
 }

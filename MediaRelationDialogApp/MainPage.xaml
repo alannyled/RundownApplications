@@ -5,7 +5,6 @@
 
     <ContentPage.Resources>
         <services:DateTimeOffsetToStringConverter x:Key="DateTimeOffsetToStringConverter"/>
-        <services:SelectedItemToColorConverter x:Key="SelectedItemToColorConverter"/>
     </ContentPage.Resources>
 
     <VerticalStackLayout Padding="20" Spacing="20">
@@ -24,12 +23,25 @@
         <Grid ColumnDefinitions="*, *, *" ColumnSpacing="10">
 
             <!-- Rundown List -->
-            <CollectionView Grid.Column="0" ItemsSource="{Binding Records}" SelectionMode="Single" 
-                SelectedItem="{Binding SelectedRecord, Mode=TwoWay}">
+            <CollectionView Grid.Column="0" ItemsSource="{Binding Rundowns}" SelectionMode="Single" 
+                    SelectedItem="{Binding SelectedRundown, Mode=TwoWay}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="10" Margin="5" BorderColor="LightGray" CornerRadius="10"
-                                BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedItemToColorConverter}}">
+                        <Frame Padding="10" Margin="5" BorderColor="LightGray" CornerRadius="10">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="LightYellow"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
                             <StackLayout>
                                 <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold"/>
                                 <Label Text="{Binding BroadcastDate, StringFormat='Udsendelse: {0:dd-MM-yyyy}'}" FontSize="14"/>
@@ -41,12 +53,25 @@
             </CollectionView>
 
             <!-- Item List for Selected Rundown -->
-            <CollectionView Grid.Column="1" ItemsSource="{Binding SelectedRecord.Items}" SelectionMode="Single"
-                SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+            <CollectionView Grid.Column="1" ItemsSource="{Binding SelectedRundown.Items}" SelectionMode="Single"
+                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="10" Margin="5" BorderColor="LightGray" CornerRadius="10"
-                   BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedItemToColorConverter}}">
+                        <Frame Padding="10" Margin="5" BorderColor="LightGray" CornerRadius="10">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="LightYellow"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
                             <StackLayout>
                                 <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold"/>
                                 <Label Text="{Binding Duration}" FontSize="14"/>
@@ -59,11 +84,24 @@
 
             <!-- Detail List for Selected Item -->
             <CollectionView Grid.Column="2" ItemsSource="{Binding SelectedItem.Details}" SelectionMode="Single"
-                SelectedItem="{Binding SelectedDetail, Mode=TwoWay}">
+                    SelectedItem="{Binding SelectedDetail, Mode=TwoWay}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="10" Margin="5" BorderColor="LightGray" CornerRadius="10"
-                   BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedItemToColorConverter}}">
+                        <Frame Padding="10" Margin="5" BorderColor="LightGray" CornerRadius="10">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="LightYellow"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
                             <StackLayout>
                                 <Label Text="{Binding Title}" FontSize="18" FontAttributes="Bold"/>
                                 <Label Text="{Binding Type}" FontSize="14"/>
@@ -73,7 +111,9 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
         </Grid>
+
 
         <!-- Grid Layout for Buttons -->
         <Grid ColumnDefinitions="*, *, *" ColumnSpacing="10" Margin="0,20,0,0">

@@ -11,31 +11,31 @@ namespace MediaRelationDialogApp.ViewModels
     {
         private readonly ApiService _apiService;
 
-        public ObservableCollection<RundownDTO> Records { get; set; } = new ObservableCollection<RundownDTO>();
+        public ObservableCollection<RundownDTO> Rundowns { get; set; } = [];
 
-        private RundownDTO _selectedRecord;
-        public RundownDTO SelectedRecord
+        private RundownDTO _selectedRundown;
+        public RundownDTO SelectedRundown
         {
-            get => _selectedRecord;
+            get => _selectedRundown;
             set
             {
-                _selectedRecord = value;
-                OnPropertyChanged(nameof(SelectedRecord));
-                OnPropertyChanged(nameof(IsRecordSelected));
+                _selectedRundown = value;
+                OnPropertyChanged(nameof(SelectedRundown));
+                OnPropertyChanged(nameof(IsRundownSelected));
                 UpdateCommandStates();
                 SelectedItem = null;
                 SelectedDetail = null;
 
-                if (_selectedRecord == null)
+                if (_selectedRundown == null)
                 {
                     StatusMessage = "Vælg venligst en rækkefølge først.";
                 }
                 else
                 {
-                    StatusMessage = $"Valgt rækkefølge: {_selectedRecord.Name}";
+                    StatusMessage = $"Valgt rækkefølge: {_selectedRundown.Name}";
                 }
             }
-        }
+        }        
 
         private RundownItemDTO _selectedItem;
         public RundownItemDTO SelectedItem
@@ -55,7 +55,7 @@ namespace MediaRelationDialogApp.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Valgt historie: {_selectedRecord.Name} \u2192 {_selectedItem.Name}";
+                    StatusMessage = $"Valgt historie: {_selectedRundown.Name} \u2192 {_selectedItem.Name}";
                 }
             }
         }
@@ -77,12 +77,12 @@ namespace MediaRelationDialogApp.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Valgt element: {_selectedRecord.Name} \u2192 {_selectedItem.Name} \u2192 {_selectedDetail.Title}";
+                    StatusMessage = $"Valgt element: {_selectedRundown.Name} \u2192 {_selectedItem.Name} \u2192 {_selectedDetail.Title}";
                 }
             }
         }
 
-        public bool IsRecordSelected => SelectedRecord != null;
+        public bool IsRundownSelected => SelectedRundown != null;
         public bool IsItemSelected => SelectedItem != null;
         public bool IsDetailSelected => SelectedDetail != null;
         public bool IsFileSelected => _selectedFile != null;
@@ -104,7 +104,7 @@ namespace MediaRelationDialogApp.ViewModels
         }
 
         // Property for at tjekke om knappen skal kunne aktiveres
-        public bool CanSaveDetail => IsRecordSelected && IsItemSelected && IsDetailSelected && IsFileSelected;
+        public bool CanSaveDetail => IsRundownSelected && IsItemSelected && IsDetailSelected && IsFileSelected;
 
         // Hent data fra API'et
         private async Task LoadDataAsync()
@@ -112,14 +112,17 @@ namespace MediaRelationDialogApp.ViewModels
             try
             {
                 StatusMessage = "Henter rækkefølger fra databasen...";
-                var rundowns = await _apiService.GetRecordsAsync();
+                var rundowns = await _apiService.GetRundownsAsync();
 
-                Records.Clear();
-                if (rundowns != null && rundowns.Any())
+                Rundowns.Clear();
+                if (rundowns != null && rundowns.Count != 0)
                 {
                     foreach (var rundown in rundowns)
                     {
-                        Records.Add(rundown);
+                        if (rundown.ArchivedDate == null)
+                        {
+                            Rundowns.Add(rundown);
+                        }
                     }
                     StatusMessage = "Rækkefølger hentet!";
                 }
@@ -139,11 +142,11 @@ namespace MediaRelationDialogApp.ViewModels
         // Nulstil udvalgte elementer ved genindlæsning
         private async Task ReloadDataAsync()
         {
-            SelectedRecord = null;
-            Records.Clear();
+            SelectedRundown = null;
+            Rundowns.Clear();
             _selectedFile = null;
             OnPropertyChanged(nameof(IsFileSelected));
-            OnPropertyChanged(nameof(IsRecordSelected));
+            OnPropertyChanged(nameof(IsRundownSelected));
             OnPropertyChanged(nameof(IsItemSelected));
             OnPropertyChanged(nameof(IsDetailSelected));
             StatusMessage = "Data nulstillet og genindlæses...";
@@ -190,7 +193,7 @@ namespace MediaRelationDialogApp.ViewModels
             {
                 SelectedDetail.VideoPath = _selectedFile.FullPath;
 
-                var response = await _apiService.UpdateDetailAsync(SelectedRecord.UUID, SelectedDetail);
+                var response = await _apiService.UpdateDetailAsync(SelectedRundown.UUID, SelectedDetail);
 
                 if (response != null)
                 {

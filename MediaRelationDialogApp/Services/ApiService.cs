@@ -17,8 +17,8 @@ namespace MediaRelationDialogApp.Services
            // _httpClient.BaseAddress = new Uri("https://localhost:3010/api/Rundown"); 
         }
 
-        // GET: Hent en liste af records
-        public async Task<List<RundownDTO>> GetRecordsAsync()
+        // GET: Hent en liste af rundowns
+        public async Task<List<RundownDTO>> GetRundownsAsync()
         {
             var response = await _httpClient.GetAsync("https://localhost:3010/api/Rundown/fetch-rundowns-with-controlrooms");
             response.EnsureSuccessStatusCode();

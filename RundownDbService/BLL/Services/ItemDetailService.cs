@@ -20,7 +20,6 @@ namespace RundownDbService.BLL.Services
                 "Kommentar" => new ItemDetailComment(),
                 "Voiceover" => new ItemDetailTeleprompter(),
                 _ => new ItemDetail()
-
             };
         }      
 

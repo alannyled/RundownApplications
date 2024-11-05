@@ -28,7 +28,7 @@ namespace MediaRelationDialogApp.ViewModels
 
                 if (_selectedRundown == null)
                 {
-                    StatusMessage = "Vælg venligst en rækkefølge først.";
+                    StatusMessage = "Vælg en rækkefølge først.";
                 }
                 else
                 {
@@ -51,7 +51,7 @@ namespace MediaRelationDialogApp.ViewModels
 
                 if (_selectedItem == null)
                 {
-                    StatusMessage = "Vælg venligst en historie";
+                    StatusMessage = "Vælg en historie";
                 }
                 else
                 {
@@ -73,7 +73,7 @@ namespace MediaRelationDialogApp.ViewModels
 
                 if (_selectedDetail == null)
                 {
-                    StatusMessage = "Vælg venligst et element.";
+                    StatusMessage = "Vælg et video element.";
                 }
                 else
                 {
@@ -93,6 +93,10 @@ namespace MediaRelationDialogApp.ViewModels
         public ICommand SaveCommand { get; }
         public ICommand ReloadCommand { get; }
 
+
+        /// <summary>
+        /// Opsætning af MainPageViewModel
+        /// </summary>
         public MainPageViewModel(ApiService apiService)
         {
             _apiService = apiService;
@@ -103,10 +107,14 @@ namespace MediaRelationDialogApp.ViewModels
             LoadDataAsync();
         }
 
-        // Property for at tjekke om knappen skal kunne aktiveres
+        /// <summary>
+        /// Aktiver gem knap, hvis alle valg er foretaget
+        /// </summary>
         public bool CanSaveDetail => IsRundownSelected && IsItemSelected && IsDetailSelected && IsFileSelected;
 
-        // Hent data fra API'et
+        /// <summary>
+        /// Henter rækkefølger fra Rundown API
+        /// </summary>
         private async Task LoadDataAsync()
         {
             try
@@ -139,21 +147,34 @@ namespace MediaRelationDialogApp.ViewModels
             }
         }
 
-        // Nulstil udvalgte elementer ved genindlæsning
+        /// <summary>
+        /// Nulsitller valgte elementer og genindlæser data
+        /// </summary>
+        /// <returns></returns>
         private async Task ReloadDataAsync()
         {
-            SelectedRundown = null;
             Rundowns.Clear();
+            ResetAllChoices();
+            StatusMessage = "Data nulstillet og genindlæses...";
+            await LoadDataAsync();
+        }
+
+        /// <summary>
+        /// Nulstiller valgte elementer
+        /// </summary>
+        private void ResetAllChoices()
+        {
+            SelectedRundown = null;           
             _selectedFile = null;
             OnPropertyChanged(nameof(IsFileSelected));
             OnPropertyChanged(nameof(IsRundownSelected));
             OnPropertyChanged(nameof(IsItemSelected));
             OnPropertyChanged(nameof(IsDetailSelected));
-            StatusMessage = "Data nulstillet og genindlæses...";
-            await LoadDataAsync();
         }
 
-        // Filvælger
+        /// <summary>
+        /// Filvalg og aktivering af gem knap
+        /// </summary>
         private async Task PickFileAsync()
         {
             if (!IsDetailSelected)
@@ -168,7 +189,7 @@ namespace MediaRelationDialogApp.ViewModels
                 if (_selectedFile != null)
                 {
                     StatusMessage = $"Valgte fil: {_selectedFile.FileName}";
-                    UpdateCommandStates(); // Aktiverer Gem knappen, hvis både fil og detail er valgt
+                    UpdateCommandStates(); 
                 }
                 else
                 {
@@ -181,6 +202,11 @@ namespace MediaRelationDialogApp.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gemmer valgt historie med tilhørende fil
+        /// Nullstiller valgte elementer
+        /// </summary>
+        /// <returns></returns>
         public async Task SaveDetailAsync()
         {
             if (!CanSaveDetail)
@@ -198,6 +224,7 @@ namespace MediaRelationDialogApp.ViewModels
                 if (response != null)
                 {
                     StatusMessage = "Historie opdateret succesfuldt!";
+                    ResetAllChoices();
                 }
                 else
                 {
@@ -223,11 +250,18 @@ namespace MediaRelationDialogApp.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Eventhandler til at opdatere view ved ændringer
+        /// </summary>
+        /// <param name="propertyName"></param>
         protected virtual void OnPropertyChanged(string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        /// <summary>
+        /// Opdaterer kommandoer
+        /// </summary>
         private void UpdateCommandStates()
         {
             OnPropertyChanged(nameof(CanSaveDetail));

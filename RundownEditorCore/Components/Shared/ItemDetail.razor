@@ -29,6 +29,12 @@
         <div class="card-body p-0">
             <p class="@(locked && lockedByUser != userName ? "bg-danger text-white text-center px-5 py-2 m-0" : "d-none")">@(locked && lockedByUser != userName ? $"Låst af {lockedByUser}" : "")</p>
             <div class="input-group">
+                @if(Detail.Type == "Video")
+                {
+                    <input class="form-control rounded-0 rounded-bottom" type="text" value="@Detail.VideoPath" readonly style="width:@($"{Detail.VideoPath.Length}ch")">
+                }
+                else
+                {
                 <textarea class="form-control rounded-0 rounded-bottom"
                     rows="@CalculateRows()"
                     cols="@(Math.Ceiling((double)content.Count()))"
@@ -37,7 +43,7 @@
                     style="resize: both;">
                     @content
                 </textarea>
-            
+                }
             </div>
         </div>
     </div>
@@ -86,8 +92,17 @@
         DetailLockState.OnLockStateChanged += HandleLockStateChanged;
         locked = DetailLockState.IsLocked(Detail.UUID.ToString(), out lockedByUser);
         active = locked && lockedByUser == userName;
+
+        RundownState.OnChange += HandleRundownStateChange;
     }
 
+    private void HandleRundownStateChange()
+    {           
+        Detail = RundownState.Item.Details.FirstOrDefault(d => d.UUID == Detail.UUID);      
+        content = SetContent();
+        InvokeAsync(StateHasChanged);
+        
+    }
     private void HandleDurationInput(ChangeEventArgs e)
     {
         Detail.Duration = e.Value?.ToString();

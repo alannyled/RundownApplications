@@ -7,18 +7,11 @@ namespace RundownDbService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RundownController : ControllerBase
+    public class RundownController(IRundownService rundownService, IItemDetailService itemDetailService, IRundownItemService rundownItemService) : ControllerBase
     {
-        private readonly IRundownService _rundownService;
-        private readonly IItemDetailService _itemDetailService;
-        private readonly IRundownItemService _rundownItemService;
-
-        public RundownController(IRundownService rundownService, IItemDetailService itemDetailService, IRundownItemService rundownItemService)
-        {
-            _rundownService = rundownService;
-            _itemDetailService = itemDetailService;
-            _rundownItemService = rundownItemService;
-        }
+        private readonly IRundownService _rundownService = rundownService;
+        private readonly IItemDetailService _itemDetailService = itemDetailService;
+        private readonly IRundownItemService _rundownItemService = rundownItemService;
 
         [HttpGet]
         public async Task<ActionResult<List<Rundown>>> GetAll()

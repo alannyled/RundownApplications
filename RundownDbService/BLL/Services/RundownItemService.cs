@@ -1,17 +1,14 @@
-﻿using RundownDbService.BLL.Interfaces;
+﻿using Newtonsoft.Json;
+using RundownDbService.BLL.Interfaces;
 using RundownDbService.DAL.Interfaces;
 using RundownDbService.Models;
 
 namespace RundownDbService.BLL.Services
 {
-    public class RundownItemService : IRundownItemService
+    public class RundownItemService(IRundownItemRepository rundownItemRepository, IKafkaService kafkaService) : IRundownItemService
     {
-        private readonly IRundownItemRepository _rundownItemRepository;
-
-        public RundownItemService(IRundownItemRepository rundownItemRepository)
-        {
-            _rundownItemRepository = rundownItemRepository;
-        }
+        private readonly IRundownItemRepository _rundownItemRepository = rundownItemRepository;
+        private readonly IKafkaService _kafkaService = kafkaService;
 
         public async Task<List<RundownItem>> GetAllRundownItemsAsync()
         {

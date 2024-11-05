@@ -32,8 +32,8 @@
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="LightYellow"/>
-                                        </VisualState.Setters>
+                                            <Setter Property="BorderColor" Value="RoyalBlue" />
+                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Normal">
                                         <VisualState.Setters>
@@ -62,7 +62,7 @@
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="LightYellow"/>
+                                            <Setter Property="BorderColor" Value="RoyalBlue" />
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Normal">
@@ -92,7 +92,7 @@
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="LightYellow"/>
+                                            <Setter Property="BorderColor" Value="RoyalBlue" />
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Normal">

@@ -28,7 +28,6 @@ namespace RundownEditorCore.States
         public List<TemplateDTO> Templates { get; private set; } = [];
         public Dictionary<string, bool> OnlineStatus { get; private set; } = [];
 
-
         internal void NotifyStateChanged(StateAction action)
         {
             OnChange?.Invoke(action);

@@ -6,8 +6,8 @@
     <ContentPage.Resources>
         <services:DateTimeOffsetToStringConverter x:Key="DateTimeOffsetToStringConverter"/>
     </ContentPage.Resources>
-
-    <VerticalStackLayout Padding="20" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
         <!--<Label Text="Fuse til rækkefølge"
            FontSize="24"
            FontAttributes="Bold"
@@ -33,6 +33,7 @@
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
                                             <Setter Property="BorderColor" Value="RoyalBlue" />
+                                            <Setter Property="BackgroundColor" Value="Black"/>
                                          </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Normal">
@@ -63,6 +64,7 @@
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
                                             <Setter Property="BorderColor" Value="RoyalBlue" />
+                                            <Setter Property="BackgroundColor" Value="Black"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Normal">
@@ -93,6 +95,7 @@
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
                                             <Setter Property="BorderColor" Value="RoyalBlue" />
+                                            <Setter Property="BackgroundColor" Value="Black"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Normal">
@@ -141,7 +144,8 @@
                     Grid.Column="2" />
         </Grid>
 
-        <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="Blue" HorizontalOptions="Center"/>
+        <Label Text="{Binding StatusMessage}" FontSize="18" TextColor="LightGray" HorizontalOptions="Center"/>
 
     </VerticalStackLayout>
+        </ScrollView>
 </ContentPage>

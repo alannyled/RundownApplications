@@ -23,7 +23,7 @@ namespace RundownDbService.Controllers
         public Guid Rundown4Uuid { get; private set; }
 
         [HttpPost("reset-data")]
-        public async Task<IActionResult> ResetAndSeedAsync()
+        public async Task<ActionResult<List<Rundown>>> ResetAndSeedAsync()
         {
             try
             {
@@ -65,7 +65,7 @@ namespace RundownDbService.Controllers
 
                 await _rundownCollection.InsertManyAsync(rundowns);
 
-                return Ok("Rundown data nulstillet og seedet.");
+                return Ok(rundowns);
             }
             catch (Exception ex)
             {

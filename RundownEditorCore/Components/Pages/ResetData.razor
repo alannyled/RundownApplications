@@ -1,5 +1,7 @@
 ﻿@page "/reset-data"
+@inject NavigationManager Navigation
 @inject ToastState ToastState
+@inject RundownState RundownState
 
 <Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
@@ -21,11 +23,13 @@
 
         if (responseRundown.IsSuccessStatusCode)
         {
+            RundownState.SelectedRundown(new());
             var responseControlRoom = await httpClient.PostAsync("https://localhost:3030/api/DataSeed/reset-data", null);
 
             if (responseControlRoom.IsSuccessStatusCode)
             {
                 ToastState.FireToast("Nulstilling af data lykkedes", "text-bg-success");
+                Navigation.NavigateTo("/");
             }
             else
             {

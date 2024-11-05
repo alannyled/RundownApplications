@@ -51,7 +51,7 @@
 
 @code {
     [Parameter]
-    public DetailDTO? Detail { get; set; }
+    public DetailDTO Detail { get; set; } = new();
     public string? icon { get; set; }
     public string? color { get; set; }
     public string? content { get; set; }
@@ -61,7 +61,7 @@
     public string lockedByUser = "";
     public string lockedClass = "";
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -97,11 +97,18 @@
     }
 
     private void HandleRundownStateChange()
-    {           
-        Detail = RundownState.Item.Details.FirstOrDefault(d => d.UUID == Detail.UUID);      
+    {       
+        if (Detail != null)
+        {
+            var updatedDetail = RundownState.Item.Details.FirstOrDefault(d => d.UUID == Detail.UUID);
+            if (updatedDetail != null)
+            {
+                Detail = updatedDetail;
+            }
+        }
+
         content = SetContent();
         InvokeAsync(StateHasChanged);
-        
     }
     private void HandleDurationInput(ChangeEventArgs e)
     {

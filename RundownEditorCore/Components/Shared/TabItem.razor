@@ -18,6 +18,8 @@
 @code {
     [Parameter]
     public string MenuItem { get; set; } = string.Empty;
+    [Parameter]
+    public string ItemId { get; set; } = string.Empty;
 
     [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
@@ -28,16 +30,8 @@
     [Parameter]
     public EventCallback<string> CloseTab { get; set; }
 
-    // protected override async Task OnParametersSetAsync()
-    // {
-    //     if(MenuItem == string.Empty)
-    //     {
-    //         MenuItem = RundownState.Item.Name;
-    //     }
-    // }
-
     public async Task RemoveTabPane()
     {
-        await CloseTab.InvokeAsync(MenuItem);
+        await CloseTab.InvokeAsync(ItemId);
     }
 }

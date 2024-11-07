@@ -17,7 +17,8 @@ namespace RundownEditorCore.States
             NewRundownAdded,
             ControlRoomsUpdated,
             TemplatesUpdated,
-            OnlineStatusUpdated
+            OnlineStatusUpdated,
+            Error
         }
 
         public event Action<StateAction>? OnChange;
@@ -27,6 +28,7 @@ namespace RundownEditorCore.States
         public List<ControlRoomDTO> ControlRooms { get; private set; } = [];
         public List<TemplateDTO> Templates { get; private set; } = [];
         public Dictionary<string, bool> OnlineStatus { get; private set; } = [];
+        public ErrorMessageDTO Error { get; private set; } = new();
 
         internal void NotifyStateChanged(StateAction action)
         {
@@ -68,6 +70,12 @@ namespace RundownEditorCore.States
             NotifyStateChanged(StateAction.OnlineStatusUpdated);
         }
 
-       
+        public void SharedError(ErrorMessageDTO error)
+        {
+            Error = error;
+            NotifyStateChanged(StateAction.Error);
+        }
+
+        
     }
 }

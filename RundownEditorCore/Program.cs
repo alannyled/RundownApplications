@@ -18,20 +18,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddHttpClient<IRundownService, RundownService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3000/api/Rundown/"); // APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/Rundown/"); // APIGateway adressen!
 });
 
 builder.Services.AddHttpClient<IHardwareService, HardwareService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3000/api/Hardware/"); // APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/Hardware/"); // APIGateway adressen!
 });
 builder.Services.AddHttpClient<IControlRoomService, ControlRoomService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3000/api/ControlRoom/"); // APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/ControlRoom/"); // APIGateway adressen!
 });
 builder.Services.AddHttpClient<ITemplateService, TemplateService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:3000/api/Template/"); // APIGateway adresse!
+    client.BaseAddress = new Uri("https://localhost:3000/api/Template/"); // APIGateway adressen!
 });
 
 builder.Services.AddLogging(loggingBuilder =>

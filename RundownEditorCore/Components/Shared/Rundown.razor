@@ -16,8 +16,7 @@
 
     <TabPaneRundown ControlRooms="ControlRooms"
                     ActiveTab="@activeTab"
-                    OpenTabPane="OpenTabPane"
-                    CurrentObjects="RundownObjects" />
+                    OpenTabPane="OpenTabPane" />
 
     @foreach (var tab in tabPanes)
     {
@@ -29,14 +28,11 @@
     [Parameter]
     public List<ControlRoomDTO> ControlRooms { get; set; }
 
-    //private bool showDialog = false;
     private string activeTab = string.Empty;
     private string openItemId = string.Empty;
 
     private List<TabFragment> menuTabs = new();
     private List<TabFragment> tabPanes = new();
-    // anvendes ved drag n drop lige nu - en anden logik måske?
-    public List<RundownObjects> RundownObjects { get; set; } = new List<RundownObjects>(); // brug RundownItemsDTO i stedet for??
 
     protected override void OnInitialized()
     {
@@ -56,7 +52,9 @@
     {
         activeTab = tabName;
     }   
-
+    /// <summary>
+    /// Viser en TabPane, hvis den findes. Ellers kaldes rendering af en ny TabPane
+    /// </summary>
     private void OpenTabPane(RundownItemDTO item)
     {
         RundownState.SelectedItem(item);
@@ -65,20 +63,23 @@
 
         if (!menuTabs.Any(tab => tab.ItemId == item.UUID.ToString()))
         {
-            AddMenuTab();
+            AddMenuTab(item.UUID.ToString());
         }
     }
-
-    private void AddMenuTab()
+    /// <summary>
+    /// Renderer en Tab til menuen
+    /// </summary>
+    private void AddMenuTab( string itemId)
     {
         string tabName = activeTab;
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabItem>(0);
             builder.AddAttribute(1, "MenuItem", tabName);
-            builder.AddAttribute(2, "ActiveTab", activeTab);
-            builder.AddAttribute(3, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
-            builder.AddAttribute(4, "CloseTab", EventCallback.Factory.Create<string>(this, RemoveTabPane));
+            builder.AddAttribute(2, "ItemId", itemId);
+            builder.AddAttribute(3, "ActiveTab", activeTab);
+            builder.AddAttribute(4, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
+            builder.AddAttribute(5, "CloseTab", EventCallback.Factory.Create<string>(this, RemoveTabPane));
             builder.CloseComponent();
         });
 
@@ -89,18 +90,20 @@
                 Content = newChild
             });
 
-        AddTabPane();
+        AddTabPane(itemId);
     }
-
-    private void AddTabPane()
+    /// <summary>
+    /// Renderer en ny TabPane
+    /// </summary>
+    private void AddTabPane(string itemId)
     {
         string tabName = activeTab;
-
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabPaneRundownItem>(0);
+            builder.SetKey(itemId);
             builder.AddAttribute(1, "ActiveTab", activeTab);
-            builder.AddAttribute(2, "ItemId", openItemId);
+            builder.AddAttribute(2, "ItemId", itemId);
             builder.AddAttribute(3, "Name", tabName);
             builder.AddAttribute(4, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));
             builder.CloseComponent();
@@ -109,33 +112,40 @@
         tabPanes.Add(new TabFragment
             {
                 Name = tabName,
-                ItemId = openItemId,
+                ItemId = itemId,
                 Content = newChild
             });
 
     }
-
-    private void RemoveTabPane(string tabName)
+    /// <summary>
+    /// Fjerne en TabPane, når der klikkes på luk-knappen
+    /// </summary>
+    private void RemoveTabPane(string itemId)
     {
-        var tabToRemove = tabPanes.FirstOrDefault(tab => tab.Name == tabName);
+        var tabToRemove = tabPanes.FirstOrDefault(tab => tab.ItemId == itemId);
         if (tabToRemove != null)
         {
             tabPanes.Remove(tabToRemove);
-            RemoveTab(tabName);
+            Console.WriteLine("TabPane removed: " + itemId + " - " +tabToRemove.ItemId);
+            RemoveTab(tabToRemove.Name);
         }
     }
-
+    /// <summary>
+    /// Fjerne en Tab fra menuen, når der klikkes på luk-knappen
+    /// </summary>
     private void RemoveTab(string tabName)
     {
         var tabToRemove = menuTabs.FirstOrDefault(tab => tab.Name == tabName);
         if (tabToRemove != null)
         {
             menuTabs.Remove(tabToRemove);
-            activeTab = RundownState.Rundown.Name;
+            activeTab = menuTabs.FirstOrDefault()?.Name ?? RundownState.Rundown.Name;
             StateHasChanged();
         }
     }
-
+    /// <summary>
+    /// Model til listen over tabs og tabpanes, hvorfra der tilføjes og fjernes elementer
+    /// </summary>
     public class TabFragment
     {
         public string? Name { get; set; }

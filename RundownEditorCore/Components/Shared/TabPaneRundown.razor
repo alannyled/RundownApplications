@@ -1,4 +1,5 @@
 ﻿@inject IRundownService RundownService
+@inject ILogger<TabPaneRundown> _logger
 @inject RundownState RundownState
 @inject SharedStates SharedStates
 @inject ModalState ModalState
@@ -69,8 +70,8 @@
     public List<ControlRoomDTO> ControlRooms { get; set; }
     [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
-    [Parameter]
-    public List<RundownObjects> CurrentObjects { get; set; } = []; // skal anvendes til Drag'n'Drop
+    // [Parameter]
+    // public List<RundownObjects> CurrentObjects { get; set; } = []; // skal måske anvendes til Drag'n'Drop ?
 
     private string? draggedChildId;
 
@@ -85,15 +86,25 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action == SharedStates.StateAction.RundownUpdated || action == SharedStates.StateAction.ItemUpdated)
+        if (action != SharedStates.StateAction.RundownUpdated && action != SharedStates.StateAction.ItemUpdated)
+           return;
+
+        if (RundownState?.Rundown == null || SharedStates.RundownUpdated == null)
         {
-            if (RundownState.Rundown.UUID == SharedStates.RundownUpdated.UUID)
-            {
-                RundownState.SelectedRundown(SharedStates.RundownUpdated);
-                await InvokeAsync(StateHasChanged);
-            }
+            _logger.LogWarning($"Enten RundownState.Rundown = {RundownState.Rundown} eller SharedStates.RundownUpdated = {SharedStates.RundownUpdated} var null ved håndtering af StateAction.");
+            return;
         }
+
+        if (RundownState.Rundown.UUID == SharedStates.RundownUpdated.UUID)
+        {
+            RundownState.SelectedRundown(SharedStates.RundownUpdated);
+            await InvokeAsync(StateHasChanged);
+        }
+
+        
     }
+
+
     private string FormatDateWithCapitalDay(DateTimeOffset date)
     {
         var formattedDate = date.ToString("dddd d. MMMM yyyy", new System.Globalization.CultureInfo("da-DK"));
@@ -133,24 +144,48 @@
     {
         if (draggedChildId != null && draggedChildId != targetChildId) // Tjek at det ikke er droppet på sig selv
         {
-            var draggedChild = CurrentObjects.FirstOrDefault(x => x.Id == draggedChildId);
-            var targetChild = CurrentObjects.FirstOrDefault(x => x.Id == targetChildId);
+            var draggedItem = RundownState.Rundown.Items.FirstOrDefault(x => x.UUID.ToString() == draggedChildId);
+            var targetItem = RundownState.Rundown.Items.FirstOrDefault(x => x.UUID.ToString() == targetChildId);
 
-            if (draggedChild != null && targetChild != null)
+            if (draggedItem != null && targetItem != null)
             {
-                CurrentObjects.Remove(draggedChild);
-                var targetIndex = CurrentObjects.IndexOf(targetChild);
-
-                if (targetIndex >= 0)
+                var targetIndex = RundownState.Rundown.Items.IndexOf(targetItem);
+                var draggedIndex = RundownState.Rundown.Items.IndexOf(draggedItem);
+                RundownState.Rundown.Items.Remove(draggedItem);
+                if (draggedIndex < targetIndex)
                 {
-                    CurrentObjects.Insert(targetIndex, draggedChild);
+                    targetIndex--; // Fordi elementerne forskydes, når et element fjernes før målplaceringen
                 }
-                await InvokeAsync(StateHasChanged);
+                targetIndex++;
+                if (targetIndex > RundownState.Rundown.Items.Count)
+                {
+                    targetIndex = RundownState.Rundown.Items.Count;
+                }
+                RundownState.Rundown.Items.Insert(targetIndex, draggedItem);
+                UpdateItemOrderValues();
+
+                await RundownService.UpdateRundownAsync(RundownState.Rundown.UUID, RundownState.Rundown);
+
+                // Eventuelt opdater shared state (afhængig af om Kafka gør det samme)
+                SharedStates.SharedRundown(RundownState.Rundown);
             }
         }
-
         draggedChildId = null;
     }
+
+    /// <summary>
+    /// Opdaterer Order-værdien for hvert element i listen konsekvent fra 0 og opefter.
+    /// </summary>
+    private void UpdateItemOrderValues()
+    {
+        int index = 0;
+        foreach (var item in RundownState.Rundown.Items)
+        {
+            item.Order = index++;
+        }
+    }
+
+
 
     /// <summary>
     /// Fjerner abonnementet for at undgå memory leaks

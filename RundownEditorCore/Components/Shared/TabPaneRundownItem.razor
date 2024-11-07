@@ -47,7 +47,7 @@
     protected override void OnInitialized()
     {
         Guid UUID = Guid.Parse(ItemId);
-        RundownItem = RundownState.Item;
+        RundownItem = RundownState.Rundown.Items.FirstOrDefault(item => item.UUID == UUID);
         SharedStates.OnChange += HandleSharedStateChange;
     }
     /// <summary>
@@ -72,7 +72,8 @@
     /// </summary>
     public async Task RemoveTabPane()
     {
-        await OnRemove.InvokeAsync(Name);
+        await OnRemove.InvokeAsync(ItemId);
+
     }
     /// <summary>
     /// Renderer formen til at oprette en ny detail og åbner modalen

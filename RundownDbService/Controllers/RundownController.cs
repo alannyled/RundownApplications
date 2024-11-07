@@ -42,18 +42,85 @@ namespace RundownDbService.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> Update(Guid id, [FromBody] RundownDTO dto)
         {
-            var rundown = await _rundownService.GetRundownByIdAsync(id);
-            if (rundown == null)
+            try
             {
-                return NotFound();
-            }
-            // Opdater felter i rundown objektet
-            rundown.ControlRoomId = Guid.Parse(dto.ControlRoomId);
-            rundown.ArchivedDate = dto.ArchivedDate;
-            await _rundownService.UpdateRundownAsync(id, rundown);
+                if (dto == null)
+                {
+                    Console.WriteLine("Fejl: Modtaget RundownDTO er null.");
+                    return BadRequest("Modtaget data er ugyldig.");
+                }
 
-            return Ok(rundown);
+                if (!ModelState.IsValid)
+                {
+                    Console.WriteLine("Fejl: ModelState er ugyldig.");
+                    foreach (var key in ModelState.Keys)
+                    {
+                        var errors = ModelState[key].Errors;
+                        foreach (var error in errors)
+                        {
+                            Console.WriteLine($"ModelState Fejl for {key}: {error.ErrorMessage}");
+                        }
+                    }
+                    return BadRequest(ModelState);
+                }
+
+                var rundown = await _rundownService.GetRundownByIdAsync(id);
+                if (rundown == null)
+                {
+                    Console.WriteLine($"Rundown med ID: {id} blev ikke fundet.");
+                    return NotFound();
+                }
+
+                // Opdater rundown
+                rundown.ControlRoomId = Guid.Parse(dto.ControlRoomId);
+                rundown.ArchivedDate = dto.ArchivedDate;
+
+                foreach (var itemDto in dto.Items)
+                {
+                    var existingItem = rundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
+                    if (existingItem != null)
+                    {
+                        existingItem.Order = itemDto.Order;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Item med UUID: {itemDto.UUID} blev ikke fundet i Rundown.");
+                    }
+                }
+
+                await _rundownService.UpdateRundownAsync(id, rundown);
+                Console.WriteLine($"Opdatering af Rundown med ID: {id} lykkedes.");
+
+                return Ok(rundown);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fejl under opdatering af rundown: {ex.Message}");
+                return BadRequest($"Fejl under opdatering: {ex.Message}");
+            }
         }
+
+
+        //public async Task<ActionResult> Update(Guid id, [FromBody] RundownDTO dto)
+        //{
+        //    var rundown = await _rundownService.GetRundownByIdAsync(id);
+        //    if (rundown == null)
+        //    {
+        //        return NotFound();
+        //    }           
+        //    rundown.ControlRoomId = Guid.Parse(dto.ControlRoomId);
+        //    rundown.ArchivedDate = dto.ArchivedDate;
+        //    foreach (var itemDto in dto.Items)
+        //    {
+        //        var existingItem = rundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
+        //        if (existingItem != null)
+        //        {
+        //            existingItem.Order = itemDto.Order;
+        //        }
+        //    }
+        //    await _rundownService.UpdateRundownAsync(id, rundown);
+        //    return Ok(rundown);
+        //}
 
 
         [HttpPut("add-item-to-rundown/{id:guid}")]

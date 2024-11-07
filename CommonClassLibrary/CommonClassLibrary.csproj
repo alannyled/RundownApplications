@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Polly" Version="8.4.1" />
+	  <ProjectReference Include="..\KafkaFactoryLibrary\KafkaServiceLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -5,8 +5,6 @@ using RundownEditorCore.Interfaces;
 using CommonClassLibrary.DTO;
 using Newtonsoft.Json;
 
-
-
 namespace RundownEditorCore.Services
 {
     /// <summary>
@@ -15,7 +13,8 @@ namespace RundownEditorCore.Services
     public class KafkaService : IKafkaService
     {
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
-        private readonly KafkaProducerClient _producerClient;        
+        private readonly KafkaProducerClient _producerClient;   
+       
 
         public KafkaService()
         {
@@ -25,7 +24,7 @@ namespace RundownEditorCore.Services
                 .Build();
 
             _kafkaService = new KafkaServiceLibrary.KafkaService(configuration);
-            _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");   
+            _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer"); 
         }
         public virtual void SendMessage(string topic, string message)
         {           
@@ -65,7 +64,7 @@ namespace RundownEditorCore.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            string[] topics = { "rundown", "detail_lock", "story", "controlroom" };
+            string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error" };
             _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "Gruppe_id", topics);
 
             await Task.Yield();
@@ -109,6 +108,12 @@ namespace RundownEditorCore.Services
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 var controlrooms = await _controlRoomService.GetControlRoomsAsync();
                                 _sharedStates.SharedControlRoom(controlrooms);
+                            }
+                            if(message.Topic == "error")
+                            {
+                                var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message);
+                                _sharedStates.SharedError(messageObject);
+                                _logger.LogError($"Kritisk Fejlbesked: {message.Message.Value}");
                             }
                         }
                         catch (JsonException ex)
@@ -165,7 +170,5 @@ namespace RundownEditorCore.Services
         public string? Name { get; set; }
         public string? UserName { get; set; }
     }
-
-
 
 }

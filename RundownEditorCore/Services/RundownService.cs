@@ -3,121 +3,198 @@ using Newtonsoft.Json;
 using RundownEditorCore.DTO;
 using CommonClassLibrary.DTO;
 using RundownEditorCore.Interfaces;
+using RundownEditorCore.States;
 
 namespace RundownEditorCore.Services
 {
-    public class RundownService(HttpClient httpClient, ILogger<RundownService> logger, IKafkaService kafkaService, IMessageBuilderService messageBuilderService) : IRundownService
+    public class RundownService(HttpClient httpClient, ToastState toastState, ILogger<RundownService> logger, IKafkaService kafkaService, IMessageBuilderService messageBuilderService) : IRundownService
     {
         private readonly HttpClient _httpClient = httpClient;
+           private readonly ToastState _toastState = toastState;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IKafkaService _kafkaService = kafkaService;
         private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
 
         public async Task<List<RundownDTO>> GetRundownsAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-rundowns-with-controlrooms");
-            _logger.LogInformation($"FETCHED All Rundowns");
-            return response;
-        }
-
-
-
-        public async Task<RundownDTO> GetRundownAsync(string uuid)
-        {
-            var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
-            //var json = JsonConvert.SerializeObject(response, Formatting.Indented);
-            //Console.WriteLine("Fetching rundown: " + json);
-            _logger.LogInformation($"FETCHED Rundown {response.Name}");
-            return response;
-        }
-
-        public async Task<RundownDTO> CreateRundownFromTemplate(string templateId, string controlroomId, DateTimeOffset date)
-        {
-            var request = new RundownDTO
+            try
             {
-                ControlRoomId = controlroomId,
-                BroadcastDate = date
-            };
-            var createdRundown = await _httpClient.PostAsJsonAsync($"create-rundown-from-template/{templateId}", request);
-            var response = await createdRundown.Content.ReadFromJsonAsync<RundownDTO>();
-            _logger.LogInformation($"CREATED Rundown {response.Name}");
-            return response;
-        }
-
-        public async Task<RundownDTO> UpdateRundownControlRoomAsync(string rundownId, string controlRoomId)
-        {
-            var updateRequest = new RundownDTO
-            {
-                ControlRoomId = controlRoomId
-            };
-
-            var response = await _httpClient.PutAsJsonAsync($"update-rundown-controlroom/{rundownId}", updateRequest);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var rundown = await response.Content.ReadFromJsonAsync<RundownDTO>();
-                _logger.LogInformation($"UPDATED Rundown {rundown.Name}");
-                return rundown;
+                var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-rundowns-with-controlrooms");
+                _logger.LogInformation("FETCHED All Rundowns");
+                return response ?? new List<RundownDTO>();
             }
-            _logger.LogInformation($"ERROR updating control room: {response.ReasonPhrase}");
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Der skete en fejl under hentning af alle rundowns.");
+                _toastState.FireToast("Der skete en fejl under hentning af alle rundowns", "text-bg-warning");
+                return new List<RundownDTO>();
+            }
         }
 
-        public async Task<RundownDTO> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
+        public async Task<RundownDTO?> GetRundownAsync(string uuid)
         {
-            var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                _logger.LogInformation($"ADDED Item to Rundown");
-                return  await response.Content.ReadFromJsonAsync<RundownDTO>();
+                var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
+                _logger.LogInformation($"FETCHED Rundown {response?.Name}");
+                return response;
             }
-            _logger.LogInformation($"ERROR adding item to rundown: {response.ReasonPhrase}");
-            return null;
-        }
-        public async Task<RundownDTO> AddDetailToItemAsync(string rundownId, ItemDetailDTO.ItemDetail itemDetail)
-        {
-            var json = JsonConvert.SerializeObject(itemDetail);
-            var detail = JsonConvert.DeserializeObject<DetailDTO>(json);
-
-            var response = await _httpClient.PutAsJsonAsync($"add-detail-to-item/{rundownId}", detail);
-
-            if (response.IsSuccessStatusCode)
+            catch (Exception ex)
             {
-                _logger.LogInformation($"ADDED Detail to item");
-                return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                _logger.LogError(ex, $"Der skete en fejl under hentning af rundown med ID {uuid}.");
+                _toastState.FireToast("Der skete en fejl under hentning af rundown med ID {uuid}", "text-bg-warning");
+                return null;
             }
-            _logger.LogInformation($"ERROR adding detail to item: {response.ReasonPhrase}");
-            return null;
         }
 
-        public async Task<RundownDTO> UpdateDetailAsync(string rundownId, DetailDTO itemDetail)
+        public async Task<RundownDTO?> CreateRundownFromTemplate(string templateId, string controlroomId, DateTimeOffset date)
         {
-            var response = await _httpClient.PutAsJsonAsync($"update-detail-in-item/{rundownId}", itemDetail);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogInformation($"UPDATED Detail in item");
-                return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                var request = new RundownDTO
+                {
+                    ControlRoomId = controlroomId,
+                    BroadcastDate = date
+                };
+                var createdRundown = await _httpClient.PostAsJsonAsync($"create-rundown-from-template/{templateId}", request);
+                var response = await createdRundown.Content.ReadFromJsonAsync<RundownDTO>();
+                _logger.LogInformation($"CREATED Rundown {response?.Name}");
+                return response;
             }
-            _logger.LogInformation($"ERROR updating detail in item: {response.ReasonPhrase}");
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Der skete en fejl under oprettelse af rundown fra template.");
+                _toastState.FireToast("Der skete en fejl under oprettelse af rundown fra template", "text-bg-warning");
+                return null;
+            }
         }
 
-        public async Task<RundownDTO> UpdateRundownAsync(string rundownId, RundownDTO rundown)
+        public async Task<RundownDTO?> UpdateRundownControlRoomAsync(string rundownId, string controlRoomId)
         {
-            var response = await _httpClient.PutAsJsonAsync($"update-rundown/{rundownId}", rundown);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogInformation($"UPDATED {rundown.Name}");
-                return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                var updateRequest = new RundownDTO
+                {
+                    ControlRoomId = controlRoomId
+                };
+
+                var response = await _httpClient.PutAsJsonAsync($"update-rundown-controlroom/{rundownId}", updateRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var rundown = await response.Content.ReadFromJsonAsync<RundownDTO>();
+                    _logger.LogInformation($"UPDATED Rundown {rundown?.Name}");
+                    return rundown;
+                }
+                _logger.LogWarning($"ERROR updating controlroom: {response.ReasonPhrase}");
+                return null;
             }
-            _logger.LogInformation($"ERROR updating rundown: {response.ReasonPhrase}");
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Der skete en fejl under opdatering af controlroom til rundown med ID {rundownId}.");
+                _toastState.FireToast("Der skete en fejl under opdatering af controlroom til rundown", "text-bg-warning");
+                return null;
+            }
+        }
+
+        public async Task<RundownDTO?> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("ADDED Item to Rundown");
+                    return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                }
+                _logger.LogWarning($"ERROR adding item to rundown: {response.ReasonPhrase}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Der skete en fejl under tilføjelse af item til rundown med ID {rundownId}.");
+                _toastState.FireToast("Der skete en fejl under tilføjelse af item til rundown", "text-bg-warning");
+                return null;
+            }
+        }
+
+        public async Task<RundownDTO?> AddDetailToItemAsync(string rundownId, ItemDetailDTO.ItemDetail itemDetail)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(itemDetail);
+                var detail = JsonConvert.DeserializeObject<DetailDTO>(json);
+
+                var response = await _httpClient.PutAsJsonAsync($"add-detail-to-item/{rundownId}", detail);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("ADDED Detail to item");
+                    return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                }
+                _logger.LogWarning($"ERROR adding detail to item: {response.ReasonPhrase}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Der skete en fejl under tilføjelse af detail til item i rundown med ID {rundownId}.");
+                _toastState.FireToast("Der skete en fejl under tilføjelse af detail til item i rundown", "text-bg-warning");
+                return null;
+            }
+        }
+
+        public async Task<RundownDTO?> UpdateDetailAsync(string rundownId, DetailDTO itemDetail)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"update-detail-in-item/{rundownId}", itemDetail);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("UPDATED Detail in item");
+                    return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                }
+                _logger.LogWarning($"ERROR updating detail in item: {response.ReasonPhrase}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Der skete en fejl under opdatering af detail i rundown med ID {rundownId}.");
+                _toastState.FireToast("Der skete en fejl under opdatering af detail i rundown", "text-bg-warning");
+                return null;
+            }
+        }
+
+        public async Task<RundownDTO?> UpdateRundownAsync(string rundownId, RundownDTO rundown)
+        {
+            try
+            {
+                foreach (var item in rundown.Items)
+                {
+                    _logger.LogInformation($"Updating Item: {item.Name}, Order: {item.Order}, RundownId: {item.RundownId}");
+                }
+
+                var response = await _httpClient.PutAsJsonAsync($"update-rundown/{rundownId}", rundown);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"UPDATED {rundown.Name}");
+                    return await response.Content.ReadFromJsonAsync<RundownDTO>();
+                }
+                _logger.LogWarning($"ERROR updating rundown: {response.ReasonPhrase}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Der skete en fejl under opdatering af rundown med ID {rundownId}.");
+                _toastState.FireToast("Der skete en fejl under opdatering af rundown", "text-bg-warning");
+                return null;
+            }
         }
     }
+
+
 
 }
 

@@ -119,6 +119,23 @@
             await GetAndFilterRundowns();
             await InvokeAsync(StateHasChanged);
         }
+        if (action == SharedStates.StateAction.Error)
+        {
+            string message = "";
+            switch(SharedStates.Error.Action)
+            {
+                case "retry":
+                    message = $"Data kunne ikke hentes {SharedStates.Error.Count}. gang.<br>Forsøger igen om {SharedStates.Error.Time} sekunder";
+                    break;
+                default:
+                    message = "Der skete en alvorlig fejl. En eller flere services er ikke tilgængelige";
+                    break;
+            }
+            await InvokeAsync(() =>
+            {
+                ToastState.FireToast(message, "text-bg-warning");
+            });
+        }
     }
     /// <summary>
     /// Henter alle rundowns og filtrerer de deaktiverede fra
@@ -136,13 +153,13 @@
     {
         try
         {
-            var selectedRundown = await RundownService.GetRundownAsync(uuid);
-            RundownState.SelectedRundown(selectedRundown);
+            RundownState.SelectedRundown(ActiveRundowns.FirstOrDefault(r => r.UUID == uuid));
+            RundownState.SelectedItem(new RundownItemDTO());
             StateHasChanged();
         }
         catch (HttpRequestException e)
         {
-            Console.WriteLine($"Error fetching rundown: {e.Message}");
+            Console.WriteLine($"Error finding rundown: {e.Message}");
         }
         activeTab = "Aktive rækkefølger";
     }

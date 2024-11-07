@@ -1,10 +1,10 @@
 ﻿function allowDrop(event) {
-    event.target.closest("tr").style.borderTop = "5px solid rgba(0,0,255,0.2)";
+    event.target.closest("tr").style.borderBottom = ""; // "5px solid rgba(0,0,255,0.2)";
     event.preventDefault();
 }
 
 function leaveDrop(event) {
-    event.target.closest("tr").style.borderTop = "none";
+    event.target.closest("tr").style.borderBottom = "";
 }
 
 function endDrop(event) {
@@ -14,7 +14,7 @@ function endDrop(event) {
     if (tbody) {
         const rows = tbody.querySelectorAll("tr");
         rows.forEach(row => {
-            row.style.borderTop = "none";
+            row.style.borderBottom = "";
         });
     }
 }

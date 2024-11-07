@@ -28,7 +28,7 @@ namespace RundownDbService.BLL.Services
         {
             string key = Guid.NewGuid().ToString();
             _producerClient.Producer.Produce(topic, new Message<string, string> { Key = key, Value = message });
-            Console.WriteLine($"Sending message to TOPIC: {topic}, KEY: {key}, VALUE: {message}");
+            //Console.WriteLine($"Sending message to TOPIC: {topic}, KEY: {key}, VALUE: {message}");
         }
     }
 }

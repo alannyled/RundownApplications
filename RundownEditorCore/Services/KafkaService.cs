@@ -65,7 +65,7 @@ namespace RundownEditorCore.Services
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error" };
-            _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "Gruppe_id", topics);
+            _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "RundownEditorCore", topics);
 
             await Task.Yield();
 

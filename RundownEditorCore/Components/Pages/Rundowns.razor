@@ -1,6 +1,7 @@
 ﻿@page "/rundowns"
 @inject IRundownService RundownService
 @inject SharedStates SharedStates
+@inject ToastState ToastState
 
 <Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
@@ -23,6 +24,24 @@
         {
             AllRundowns = await RundownService.GetRundownsAsync();
             await InvokeAsync(StateHasChanged);
+        }
+
+        if (action == SharedStates.StateAction.Error)
+        {
+            string message = "";
+            switch (SharedStates.Error.Action)
+            {
+                case "retry":
+                    message = $"Data kunne ikke hentes {SharedStates.Error.Count}. gang.<br>Forsøger igen om {SharedStates.Error.Time} sekunder";
+                    break;
+                default:
+                    message = "Der skete en alvorlig fejl. En eller flere services er ikke tilgængelige";
+                    break;
+            }
+            await InvokeAsync(() =>
+            {
+                ToastState.FireToast(message, "text-bg-warning");
+            });
         }
     }
 

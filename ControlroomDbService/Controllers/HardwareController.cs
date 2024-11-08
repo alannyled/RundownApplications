@@ -44,7 +44,9 @@ namespace ControlRoomDbService.Controllers
                 MacAddress = newHardwareDto.MacAddress,
                 IpAddress = newHardwareDto.IpAddress,
                 Port = newHardwareDto.Port,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                ArchivedDate  = null,
+                ArchivedBy  = null
             };
 
             await _hardwareService.CreateHardwareAsync(newHardware);

@@ -1,6 +1,7 @@
 ﻿@using CommonClassLibrary.DTO
 @inject IRundownService RundownService
 @inject RundownState RundownState
+@inject SharedStates SharedStates
 
 @if (!string.IsNullOrEmpty(RundownState.Rundown.Name))
 {
@@ -37,8 +38,12 @@
     protected override void OnInitialized()
     {
         RundownState.OnChange += HandleRundownStateChange;
+        SharedStates.OnChange += HandleSharedStateChange;
     }
 
+    /// <summary>
+    /// Rydder alle tabs og tabpanes, hvis der skiftes Rundown
+    /// </summary>
     private void HandleRundownStateChange()
     {
         if (activeTab != RundownState.Item.Name && activeTab != RundownState.Rundown.Name)
@@ -48,6 +53,27 @@
             tabPanes = [];
         }
     }
+    /// <summary>
+    /// opdaterer RundownItem, hvis det er blevet ændret. på tværs af alle brugere og rundowns indlæst
+    /// </summary>
+    private void HandleSharedStateChange(SharedStates.StateAction action)
+    {
+        if (action == SharedStates.StateAction.ItemUpdated)
+        {
+            if (!RundownState.Rundown.Items.Any() || SharedStates.ItemUpdated.UUID == Guid.Empty) return;
+
+            var rundown = RundownState.Rundown;
+            var index = rundown.Items.FindIndex(i => i.UUID == SharedStates.ItemUpdated.UUID);
+            if (index != -1)
+            {
+                rundown.Items[index] = SharedStates.ItemUpdated;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sætter den valgte tab til den aktive, så visning i UI sker
+    /// </summary>
     private void SelectTab(string tabName)
     {
         activeTab = tabName;

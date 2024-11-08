@@ -58,10 +58,9 @@
     {
         if (action == SharedStates.StateAction.ItemUpdated)
         {
-
             if (SharedStates.ItemUpdated.UUID == RundownItem.UUID)
             {
-                RundownState.SelectedItem(SharedStates.ItemUpdated);
+                RundownState.SelectedItem(SharedStates.ItemUpdated);               
                 RundownItem = RundownState.Item;
                 InvokeAsync(StateHasChanged);
             }

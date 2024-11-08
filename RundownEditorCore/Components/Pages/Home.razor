@@ -114,7 +114,7 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action == SharedStates.StateAction.NewRundownAdded || action == SharedStates.StateAction.RundownUpdated)
+        if (action == SharedStates.StateAction.NewRundownAdded || action == SharedStates.StateAction.RundownUpdated || action == SharedStates.StateAction.ItemUpdated)
         {
             await GetAndFilterRundowns();
             await InvokeAsync(StateHasChanged);

@@ -6,9 +6,10 @@ namespace RundownEditorCore.States
 {
     public class DetailLockState
     {
-        private readonly Dictionary<string, string> _lockedDetails = [];
-
         public event Action<DetailDTO, bool, string> OnLockStateChanged;
+
+        private readonly Dictionary<string, string> _lockedDetails = [];
+        
         public bool IsLocked(string detailId, out string lockedByUserId)
         {
             return _lockedDetails.TryGetValue(detailId, out lockedByUserId);

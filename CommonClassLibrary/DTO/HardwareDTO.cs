@@ -16,7 +16,7 @@ namespace CommonClassLibrary.DTO
         public string? MacAddress { get; set; }
         public string? IpAddress { get; set; }
         public int Port { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime? ArchivedDate { get; set; } = null;
         public string? ArchivedBy { get; set; } = null;
     }

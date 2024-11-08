@@ -20,7 +20,7 @@ namespace RundownDbService.BLL.Services
 
             _kafkaService = new KafkaServiceLibrary.KafkaService(configuration);
             _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
-            _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "rundown", ["rundown"]);
+            _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "RundownDbService", ["rundown"]);
 
         }
 

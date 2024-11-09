@@ -2,6 +2,7 @@
 using RundownDbService.BLL.Interfaces;
 using CommonClassLibrary.DTO;
 using RundownDbService.Models;
+using Newtonsoft.Json;
 
 namespace RundownDbService.Controllers
 {
@@ -101,28 +102,6 @@ namespace RundownDbService.Controllers
         }
 
 
-        //public async Task<ActionResult> Update(Guid id, [FromBody] RundownDTO dto)
-        //{
-        //    var rundown = await _rundownService.GetRundownByIdAsync(id);
-        //    if (rundown == null)
-        //    {
-        //        return NotFound();
-        //    }           
-        //    rundown.ControlRoomId = Guid.Parse(dto.ControlRoomId);
-        //    rundown.ArchivedDate = dto.ArchivedDate;
-        //    foreach (var itemDto in dto.Items)
-        //    {
-        //        var existingItem = rundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
-        //        if (existingItem != null)
-        //        {
-        //            existingItem.Order = itemDto.Order;
-        //        }
-        //    }
-        //    await _rundownService.UpdateRundownAsync(id, rundown);
-        //    return Ok(rundown);
-        //}
-
-
         [HttpPut("add-item-to-rundown/{id:guid}")]
         public async Task<IActionResult> AddItemToRundown(Guid id, [FromBody] RundownItemDTO rundownDto)
         {
@@ -152,7 +131,6 @@ namespace RundownDbService.Controllers
             });
       
             var updatedRundown = await _rundownService.UpdateRundownAsync(id, existingRundown);
-
             return Ok(updatedRundown);
         }
 
@@ -206,7 +184,8 @@ namespace RundownDbService.Controllers
             // Tilføj itemDetail til existingItem's detaljer
             existingItem.Details.Add(itemDetail);
 
-            await _itemDetailService.CreateItemDetailAsync(existingRundown.UUID, existingItem);
+           // await _itemDetailService.CreateItemDetailAsync(existingRundown.UUID, existingItem);
+            await _itemDetailService.CreateItemDetailAsync(existingRundown, existingItem);
             return Ok(existingRundown);
         }
 
@@ -256,7 +235,7 @@ namespace RundownDbService.Controllers
             }
 
             // Gem ændringerne
-            await _itemDetailService.CreateItemDetailAsync(existingRundown.UUID, existingItem);
+            await _itemDetailService.CreateItemDetailAsync(existingRundown, existingItem);
 
             return Ok(existingRundown);
         }

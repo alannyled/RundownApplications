@@ -23,7 +23,7 @@
                     </select>
                 </div>
                 <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="ShowRundownItemForm"><i class="bi bi-plus"></i></button>
-              
+
 
             </div>
         </div>
@@ -35,12 +35,15 @@
                     <tr>
                         <th>Name</th>
                         <th>Duration</th>
+                        <th>Details</th>
+                        <th>Videos</th>
+                        <th>Graphics</th>
                         <th>Order</th>
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
                     @foreach (var item in RundownState.Rundown.Items.OrderBy(i => i.Order))
-                        {
+                    {
                         <tr draggable="true"
                             @onclick="() => OpenTabPane.InvokeAsync(item)"
                             @key="item.UUID"
@@ -52,10 +55,13 @@
                             class="drag-item">
                             <td>@item.Name</td>
                             <td>@item.Duration</td>
+                            <td>@item.Details.Count</td>
+                            <td>@item.Details.Count(detail => detail.Type == "Video")</td>
+                            <td>@item.Details.Count(detail => detail.Type == "Grafik")</td>
                             <td>@item.Order</td>
                         </tr>
-                        }
-                </tbody>              
+                    }
+                </tbody>
             </table>
         </div>
 
@@ -67,11 +73,9 @@
     [Parameter]
     public EventCallback<RundownItemDTO> OpenTabPane { get; set; }
     [Parameter]
-    public List<ControlRoomDTO> ControlRooms { get; set; }
-    [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
-    // [Parameter]
-    // public List<RundownObjects> CurrentObjects { get; set; } = []; // skal måske anvendes til Drag'n'Drop ?
+
+    public List<ControlRoomDTO> ControlRooms { get; set; }
 
     private string? draggedChildId;
 
@@ -86,37 +90,33 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action != SharedStates.StateAction.RundownUpdated && action != SharedStates.StateAction.ItemUpdated)
-           return;
-
-        if (RundownState?.Rundown == null || SharedStates.RundownUpdated == null)
-        {
-            _logger.LogWarning($"Enten RundownState.Rundown = {RundownState.Rundown} eller SharedStates.RundownUpdated = {SharedStates.RundownUpdated} var null ved håndtering af StateAction.");
-            return;
-        }
-
-        if (RundownState.Rundown.UUID == SharedStates.RundownUpdated.UUID)
-        {
-            RundownState.SelectedRundown(SharedStates.RundownUpdated);
-            await InvokeAsync(StateHasChanged);
-        }
-
-        
+        if (action != SharedStates.StateAction.AllRundownsUpdated && action != SharedStates.StateAction.ItemUpdated) return;
+        if (RundownState?.Rundown == null || SharedStates.RundownUpdated == null) return;
+        var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown.UUID);
+        if (currentRundown == null) return;
+        RundownState.SelectedRundown(currentRundown);
+        await InvokeAsync(StateHasChanged);
     }
-
-
+    /// <summary>
+    /// Formattere et pænt dato format til UI
+    /// </summary>
     private string FormatDateWithCapitalDay(DateTimeOffset date)
     {
         var formattedDate = date.ToString("dddd d. MMMM yyyy", new System.Globalization.CultureInfo("da-DK"));
         return char.ToUpper(formattedDate[0]) + formattedDate.Substring(1);
     }
 
+    // skal laves om til ren event driven - må ikke sætte state her !!
     private async Task OnControlRoomChange(ChangeEventArgs e)
     {
         var selectedControlRoomUuid = e.Value.ToString();
-        var rundown = await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);
-        SharedStates.SharedRundown(rundown);   
+        await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);
+        var allUpdatedRundowns = await RundownService.GetRundownsAsync();
+        RundownState.SelectedRundown(allUpdatedRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown.UUID));
+        SharedStates.SharedAllRundowns(allUpdatedRundowns);
     }
+
+
 
     List<string> Templates = ["Template1", "Template2", "Template3"];
     /// <summary>
@@ -142,36 +142,51 @@
 
     private async Task OnDrop(DragEventArgs e, string targetChildId)
     {
-        if (draggedChildId != null && draggedChildId != targetChildId) // Tjek at det ikke er droppet på sig selv
+        if (draggedChildId != null && draggedChildId != targetChildId)
         {
-            var draggedItem = RundownState.Rundown.Items.FirstOrDefault(x => x.UUID.ToString() == draggedChildId);
-            var targetItem = RundownState.Rundown.Items.FirstOrDefault(x => x.UUID.ToString() == targetChildId);
+            var itemsCopy = RundownState.Rundown.Items.ToList();
+
+            var draggedItem = itemsCopy.FirstOrDefault(x => x.UUID.ToString() == draggedChildId);
+            var targetItem = itemsCopy.FirstOrDefault(x => x.UUID.ToString() == targetChildId);
 
             if (draggedItem != null && targetItem != null)
             {
-                var targetIndex = RundownState.Rundown.Items.IndexOf(targetItem);
-                var draggedIndex = RundownState.Rundown.Items.IndexOf(draggedItem);
-                RundownState.Rundown.Items.Remove(draggedItem);
+                var targetIndex = itemsCopy.IndexOf(targetItem);
+                var draggedIndex = itemsCopy.IndexOf(draggedItem);
+
+                itemsCopy.Remove(draggedItem);
                 if (draggedIndex < targetIndex)
                 {
-                    targetIndex--; // Fordi elementerne forskydes, når et element fjernes før målplaceringen
+                    targetIndex--;
                 }
                 targetIndex++;
-                if (targetIndex > RundownState.Rundown.Items.Count)
+                if (targetIndex > itemsCopy.Count)
                 {
-                    targetIndex = RundownState.Rundown.Items.Count;
+                    targetIndex = itemsCopy.Count;
                 }
-                RundownState.Rundown.Items.Insert(targetIndex, draggedItem);
-                UpdateItemOrderValues();
+                itemsCopy.Insert(targetIndex, draggedItem);
 
-                await RundownService.UpdateRundownAsync(RundownState.Rundown.UUID, RundownState.Rundown);
+                // Opdater order i kopien
+                UpdateItemOrderValues(itemsCopy);
 
-                // Eventuelt opdater shared state (afhængig af om Kafka gør det samme)
-                SharedStates.SharedRundown(RundownState.Rundown);
+                // Send kun kopien til databasen
+                var updatedRundown = RundownState.Rundown;
+                updatedRundown.Items = itemsCopy;
+                await RundownService.UpdateRundownAsync(RundownState.Rundown.UUID, updatedRundown);
+                // RundownState opdateres først, når Kafka bekræfter ændringen
             }
         }
         draggedChildId = null;
     }
+
+    private void UpdateItemOrderValues(List<RundownItemDTO> items)
+    {
+        for (int i = 0; i < items.Count; i++)
+        {
+            items[i].Order = i;
+        }
+    }
+
 
     /// <summary>
     /// Opdaterer Order-værdien for hvert element i listen konsekvent fra 0 og opefter.

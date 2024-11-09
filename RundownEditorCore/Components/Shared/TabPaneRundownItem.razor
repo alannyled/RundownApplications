@@ -54,16 +54,19 @@
     /// Håndterer ændringer i SharedStates forårsaget af Kafka beskeder
     /// Hvis det påvirker det aktuelle RundownItem, opdateres det
     /// </summary>
-    private void HandleSharedStateChange(SharedStates.StateAction action)
+    private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action == SharedStates.StateAction.ItemUpdated)
+        if (action == SharedStates.StateAction.AllRundownsUpdated)
         {
-            if (SharedStates.ItemUpdated.UUID == RundownItem.UUID)
-            {
-                RundownState.SelectedItem(SharedStates.ItemUpdated);               
-                RundownItem = RundownState.Item;
-                InvokeAsync(StateHasChanged);
-            }
+            var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown?.UUID);
+            if(currentRundown == null) return;
+            SharedStates.SharedRundown(currentRundown); // er ddet nødevendigt?
+            RundownItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
+            if (RundownItem == null) return;
+
+            RundownState.SelectedItem(RundownItem);
+            SharedStates.SharedItem(RundownItem);
+            await InvokeAsync(StateHasChanged);
         }
     }
     /// <summary>

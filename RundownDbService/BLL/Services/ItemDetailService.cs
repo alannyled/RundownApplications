@@ -23,36 +23,29 @@ namespace RundownDbService.BLL.Services
             };
         }      
 
-        public async Task<RundownItem> CreateItemDetailAsync(Guid rundownId, RundownItem existingItem)
+        public async Task<Rundown> CreateItemDetailAsync(Rundown rundown, RundownItem existingItem)
         {
-            await _rundownRepository.UpdateItemAsync(rundownId, existingItem);
+            //await _rundownRepository.UpdateItemAsync(rundownId, existingItem);
+            await _rundownRepository.UpdateItemAsync(rundown.UUID, existingItem);
+            //var messageObject = new
+            //{
+            //    Action = "new_detail",
+            //    Item = existingItem
+            //};
+            //string message = JsonConvert.SerializeObject(messageObject);
+            //Console.WriteLine($"Sending message to TOPIC STORY: {message}");
+            //_kafkaService.SendMessage("story", message);
             var messageObject = new
             {
-                Action = "new_detail",
-                Item = existingItem
+                Action = "update",
+                Item = existingItem,
+                Rundown = rundown
             };
             string message = JsonConvert.SerializeObject(messageObject);
-            Console.WriteLine($"Sending message to TOPIC STORY: {message}");
-            _kafkaService.SendMessage("story", message);
-
-            return existingItem;
+            //Console.WriteLine($"Sending message to TOPIC RUNDOWN - Fra Ny metode!!! : {message}");
+            _kafkaService.SendMessage("rundown", message);
+            // return existingItem;
+            return rundown;
         }
-
-
-
-        //public async Task DeleteItemDetailAsync(Guid uuid)
-        //{
-        //    await _itemDetailRepository.DeleteAsync(uuid);
-        //}
-
-        //public async Task<List<ItemDetail>> GetAllItemDetailsAsync()
-        //{
-        //    return await _itemDetailRepository.GetAllAsync();
-        //}
-
-        //public async Task<ItemDetail> GetItemDetailByIdAsync(Guid uuid)
-        //{
-        //    return await _itemDetailRepository.GetByIdAsync(uuid);
-        //}
     }
 }

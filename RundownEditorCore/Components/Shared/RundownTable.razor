@@ -47,14 +47,15 @@
     [Parameter]
     public EventCallback<string> OpenRundown { get; set; }
     [Parameter]
-    public List<RundownDTO>? Rundowns { get; set; }
+    public List<RundownDTO> Rundowns { get; set; } = [];
     [Parameter]
     public DateTime SelectedDate { get; set; }
     [Parameter]
     public bool ShowArchived { get; set; } = false;
 
     public async Task OpenThisRundown(string uuid)
-    {        
+    {      
+        Console.WriteLine("OpenThisRundown " + uuid);
         await OpenRundown.InvokeAsync(uuid);
     }
 

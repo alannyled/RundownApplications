@@ -32,17 +32,13 @@ namespace RundownEditorCore.Services
         }
 
         public RenderFragment RenderNewRundownForm(
-            List<TemplateDTO> AllTemplates, 
-            List<ControlRoomDTO> ControlRooms, 
             DateTime BroadcastDate
             )
         {
             return builder =>
             {
                 builder.OpenComponent(0, typeof(CreateNewRundownForm));
-                builder.AddAttribute(1, "Templates", AllTemplates);
-                builder.AddAttribute(2, "ControlRooms", ControlRooms);
-                builder.AddAttribute(3, "BroadcastDate", BroadcastDate);
+                builder.AddAttribute(1, "BroadcastDate", BroadcastDate);
                 builder.CloseComponent();
             };
         }

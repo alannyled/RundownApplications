@@ -4,6 +4,7 @@
 @inject IControlRoomService ControlRoomService
 @inject ITemplateService TemplateService
 @inject IHttpClientFactory ClientFactory
+@inject ILogger<TabPaneRundown> _logger
 @inject FormRenderService FormRenderservice
 @inject ModalState ModalState
 @inject ToastState ToastState
@@ -66,7 +67,7 @@
         <div class="col-xl-9">
             <div class="row">
                 <div class="col">
-                    <Rundown ControlRooms="controlRooms" />
+                    <Rundown />
                 </div>
                 <div class="col-12 col-xl-auto pt-1">
                     <div class="card card-height-100 mt-5">
@@ -93,18 +94,36 @@
 
     public DateTime SelectedDate = DateTime.Now.ToLocalTime();
     private string activeTab = "Aktive rækkefølger";
-    private List<ControlRoomDTO> controlRooms = new();
+    private List<ControlRoomDTO> ControlRooms = new();
     private List<RundownDTO> AllRundowns = new();
     private List<RundownDTO> ActiveRundowns = new();
     private List<TemplateDTO> AllTemplates = new();
 
     protected override async Task OnInitializedAsync()
     {
-        controlRooms = await ControlRoomService.GetControlRoomsAsync();
-        AllTemplates = await TemplateService.GetAllTemplatesAsync();
-        SharedStates.SharedControlRoom(controlRooms);
-        await GetAndFilterRundowns();
-
+        if(SharedStates.ControlRooms.Count == 0)
+        {
+            ControlRooms = await ControlRoomService.GetControlRoomsAsync();
+            SharedStates.SharedControlRoom(ControlRooms);
+        }
+        if(SharedStates.Templates.Count == 0)
+        {
+            AllTemplates = await TemplateService.GetAllTemplatesAsync();
+            SharedStates.SharedTemplates(AllTemplates);
+        }
+        if(SharedStates.AllRundowns.Count == 0)
+        {
+            _logger.LogInformation($"Henter alle rundowns fra databasen");
+            AllRundowns = await RundownService.GetRundownsAsync();
+            SharedStates.SharedAllRundowns(AllRundowns);
+        }
+        //ControlRooms = await ControlRoomService.GetControlRoomsAsync();
+        //  AllTemplates = await TemplateService.GetAllTemplatesAsync();
+        //  AllRundowns = await RundownService.GetRundownsAsync();
+        //  SharedStates.SharedControlRoom(ControlRooms);
+        //  SharedStates.SharedTemplates(AllTemplates);
+        //  SharedStates.SharedAllRundowns(AllRundowns);
+        await FilterActiveRundowns();
         SharedStates.OnChange += HandleSharedStateChange;   
 
     }
@@ -113,10 +132,16 @@
     /// og bestemte StateActions
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
-    {
-        if (action == SharedStates.StateAction.NewRundownAdded || action == SharedStates.StateAction.RundownUpdated || action == SharedStates.StateAction.ItemUpdated)
+    { 
+        // if(action == SharedStates.StateAction.AllRundownsUpdated){
+        //     await FilterActiveRundowns();
+        //     await InvokeAsync(StateHasChanged);
+        // }
+        if (action == SharedStates.StateAction.NewRundownAdded || 
+            action == SharedStates.StateAction.ItemUpdated || 
+            action == SharedStates.StateAction.AllRundownsUpdated)
         {
-            await GetAndFilterRundowns();
+            await FilterActiveRundowns();
             await InvokeAsync(StateHasChanged);
         }
         if (action == SharedStates.StateAction.Error)
@@ -140,10 +165,13 @@
     /// <summary>
     /// Henter alle rundowns og filtrerer de deaktiverede fra
     /// </summary>
-    private async Task GetAndFilterRundowns()
+    private async Task FilterActiveRundowns()
     {
-        AllRundowns = await RundownService.GetRundownsAsync();
-        ActiveRundowns = AllRundowns.Where(r => r.ArchivedDate == null).ToList();
+        // AllRundowns = await RundownService.GetRundownsAsync();
+        var allRundowns = SharedStates.AllRundowns;
+        ActiveRundowns = allRundowns.Where(r => r.ArchivedDate == null).ToList() ?? [];
+
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -153,9 +181,10 @@
     {
         try
         {
-            RundownState.SelectedRundown(ActiveRundowns.FirstOrDefault(r => r.UUID == uuid));
+            var selectedRundown = ActiveRundowns.FirstOrDefault(r => r.UUID == uuid);
+            RundownState.SelectedRundown(selectedRundown);
             RundownState.SelectedItem(new RundownItemDTO());
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
         catch (HttpRequestException e)
         {
@@ -185,8 +214,6 @@
         var content = new RenderFragment(builder =>
         {
             builder.AddContent(0, FormRenderservice.RenderNewRundownForm(
-                AllTemplates,
-                controlRooms,
                 SelectedDate
             ));
         });

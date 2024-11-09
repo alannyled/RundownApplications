@@ -2,6 +2,7 @@
 @using RundownEditorCore.Interfaces
 @inject IRundownService RundownService
 @inject RundownState RundownState
+@inject SharedStates SharedStates
 @inject ModalState ModalState
 @inject ToastState ToastState
 
@@ -17,7 +18,7 @@
         <select id="category" class="form-control form-control-sm"
                 @bind="Template">
             <option value="">Vælg en Skabelon</option>
-            @foreach (var template in Templates)
+            @foreach (var template in SharedStates.Templates)
             {
                 <option value="@template.Uuid">@template.Name</option>
             }
@@ -29,7 +30,7 @@
         <select id="controlroom" class="form-control form-control-sm"
                 @bind="ControlRoom">
             <option value="">Vælg kontrolrum</option>
-            @foreach (var controlroom in ControlRooms)
+            @foreach (var controlroom in SharedStates.ControlRooms)
             {
                 <option value="@controlroom.Uuid">@controlroom.Name</option>
             }
@@ -42,10 +43,6 @@
 
 @code {
 
-    [Parameter]
-    public List<TemplateDTO> Templates { get; set; } = new List<TemplateDTO>();
-    [Parameter]
-    public List<ControlRoomDTO> ControlRooms { get; set; } = new List<ControlRoomDTO>();
     [Parameter]
     public DateTime BroadcastDate { get; set; } = DateTime.Now;
 
@@ -68,6 +65,7 @@
         RundownState.SelectedRundown(rundown);
         ModalState.Close();
         var activeRundowns = await RundownService.GetRundownsAsync();
+        SharedStates.SharedAllRundowns(activeRundowns);
         return true;
     }
 }

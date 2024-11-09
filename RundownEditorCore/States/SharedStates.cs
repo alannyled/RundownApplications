@@ -18,6 +18,7 @@ namespace RundownEditorCore.States
             ControlRoomsUpdated,
             TemplatesUpdated,
             OnlineStatusUpdated,
+            AllRundownsUpdated,
             Error
         }
 
@@ -25,6 +26,7 @@ namespace RundownEditorCore.States
         public RundownItemDTO ItemUpdated { get; private set; } = new();
         public RundownDTO RundownUpdated { get; private set; } = new();
         public RundownDTO NewRundown { get; private set; } = new();
+        public List<RundownDTO> AllRundowns { get; private set; } = [];
         public List<ControlRoomDTO> ControlRooms { get; private set; } = [];
         public List<TemplateDTO> Templates { get; private set; } = [];
         public Dictionary<string, bool> OnlineStatus { get; private set; } = [];
@@ -50,6 +52,12 @@ namespace RundownEditorCore.States
         {
             NewRundown = rundown;
             NotifyStateChanged(StateAction.NewRundownAdded);
+        }
+
+        public void SharedAllRundowns(List<RundownDTO> rundowns)
+        {
+            AllRundowns = rundowns;
+            NotifyStateChanged(StateAction.AllRundownsUpdated);
         }
 
         public void SharedControlRoom(List<ControlRoomDTO> controlRooms)

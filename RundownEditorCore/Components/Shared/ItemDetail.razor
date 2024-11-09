@@ -3,6 +3,7 @@
 @inject IKafkaService KafkaService
 @inject IMessageBuilderService MessageBuilderService
 @inject RundownState RundownState
+@inject SharedStates SharedStates
 @inject DetailLockState DetailLockState
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.EntityFrameworkCore
@@ -96,9 +97,9 @@
         RundownState.OnChange += HandleRundownStateChange;
     }
 
-    private void HandleRundownStateChange()
+    private void HandleRundownStateChange(RundownState.StateAction action)
     {       
-        if (Detail != null)
+        if (Detail != null && action == RundownState.StateAction.ItemUpdated)
         {
             var updatedDetail = RundownState.Item.Details.FirstOrDefault(d => d.UUID == Detail.UUID);
             if (updatedDetail != null)
@@ -144,10 +145,15 @@
             "Kommentar" => Detail.Comment = content,
             _ => "Noget gik helt galt her??!!"
         };
-        await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
 
+        await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
+        var item = RundownState.Rundown.Items.FirstOrDefault(i => i.UUID == Detail.ItemId);
+        SharedStates.SharedItem(item); // skal laves om til en event driven løsning
     }
 
+    /// <summary>
+    /// Sætter lås på et element, hvis det redigeres, så andre ikke kan redigere det
+    /// </summary>
     private void SetLockOnElement()
     {
         active = !active;
@@ -163,6 +169,7 @@
         var message = MessageBuilderService.BuildDetailLockMessage(Detail, locked, userName);
         KafkaService.SendMessage("detail_lock", message);
     }
+
     private string SetContent()
     {
         return Detail.Type switch
@@ -199,7 +206,6 @@
 
     public void Dispose()
     {
-        // Lyt ikke længere, når komponenten lukkes
         DetailLockState.OnLockStateChanged -= HandleLockStateChanged;
     }
 }

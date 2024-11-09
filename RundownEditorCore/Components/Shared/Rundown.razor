@@ -15,8 +15,7 @@
 }
 <div class="tab-content">
 
-    <TabPaneRundown ControlRooms="ControlRooms"
-                    ActiveTab="@activeTab"
+    <TabPaneRundown ActiveTab="@activeTab"
                     OpenTabPane="OpenTabPane" />
 
     @foreach (var tab in tabPanes)
@@ -26,8 +25,8 @@
 </div>
 
 @code {
-    [Parameter]
-    public List<ControlRoomDTO> ControlRooms { get; set; }
+    // [Parameter]
+    // public List<ControlRoomDTO> ControlRooms { get; set; }
 
     private string activeTab = string.Empty;
     private string openItemId = string.Empty;
@@ -38,38 +37,51 @@
     protected override void OnInitialized()
     {
         RundownState.OnChange += HandleRundownStateChange;
-        SharedStates.OnChange += HandleSharedStateChange;
+        //SharedStates.OnChange += HandleSharedStateChange;
     }
 
     /// <summary>
     /// Rydder alle tabs og tabpanes, hvis der skiftes Rundown
     /// </summary>
-    private void HandleRundownStateChange()
+    private string previousRundownName = string.Empty;
+
+    private async void HandleRundownStateChange(RundownState.StateAction action)
     {
-        if (activeTab != RundownState.Item.Name && activeTab != RundownState.Rundown.Name)
+        if (action != RundownState.StateAction.RundownUpdated) return;
+
+        bool activeTabExists = menuTabs.Any(tab => tab.Name == activeTab);
+        bool isNewRundown = RundownState.Rundown.Name != previousRundownName;
+
+        if (activeTabExists && !isNewRundown)
         {
-            activeTab = RundownState.Rundown.Name ?? "Unknown";
-            menuTabs = [];
-            tabPanes = [];
+            previousRundownName = RundownState.Rundown.Name;
+            return;
         }
+        activeTab = RundownState.Rundown.Name ?? "Unknown";
+        previousRundownName = RundownState.Rundown.Name;
+        menuTabs.Clear();
+        tabPanes.Clear();
+        await InvokeAsync(StateHasChanged);        
     }
+
     /// <summary>
     /// opdaterer RundownItem, hvis det er blevet ændret. på tværs af alle brugere og rundowns indlæst
     /// </summary>
-    private void HandleSharedStateChange(SharedStates.StateAction action)
-    {
-        if (action == SharedStates.StateAction.ItemUpdated)
-        {
-            if (!RundownState.Rundown.Items.Any() || SharedStates.ItemUpdated.UUID == Guid.Empty) return;
+    // private async void HandleSharedStateChange(SharedStates.StateAction action)
+    // {
+    //     if (action == SharedStates.StateAction.ItemUpdated)
+    //     {
+    //         if (!RundownState.Rundown.Items.Any() || SharedStates.ItemUpdated.UUID == Guid.Empty) return;
 
-            var rundown = RundownState.Rundown;
-            var index = rundown.Items.FindIndex(i => i.UUID == SharedStates.ItemUpdated.UUID);
-            if (index != -1)
-            {
-                rundown.Items[index] = SharedStates.ItemUpdated;
-            }
-        }
-    }
+    //         var rundown = RundownState.Rundown;
+    //         var index = rundown.Items.FindIndex(i => i.UUID == SharedStates.ItemUpdated.UUID);
+    //         if (index != -1)
+    //         {
+    //             rundown.Items[index] = SharedStates.ItemUpdated;
+    //             await InvokeAsync(StateHasChanged);
+    //         }
+    //     }
+    // }
 
     /// <summary>
     /// Sætter den valgte tab til den aktive, så visning i UI sker
@@ -77,25 +89,28 @@
     private void SelectTab(string tabName)
     {
         activeTab = tabName;
-    }   
+    }
     /// <summary>
     /// Viser en TabPane, hvis den findes. Ellers kaldes rendering af en ny TabPane
     /// </summary>
-    private void OpenTabPane(RundownItemDTO item)
+    private async void OpenTabPane(RundownItemDTO item)
     {
-        RundownState.SelectedItem(item);
+        Console.WriteLine("Opening TabPane: " + item.Name);
         activeTab = item.Name;
+        RundownState.SelectedItem(item);
+
         openItemId = item.UUID.ToString();
 
         if (!menuTabs.Any(tab => tab.ItemId == item.UUID.ToString()))
         {
             AddMenuTab(item.UUID.ToString());
         }
+        await InvokeAsync(StateHasChanged);
     }
     /// <summary>
     /// Renderer en Tab til menuen
     /// </summary>
-    private void AddMenuTab( string itemId)
+    private void AddMenuTab(string itemId)
     {
         string tabName = activeTab;
         var newChild = new RenderFragment(builder =>
@@ -152,7 +167,7 @@
         if (tabToRemove != null)
         {
             tabPanes.Remove(tabToRemove);
-            Console.WriteLine("TabPane removed: " + itemId + " - " +tabToRemove.ItemId);
+            Console.WriteLine("TabPane removed: " + itemId + " - " + tabToRemove.ItemId);
             RemoveTab(tabToRemove.Name);
         }
     }

@@ -1,26 +1,32 @@
 ﻿using CommonClassLibrary.DTO;
+using System;
 
 namespace RundownEditorCore.States
 {
     public class RundownState
     {
-        public event Action OnChange;
+        public enum StateAction
+        {
+            ItemUpdated,
+            RundownUpdated
+        }
+        public event Action<StateAction>? OnChange;
         public RundownItemDTO Item { get; private set; } = new();
         public RundownDTO Rundown { get; private set; } = new();
         
         public void SelectedItem(RundownItemDTO item)
         {
             Item = item;
-            NotifyStateChanged();
+            NotifyStateChanged(StateAction.ItemUpdated);
         }
         public void SelectedRundown(RundownDTO rundown)
         {
             Rundown = rundown;
-            NotifyStateChanged();
+            NotifyStateChanged(StateAction.RundownUpdated);
         }
-        private void NotifyStateChanged()
+        private void NotifyStateChanged(StateAction action)
         {
-            OnChange?.Invoke();
+            OnChange?.Invoke(action);
         }
     }
 }

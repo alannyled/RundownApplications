@@ -135,13 +135,29 @@ namespace RundownEditorCore.Services
             var messageObject = ConvertMessageToJson<RundownMessage>(message);
             if (messageObject?.Action == "update")
             {
-                _logger.LogInformation($"MESSAGE: Rundown opdateret UUID = {messageObject?.Rundown?.UUID}");
-                _sharedStates.SharedRundown(messageObject?.Rundown);
+                _logger.LogInformation($"MESSAGE: Rundown opdateret UUID = {messageObject?.Rundown?.UUID}");               
+                UpdateRundownInSharedStates(messageObject?.Rundown);
             }
             if (messageObject?.Action == "create")
             {
                 _logger.LogInformation($"MESSAGE: Ny Rundown oprettet {messageObject?.Rundown?.Name}");
                 _sharedStates.SharedNewRundown(messageObject?.Rundown);
+            }
+        }
+
+        private void UpdateRundownInSharedStates(RundownDTO rundown)
+        {
+            var allRundowns = new List<RundownDTO>(sharedStates.AllRundowns);
+            var updatedRundown = allRundowns.Find(r => r.UUID == rundown.UUID);
+            var index = allRundowns.FindIndex(r => r.UUID == rundown.UUID);
+
+            rundown.ControlRoomId = updatedRundown.ControlRoomId;
+            rundown.ControlRoomName = updatedRundown.ControlRoomName;
+
+            if (index >= 0)
+            {
+                allRundowns[index] = rundown;
+                sharedStates.SharedAllRundowns(allRundowns);
             }
         }
     }

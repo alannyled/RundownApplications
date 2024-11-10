@@ -64,8 +64,8 @@
         var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
         RundownState.SelectedRundown(rundown);
         ModalState.Close();
-        var activeRundowns = await RundownService.GetRundownsAsync();
-        SharedStates.SharedAllRundowns(activeRundowns);
+        // var activeRundowns = await RundownService.GetRundownsAsync();
+        // SharedStates.SharedAllRundowns(activeRundowns);
         return true;
     }
 }

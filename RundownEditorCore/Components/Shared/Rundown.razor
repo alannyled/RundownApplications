@@ -25,9 +25,6 @@
 </div>
 
 @code {
-    // [Parameter]
-    // public List<ControlRoomDTO> ControlRooms { get; set; }
-
     private string activeTab = string.Empty;
     private string openItemId = string.Empty;
 
@@ -37,11 +34,10 @@
     protected override void OnInitialized()
     {
         RundownState.OnChange += HandleRundownStateChange;
-        //SharedStates.OnChange += HandleSharedStateChange;
     }
 
     /// <summary>
-    /// Rydder alle tabs og tabpanes, hvis der skiftes Rundown
+    /// Rydder alle tabs og tabpanes, hvis der skiftes til en anden Rundown
     /// </summary>
     private string previousRundownName = string.Empty;
 
@@ -63,25 +59,6 @@
         tabPanes.Clear();
         await InvokeAsync(StateHasChanged);        
     }
-
-    /// <summary>
-    /// opdaterer RundownItem, hvis det er blevet ændret. på tværs af alle brugere og rundowns indlæst
-    /// </summary>
-    // private async void HandleSharedStateChange(SharedStates.StateAction action)
-    // {
-    //     if (action == SharedStates.StateAction.ItemUpdated)
-    //     {
-    //         if (!RundownState.Rundown.Items.Any() || SharedStates.ItemUpdated.UUID == Guid.Empty) return;
-
-    //         var rundown = RundownState.Rundown;
-    //         var index = rundown.Items.FindIndex(i => i.UUID == SharedStates.ItemUpdated.UUID);
-    //         if (index != -1)
-    //         {
-    //             rundown.Items[index] = SharedStates.ItemUpdated;
-    //             await InvokeAsync(StateHasChanged);
-    //         }
-    //     }
-    // }
 
     /// <summary>
     /// Sætter den valgte tab til den aktive, så visning i UI sker

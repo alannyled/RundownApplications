@@ -117,12 +117,6 @@
             AllRundowns = await RundownService.GetRundownsAsync();
             SharedStates.SharedAllRundowns(AllRundowns);
         }
-        //ControlRooms = await ControlRoomService.GetControlRoomsAsync();
-        //  AllTemplates = await TemplateService.GetAllTemplatesAsync();
-        //  AllRundowns = await RundownService.GetRundownsAsync();
-        //  SharedStates.SharedControlRoom(ControlRooms);
-        //  SharedStates.SharedTemplates(AllTemplates);
-        //  SharedStates.SharedAllRundowns(AllRundowns);
         await FilterActiveRundowns();
         SharedStates.OnChange += HandleSharedStateChange;   
 
@@ -133,12 +127,7 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     { 
-        // if(action == SharedStates.StateAction.AllRundownsUpdated){
-        //     await FilterActiveRundowns();
-        //     await InvokeAsync(StateHasChanged);
-        // }
-        if (action == SharedStates.StateAction.NewRundownAdded || 
-            action == SharedStates.StateAction.ItemUpdated || 
+        if (action == SharedStates.StateAction.ItemUpdated || 
             action == SharedStates.StateAction.AllRundownsUpdated)
         {
             await FilterActiveRundowns();
@@ -167,7 +156,6 @@
     /// </summary>
     private async Task FilterActiveRundowns()
     {
-        // AllRundowns = await RundownService.GetRundownsAsync();
         var allRundowns = SharedStates.AllRundowns;
         ActiveRundowns = allRundowns.Where(r => r.ArchivedDate == null).ToList() ?? [];
 

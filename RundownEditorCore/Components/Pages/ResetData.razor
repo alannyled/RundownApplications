@@ -2,6 +2,7 @@
 @inject NavigationManager Navigation
 @inject ToastState ToastState
 @inject RundownState RundownState
+@inject SharedStates SharedStates
 
 <Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
@@ -28,6 +29,8 @@
 
             if (responseControlRoom.IsSuccessStatusCode)
             {
+                SharedStates.SharedAllRundowns(new List<RundownDTO>());
+                SharedStates.SharedControlRoom(new List<ControlRoomDTO>());
                 ToastState.FireToast("Nulstilling af data lykkedes", "text-bg-success");
                 Navigation.NavigateTo("/");
             }

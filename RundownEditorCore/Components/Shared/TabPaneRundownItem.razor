@@ -60,7 +60,7 @@
         {
             var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown?.UUID);
             if(currentRundown == null) return;
-            SharedStates.SharedRundown(currentRundown); // er ddet nødevendigt?
+            SharedStates.SharedRundown(currentRundown); // er ddet nødevendigt? Udløser et event!
             RundownItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
             if (RundownItem == null) return;
 

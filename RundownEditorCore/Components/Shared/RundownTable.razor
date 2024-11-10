@@ -44,27 +44,25 @@
 </div>
 
 @code {
-    [Parameter]
-    public EventCallback<string> OpenRundown { get; set; }
+    // Rundowns sendes med som parameter, da indholdet er forskelligt, - feks. filtreret
     [Parameter]
     public List<RundownDTO> Rundowns { get; set; } = [];
+    [Parameter]
+    public EventCallback<string> OpenRundown { get; set; }    
     [Parameter]
     public DateTime SelectedDate { get; set; }
     [Parameter]
     public bool ShowArchived { get; set; } = false;
 
     public async Task OpenThisRundown(string uuid)
-    {      
-        Console.WriteLine("OpenThisRundown " + uuid);
+    { 
         await OpenRundown.InvokeAsync(uuid);
     }
 
     public bool IsArchived(DateTime? archivedDate)
     {
         return archivedDate.HasValue;
-
     }
-
 
     public async Task<RundownDTO> HandleCheckBoxChange(RundownDTO rundown)
     {

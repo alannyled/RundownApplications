@@ -7,10 +7,11 @@ using RundownEditorCore.States;
 
 namespace RundownEditorCore.Services
 {
-    public class RundownService(HttpClient httpClient, ToastState toastState, ILogger<RundownService> logger, IKafkaService kafkaService, IMessageBuilderService messageBuilderService) : IRundownService
+    public class RundownService(HttpClient httpClient, ToastState toastState, SharedStates sharedStates, ILogger<RundownService> logger, IKafkaService kafkaService, IMessageBuilderService messageBuilderService) : IRundownService
     {
         private readonly HttpClient _httpClient = httpClient;
            private readonly ToastState _toastState = toastState;
+        private readonly SharedStates _sharedStates = sharedStates;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IKafkaService _kafkaService = kafkaService;
         private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
@@ -83,6 +84,8 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var rundown = await response.Content.ReadFromJsonAsync<RundownDTO>();
+                     var allUpdatedRundowns = await GetRundownsAsync();
+                     _sharedStates.SharedAllRundowns(allUpdatedRundowns);
                     _logger.LogInformation($"UPDATED Rundown {rundown?.Name}");
                     return rundown;
                 }

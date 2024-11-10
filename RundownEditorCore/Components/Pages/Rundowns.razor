@@ -13,16 +13,24 @@
     private List<RundownDTO> AllRundowns = new();
 
     protected override async Task OnInitializedAsync()
-    {       
-        AllRundowns = await RundownService.GetRundownsAsync();
+    {
+        if (SharedStates.AllRundowns.Count == 0)
+        {
+            AllRundowns = await RundownService.GetRundownsAsync();
+            SharedStates.SharedAllRundowns(AllRundowns);
+        }
+        else
+        {
+            AllRundowns = SharedStates.AllRundowns;
+        }
         SharedStates.OnChange += HandleSharedStateChange;
     }
 
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action == SharedStates.StateAction.NewRundownAdded)
+        if (action == SharedStates.StateAction.AllRundownsUpdated)
         {
-            AllRundowns = await RundownService.GetRundownsAsync();
+            AllRundowns = new List<RundownDTO>(SharedStates.AllRundowns);
             await InvokeAsync(StateHasChanged);
         }
 

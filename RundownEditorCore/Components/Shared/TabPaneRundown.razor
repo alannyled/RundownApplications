@@ -106,14 +106,10 @@
         return char.ToUpper(formattedDate[0]) + formattedDate.Substring(1);
     }
 
-    // skal laves om til ren event driven - må ikke sætte state her !!
     private async Task OnControlRoomChange(ChangeEventArgs e)
     {
         var selectedControlRoomUuid = e.Value.ToString();
-        await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);
-        var allUpdatedRundowns = await RundownService.GetRundownsAsync();
-        RundownState.SelectedRundown(allUpdatedRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown.UUID));
-        SharedStates.SharedAllRundowns(allUpdatedRundowns);
+        await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);      
     }
 
 

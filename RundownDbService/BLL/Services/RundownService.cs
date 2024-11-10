@@ -49,6 +49,7 @@ namespace RundownDbService.BLL.Services
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 _kafkaService.SendMessage("rundown", message);
+                Console.WriteLine($"MESSAGE: Rundown opdateret UUID = {rundown.UUID}");
                 return rundown;
             });
         }

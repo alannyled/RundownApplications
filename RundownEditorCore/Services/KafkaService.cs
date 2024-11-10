@@ -4,6 +4,7 @@ using RundownEditorCore.States;
 using RundownEditorCore.Interfaces;
 using CommonClassLibrary.DTO;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace RundownEditorCore.Services
 {
@@ -13,8 +14,8 @@ namespace RundownEditorCore.Services
     public class KafkaService : IKafkaService
     {
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
-        private readonly KafkaProducerClient _producerClient;   
-       
+        private readonly KafkaProducerClient _producerClient;
+
 
         public KafkaService()
         {
@@ -24,12 +25,12 @@ namespace RundownEditorCore.Services
                 .Build();
 
             _kafkaService = new KafkaServiceLibrary.KafkaService(configuration);
-            _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer"); 
+            _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
         }
         public virtual void SendMessage(string topic, string message)
-        {           
+        {
             string key = Guid.NewGuid().ToString();
-            _producerClient.Producer.Produce(topic, new Message<string, string> { Key = key, Value = message });                 
+            _producerClient.Producer.Produce(topic, new Message<string, string> { Key = key, Value = message });
         }
     }
 
@@ -45,11 +46,12 @@ namespace RundownEditorCore.Services
             ) : BackgroundService
     {
 
-        private readonly KafkaServiceLibrary.KafkaService _kafkaService = kafkaService;        
+        private readonly KafkaServiceLibrary.KafkaService _kafkaService = kafkaService;
         private readonly DetailLockState _detailLockState = detailLockState;
         private readonly SharedStates _sharedStates = sharedStates;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IControlRoomService _controlRoomService = controlRoomService;
+
 
         private KafkaConsumerClient? _consumerClient;
 
@@ -102,14 +104,14 @@ namespace RundownEditorCore.Services
                             {
                                 HandleRundownMessage(message);
                             }
-                            if(message.Topic == "controlroom")
+                            if (message.Topic == "controlroom")
                             {
                                 _logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 var controlrooms = await _controlRoomService.GetControlRoomsAsync();
                                 _sharedStates.SharedControlRoom(controlrooms);
                             }
-                            if(message.Topic == "error")
+                            if (message.Topic == "error")
                             {
                                 var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message);
                                 _sharedStates.SharedError(messageObject);
@@ -133,15 +135,16 @@ namespace RundownEditorCore.Services
         public void HandleRundownMessage(ConsumeResult<string, string> message)
         {
             var messageObject = ConvertMessageToJson<RundownMessage>(message);
-            if (messageObject?.Action == "update")
+
+            if (messageObject?.Action == "update" && messageObject?.Rundown != null)
             {
-                _logger.LogInformation($"MESSAGE: Rundown opdateret UUID = {messageObject?.Rundown?.UUID}");               
-                UpdateRundownInSharedStates(messageObject?.Rundown);
+                _logger.LogInformation($"MESSAGE: Rundown {messageObject.Rundown.Name} opdateret");
+                UpdateRundownInSharedStates(messageObject.Rundown);
             }
-            if (messageObject?.Action == "create")
+            if (messageObject?.Action == "create" && messageObject?.Rundown != null)
             {
-                _logger.LogInformation($"MESSAGE: Ny Rundown oprettet {messageObject?.Rundown?.Name}");
-                _sharedStates.SharedNewRundown(messageObject?.Rundown);
+                _logger.LogInformation($"MESSAGE: Ny Rundown oprettet: {messageObject.Rundown.Name}");
+                AddNewRundownToSharedStates(messageObject.Rundown);
             }
         }
 
@@ -149,16 +152,26 @@ namespace RundownEditorCore.Services
         {
             var allRundowns = new List<RundownDTO>(sharedStates.AllRundowns);
             var updatedRundown = allRundowns.Find(r => r.UUID == rundown.UUID);
-            var index = allRundowns.FindIndex(r => r.UUID == rundown.UUID);
+            var index = allRundowns.FindIndex(r => r.UUID == rundown.UUID);            
 
-            rundown.ControlRoomId = updatedRundown.ControlRoomId;
-            rundown.ControlRoomName = updatedRundown.ControlRoomName;
-
-            if (index >= 0)
+            if (index >= 0 && updatedRundown != null)
             {
+                rundown.ControlRoomId = updatedRundown.ControlRoomId;
+                rundown.ControlRoomName = updatedRundown.ControlRoomName;
                 allRundowns[index] = rundown;
                 sharedStates.SharedAllRundowns(allRundowns);
             }
+        }
+
+        private void AddNewRundownToSharedStates(RundownDTO rundown)
+        {            
+            var controlRoom = sharedStates.ControlRooms.FirstOrDefault(c => c.Uuid.ToString() == rundown.ControlRoomId);
+            rundown.ControlRoomName = controlRoom?.Name;
+            var allRundowns = new List<RundownDTO>(sharedStates.AllRundowns)
+            {
+                rundown
+            };
+            sharedStates.SharedAllRundowns(allRundowns);
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿@inject IRundownService RundownService
+@inject IControlRoomService ControlRoomService
 @inject ILogger<TabPaneRundown> _logger
 @inject RundownState RundownState
 @inject SharedStates SharedStates
@@ -76,12 +77,19 @@
     public string ActiveTab { get; set; } = string.Empty;
 
     public List<ControlRoomDTO> ControlRooms { get; set; }
-
     private string? draggedChildId;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        ControlRooms = SharedStates.ControlRooms;
+        if (SharedStates.ControlRooms.Count == 0)
+        {
+            ControlRooms = await ControlRoomService.GetControlRoomsAsync();
+            SharedStates.SharedControlRoom(ControlRooms);
+        }
+        else
+        {
+            ControlRooms = SharedStates.ControlRooms;
+        }
         SharedStates.OnChange += HandleSharedStateChange;
     }
     /// <summary>

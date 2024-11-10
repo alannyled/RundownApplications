@@ -98,12 +98,20 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action != SharedStates.StateAction.AllRundownsUpdated && action != SharedStates.StateAction.ItemUpdated) return;
-        if (RundownState?.Rundown == null || SharedStates.RundownUpdated == null) return;
-        var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown.UUID);
-        if (currentRundown == null) return;
-        RundownState.SelectedRundown(currentRundown);
-        await InvokeAsync(StateHasChanged);
+        if (action == SharedStates.StateAction.AllRundownsUpdated || action == SharedStates.StateAction.ItemUpdated)
+        {
+            if (RundownState?.Rundown == null || SharedStates.RundownUpdated == null) return;
+            var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown.UUID);
+            if (currentRundown == null) return;
+            RundownState.SelectedRundown(currentRundown);
+            await InvokeAsync(StateHasChanged);
+        }
+
+        if(action == SharedStates.StateAction.ControlRoomsUpdated)
+        {
+            ControlRooms = SharedStates.ControlRooms;
+            await InvokeAsync(StateHasChanged);
+        }
     }
     /// <summary>
     /// Formattere et pænt dato format til UI

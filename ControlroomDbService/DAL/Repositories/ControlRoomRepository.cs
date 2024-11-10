@@ -26,8 +26,14 @@ namespace ControlRoomDbService.DAL.Repositories
         public async Task CreateAsync(ControlRoom newControlRoom) =>
             await _controlRoomCollection.InsertOneAsync(newControlRoom);
 
-        public async Task UpdateAsync(string id, ControlRoom updatedControlRoom) =>
+        public async Task<List<ControlRoom>> UpdateAsync(string id, ControlRoom updatedControlRoom)
+        {
             await _controlRoomCollection.ReplaceOneAsync(x => x.UUID == Guid.Parse(id), updatedControlRoom);
+
+            // Hent alle controlrooms og returnér listen
+            return await _controlRoomCollection.Find(_ => true).ToListAsync();
+        }
+
 
         public async Task RemoveAsync(string id) =>
             await _controlRoomCollection.DeleteOneAsync(x => x.UUID == Guid.Parse(id));

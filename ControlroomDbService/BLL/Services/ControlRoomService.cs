@@ -29,10 +29,17 @@ namespace ControlRoomDbService.BLL.Services
 
         public async Task UpdateControlRoomAsync(string id, ControlRoom updatedControlRoom)
         {
-            await _controlRoomRepository.UpdateAsync(id, updatedControlRoom);
-            string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = "update" });
+            var controlRooms = await _controlRoomRepository.UpdateAsync(id, updatedControlRoom);
+            string message = JsonConvert.SerializeObject(new
+            {
+                TimeStamp = DateTime.Now,
+                Action = "update",
+                ControlRooms = controlRooms
+            });
+
             _kafkaService.SendMessage("controlroom", message);
         }
+
 
         public async Task DeleteControlRoomAsync(string id)
         {

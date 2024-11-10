@@ -104,13 +104,16 @@ namespace RundownEditorCore.Services
                             {
                                 HandleRundownMessage(message);
                             }
+
                             if (message.Topic == "controlroom")
                             {
                                 _logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
+                                //var controlrooms = messageObject.ControlRooms; (der mangler hardware her)                       
                                 var controlrooms = await _controlRoomService.GetControlRoomsAsync();
                                 _sharedStates.SharedControlRoom(controlrooms);
                             }
+
                             if (message.Topic == "error")
                             {
                                 var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message);
@@ -178,6 +181,8 @@ namespace RundownEditorCore.Services
     public class ControlRoomMessage
     {
         public string? Action { get; set; }
+        public DateTime TimeStamp { get; set; }
+        public List<ControlRoomDTO> ControlRooms { get; set; }
     }
     public class ItemMessage
     {

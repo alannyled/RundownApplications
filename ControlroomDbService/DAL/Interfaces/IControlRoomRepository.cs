@@ -7,7 +7,7 @@ namespace ControlRoomDbService.DAL.Interfaces
         Task<List<ControlRoom>> GetAsync();
         Task<ControlRoom?> GetByIdAsync(string id);
         Task CreateAsync(ControlRoom newControlRoom);
-        Task UpdateAsync(string id, ControlRoom updatedControlRoom);
+        Task<List<ControlRoom>> UpdateAsync(string id, ControlRoom updatedControlRoom);
         Task RemoveAsync(string id);
         Task RemoveAllAsync();
     }

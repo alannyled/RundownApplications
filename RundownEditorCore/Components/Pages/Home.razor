@@ -34,7 +34,7 @@
 
                         <div class="card-body">
                             <h5 class="card-title">Templates</h5>
-                            <TemplatesTable Templates="AllTemplates" />
+                            <TemplatesTable Templates="SharedStates.Templates" />
                         </div>
                     </div>
                 </div>
@@ -133,6 +133,13 @@
             await FilterActiveRundowns();
             await InvokeAsync(StateHasChanged);
         }
+
+        if(action == SharedStates.StateAction.TemplatesUpdated)
+        {
+            AllTemplates = new List<TemplateDTO>(SharedStates.Templates);
+            await InvokeAsync(StateHasChanged);
+        }
+
         if (action == SharedStates.StateAction.Error)
         {
             string message = "";

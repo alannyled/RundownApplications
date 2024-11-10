@@ -1,16 +1,31 @@
 ﻿@page "/templates"
 
 @inject ITemplateService TemplateService
+@inject SharedStates SharedStates
 
 <div class="container-fluid" style="max-width:1600px">
-    <TemplatesTable Templates="AllTemplates"/>
- </div>
- @code{
+    <TemplatesTable Templates="SharedStates.Templates" />
+</div>
+@code {
 
     private List<TemplateDTO> AllTemplates = new();
 
     protected override async Task OnInitializedAsync()
     {
-        AllTemplates = await TemplateService.GetAllTemplatesAsync();
+        if (SharedStates.Templates.Count == 0)
+        {
+            AllTemplates = await TemplateService.GetAllTemplatesAsync();
+            SharedStates.SharedTemplates(AllTemplates);
+        }
+
+        SharedStates.OnChange += HandleSharedStateChange;
+    }
+
+    private async void HandleSharedStateChange(SharedStates.StateAction action)
+    {
+        if (action == SharedStates.StateAction.TemplatesUpdated)
+        {
+            await InvokeAsync(StateHasChanged);
+        }
     }
  }

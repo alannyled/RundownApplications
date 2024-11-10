@@ -76,7 +76,7 @@
     [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
 
-    public List<ControlRoomDTO> ControlRooms { get; set; }
+    public List<ControlRoomDTO> ControlRooms { get; set; } = new();
     private string? draggedChildId;
 
     protected override async Task OnInitializedAsync()

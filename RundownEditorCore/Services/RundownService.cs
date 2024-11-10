@@ -37,7 +37,7 @@ namespace RundownEditorCore.Services
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
-                _logger.LogInformation($"FETCHED Rundown {response?.Name}");
+                _logger.LogInformation($"FETCHED Rundown {response?.Name} {response.BroadcastDate.DateTime.ToShortDateString()}");
                 return response;
             }
             catch (Exception ex)
@@ -59,7 +59,7 @@ namespace RundownEditorCore.Services
                 };
                 var createdRundown = await _httpClient.PostAsJsonAsync($"create-rundown-from-template/{templateId}", request);
                 var response = await createdRundown.Content.ReadFromJsonAsync<RundownDTO>();
-                _logger.LogInformation($"CREATED Rundown {response?.Name}");
+                _logger.LogInformation($"CREATED Rundown {response?.Name} {response?.BroadcastDate.DateTime.ToShortDateString()}");
                 return response;
             }
             catch (Exception ex)
@@ -173,16 +173,11 @@ namespace RundownEditorCore.Services
         {
             try
             {
-                foreach (var item in rundown.Items)
-                {
-                    _logger.LogInformation($"Updating Item: {item.Name}, Order: {item.Order}, RundownId: {item.RundownId}");
-                }
-
                 var response = await _httpClient.PutAsJsonAsync($"update-rundown/{rundownId}", rundown);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"UPDATED {rundown.Name}");
+                    _logger.LogInformation($"UPDATED {rundown.Name} {rundown.BroadcastDate.DateTime.ToShortDateString()}");
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
                 _logger.LogWarning($"ERROR updating rundown: {response.ReasonPhrase}");

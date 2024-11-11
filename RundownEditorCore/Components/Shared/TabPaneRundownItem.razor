@@ -28,6 +28,17 @@
             {
                 <ItemDetail Detail="detail"></ItemDetail>
             }
+            @if (isCreating )
+            {
+                <div class="card d-inline-block">
+                    <div class="card-header">
+                        Opretter nyt element...
+                    </div>
+                    <div class="card-body bg-secondary-subtle">
+                        <p class="card-text">.....................</p>                        
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -43,6 +54,7 @@
     public EventCallback<string> OnRemove { get; set; }
 
     public RundownItemDTO? RundownItem { get; set; } = new();
+    public bool isCreating { get; set; } = false;
 
     protected override void OnInitialized()
     {
@@ -66,9 +78,13 @@
 
             RundownState.SelectedItem(RundownItem);
             SharedStates.SharedItem(RundownItem);
+
+            isCreating = false;
             await InvokeAsync(StateHasChanged);
         }
     }
+
+  
     /// <summary>
     /// Kalder callback for at fjerne lukket items tabpane fra UI
     /// </summary>
@@ -82,6 +98,7 @@
     /// </summary>
     public void AddSelected(string type)
     {
+        isCreating = true;
         var content = new RenderFragment(builder =>
         {
             builder.AddContent(0, FormRenderservice.RenderItemDetailForm(

@@ -64,9 +64,15 @@ namespace RundownEditorCore.Services
             return JsonConvert.DeserializeObject<T>(message.Message.Value);
         }
 
+        private readonly string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error" };
+        private async Task InitializeTopics() {
+           await _kafkaService.CreateMissingTopicsAsync(topics, numPartitions: 3, replicationFactor: 1);
+        }
+    
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error" };
+            await InitializeTopics();
             _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "RundownEditorCore", topics);
 
             await Task.Yield();
@@ -76,6 +82,7 @@ namespace RundownEditorCore.Services
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var message = _consumerClient.Consumer.Consume(stoppingToken);
+                    Console.WriteLine($"Modtaget besked i appsen: {message.Message.Value}");
                     if (message != null)
                     {
                         try

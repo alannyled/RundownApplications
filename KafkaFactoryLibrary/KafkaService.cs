@@ -52,7 +52,7 @@ namespace KafkaServiceLibrary
                 {
                     topicSpecifications.Add(new TopicSpecification
                     {
-                        Name = topic.Trim(), // fjerner mellemrum
+                        Name = topic.Trim(), 
                         NumPartitions = numPartitions,
                         ReplicationFactor = replicationFactor
                     });
@@ -127,6 +127,66 @@ namespace KafkaServiceLibrary
                 catch (KafkaException ex)
                 {
                     Console.WriteLine($"An error occurred while listing topics: {ex.Error.Reason}");
+                }
+            }
+        }
+
+        public async Task<bool> TopicExistsAsync(string topicName)
+        {
+            using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrapServers }).Build())
+            {
+                try
+                {
+                    var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(5));
+                    return metadata.Topics.Any(t => t.Topic == topicName && t.Error.Code == ErrorCode.NoError);
+                }
+                catch (KafkaException ex)
+                {
+                    Console.WriteLine($"Fejl ved forespørgsel af topics: {ex.Message}");
+                    return false;
+                }
+            }
+        }
+
+        public async Task CreateMissingTopicsAsync(IEnumerable<string> topics, int numPartitions = 1, short replicationFactor = 1)
+        {
+            using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrapServers }).Build())
+            {
+                var missingTopics = new List<string>();
+
+                foreach (var topic in topics)
+                {
+                    if (!await TopicExistsAsync(topic))
+                    {
+                        missingTopics.Add(topic);
+                    }
+                }
+
+                if (missingTopics.Any())
+                {
+                    var topicSpecifications = missingTopics.Select(topic => new TopicSpecification
+                    {
+                        Name = topic,
+                        NumPartitions = numPartitions,
+                        ReplicationFactor = replicationFactor
+                    }).ToList();
+
+                    try
+                    {
+                        await adminClient.CreateTopicsAsync(topicSpecifications);
+                        Console.WriteLine($"Manglende topics oprettet: {string.Join(", ", missingTopics)}");
+                    }
+                    catch (CreateTopicsException ex)
+                    {
+                        foreach (var result in ex.Results)
+                        {
+                            Console.WriteLine($"Fejl ved oprettelse af topic '{result.Topic}': {result.Error.Reason}");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Alle topics findes allerede.");
                 }
             }
         }

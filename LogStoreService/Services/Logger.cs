@@ -9,7 +9,7 @@ namespace LogStoreService.Services
     {
         public void Test(LogMessageDTO message)
         {
-            Console.WriteLine($"{message.TimeStamp} - {message.LogLevel} - {message.Message}");
+            Console.WriteLine($"{message.TimeStamp} - {message.LogLevel} From {message.Host}: {message.Message}");
         }
     }
 }

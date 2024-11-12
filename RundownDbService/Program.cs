@@ -7,7 +7,6 @@ using RundownDbService.DAL;
 using RundownDbService.DAL.Interfaces;
 using RundownDbService.DAL.Repositories;
 using RundownDbService.Models;
-using LogStoreService.Services;
 
 
 
@@ -37,7 +36,7 @@ builder.Services.AddScoped<IItemDetailService, ItemDetailService>();
 builder.Services.AddSingleton<IKafkaService, KafkaService>();
 builder.Services.AddSingleton<ResilienceService>();
 
-//builder.Services.AddSingleton<LogStoreLogger>();
+builder.Services.AddSingleton<RemoteLogger>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -70,7 +69,7 @@ RegisterMongoClassMaps();
 
 app.Run();
 
-void RegisterMongoClassMaps()
+static void RegisterMongoClassMaps()
 {
     if (!BsonClassMap.IsClassMapRegistered(typeof(ItemDetail)))
     {

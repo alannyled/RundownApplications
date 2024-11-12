@@ -20,14 +20,14 @@
     {
         using var httpClient = new HttpClient();
 
-        var responseRundown = await httpClient.PostAsync("https://localhost:3020/api/DataSeed/reset-data", null);
+        var responseControlRoom = await httpClient.PostAsync("https://localhost:3020/api/DataSeed/reset-data", null);
 
-        if (responseRundown.IsSuccessStatusCode)
+        if (responseControlRoom.IsSuccessStatusCode)
         {
             RundownState.SelectedRundown(new());
-            var responseControlRoom = await httpClient.PostAsync("https://localhost:3030/api/DataSeed/reset-data", null);
+            var responseRundown = await httpClient.PostAsync("https://localhost:3030/api/DataSeed/reset-data", null);
 
-            if (responseControlRoom.IsSuccessStatusCode)
+            if (responseRundown.IsSuccessStatusCode)
             {
                 SharedStates.SharedAllRundowns(new List<RundownDTO>());
                 SharedStates.SharedControlRoom(new List<ControlRoomDTO>());
@@ -36,11 +36,13 @@
             }
             else
             {
+                Console.WriteLine(responseRundown.StatusCode);
                 ToastState.FireToast("Nulstilling af Rundowndata mislykkedes", "text-bg-warning");
             }
         }
         else
         {
+            Console.WriteLine(responseControlRoom.StatusCode);
             ToastState.FireToast("Nulstilling af ControlRoomdata mislykkedes", "text-bg-warning");
         }
     }

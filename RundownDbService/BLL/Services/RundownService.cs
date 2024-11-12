@@ -3,36 +3,33 @@ using RundownDbService.DAL.Interfaces;
 using RundownDbService.Models;
 using Newtonsoft.Json;
 using CommonClassLibrary.Services;
-using LogStoreService.Services;
+using CommonClassLibrary.DTO;
 
 namespace RundownDbService.BLL.Services
 {
-    public class RundownService : IRundownService
+    public class RundownService(IRundownRepository rundownRepository, IKafkaService kafkaService, ResilienceService resilienceService, RemoteLogger logger) : IRundownService
     {
-        private readonly IRundownRepository _rundownRepository;
-        private readonly IKafkaService _kafkaService;
-        private readonly ResilienceService _resilienceService;
-        private readonly ILogger _logger;
-
-        public RundownService(IRundownRepository rundownRepository, IKafkaService kafkaService, ResilienceService resilienceService)
-        {
-            _rundownRepository = rundownRepository;
-            _kafkaService = kafkaService;
-            _resilienceService = resilienceService;
-            _logger = CustomLoggerFactory.CreateLogger(nameof(RundownService), (message, topic) => { _kafkaService.SendMessage(topic, message); return true; });
-        }
+        private readonly IRundownRepository _rundownRepository = rundownRepository;
+        private readonly IKafkaService _kafkaService = kafkaService;
+        private readonly ResilienceService _resilienceService = resilienceService;
+        private readonly RemoteLogger _logger = logger;
 
         public async Task<List<Rundown>> GetAllRundownsAsync()
-        {
-            _kafkaService.SendMessage("log", "Old school En opgave blev udført");
-            _logger.LogInformation("En opgave blev udført");
-            return await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.GetAllAsync());
-            
+        {  
+            var rundown = await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.GetAllAsync());
+            _logger.LogInformation("Alle rundowns er hentet fra databasen");
+            return rundown;            
         }
 
         public async Task<Rundown?> GetRundownByIdAsync(Guid uuid)
         {
-            return await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.GetByIdAsync(uuid));
+            var rundown = await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.GetByIdAsync(uuid));
+            if (rundown == null)
+            {
+                _logger.LogInformation($"Rundown med UUID = {uuid} blev ikke fundet i databasen");
+            }
+            _logger.LogInformation($"Rundown med UUID = {uuid} hentet i databasen");
+            return rundown;
         }
 
         public async Task CreateRundownAsync(Rundown newRundown)
@@ -47,6 +44,7 @@ namespace RundownDbService.BLL.Services
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 _kafkaService.SendMessage("rundown", message);
+                _logger.LogInformation($"Rundown oprettet: {rundown.BroadcastDate.ToShortDateString()} {rundown.Name}");
             });
         }
 
@@ -62,7 +60,7 @@ namespace RundownDbService.BLL.Services
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 _kafkaService.SendMessage("rundown", message);
-                Console.WriteLine($"MESSAGE: Rundown opdateret UUID = {rundown.UUID}");
+                _logger.LogInformation($"Rundown opdateret: {rundown.BroadcastDate.ToShortDateString()} {rundown.Name}");
                 return rundown;
             });
         }

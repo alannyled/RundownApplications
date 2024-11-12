@@ -186,7 +186,7 @@ namespace KafkaServiceLibrary
                 }
                 else
                 {
-                    Console.WriteLine("Alle topics findes allerede.");
+                    Console.WriteLine("Alle nødvendige topics findes i Kafka.");
                 }
             }
         }

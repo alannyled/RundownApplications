@@ -82,7 +82,6 @@ namespace RundownEditorCore.Services
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var message = _consumerClient.Consumer.Consume(stoppingToken);
-                    Console.WriteLine($"Modtaget besked i appsen: {message.Message.Value}");
                     if (message != null)
                     {
                         try

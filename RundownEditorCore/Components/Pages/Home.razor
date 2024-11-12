@@ -13,6 +13,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using CommonClassLibrary.DTO
 
+@inject IKafkaService KafkaService
+@inject IMessageBuilderService MessageBuilderService
+
 @attribute [Authorize(Roles = "User,Administrator")]
 
 <PageTitle>Home</PageTitle>
@@ -101,6 +104,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var message = MessageBuilderService.BuildLogMessage("Så er HOME reloaded igen", LogLevel.Warning);
+        KafkaService.SendMessage("log", message);
+
         if(SharedStates.ControlRooms.Count == 0)
         {
             ControlRooms = await ControlRoomService.GetControlRoomsAsync();

@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonClassLibrary", "Commo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaRelationDialogApp", "MediaRelationDialogApp\MediaRelationDialogApp.csproj", "{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogStoreService", "LogStoreService\LogStoreService.csproj", "{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

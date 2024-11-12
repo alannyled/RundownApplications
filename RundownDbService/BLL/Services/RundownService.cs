@@ -3,18 +3,31 @@ using RundownDbService.DAL.Interfaces;
 using RundownDbService.Models;
 using Newtonsoft.Json;
 using CommonClassLibrary.Services;
+using LogStoreService.Services;
 
 namespace RundownDbService.BLL.Services
 {
-    public class RundownService(IRundownRepository rundownRepository, IKafkaService kafkaService, ResilienceService resilienceService) : IRundownService
+    public class RundownService : IRundownService
     {
-        private readonly IRundownRepository _rundownRepository = rundownRepository;
-        private readonly IKafkaService _kafkaService = kafkaService;
-        private readonly ResilienceService _resilienceService = resilienceService;
+        private readonly IRundownRepository _rundownRepository;
+        private readonly IKafkaService _kafkaService;
+        private readonly ResilienceService _resilienceService;
+        private readonly ILogger _logger;
+
+        public RundownService(IRundownRepository rundownRepository, IKafkaService kafkaService, ResilienceService resilienceService)
+        {
+            _rundownRepository = rundownRepository;
+            _kafkaService = kafkaService;
+            _resilienceService = resilienceService;
+            _logger = CustomLoggerFactory.CreateLogger(nameof(RundownService), (message, topic) => { _kafkaService.SendMessage(topic, message); return true; });
+        }
 
         public async Task<List<Rundown>> GetAllRundownsAsync()
         {
+            _kafkaService.SendMessage("log", "Old school En opgave blev udført");
+            _logger.LogInformation("En opgave blev udført");
             return await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.GetAllAsync());
+            
         }
 
         public async Task<Rundown?> GetRundownByIdAsync(Guid uuid)

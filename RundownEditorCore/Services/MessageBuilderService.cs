@@ -6,22 +6,33 @@ namespace RundownEditorCore.Services
 {
     public class MessageBuilderService : IMessageBuilderService
     {
-        public string BuildRundownUpdateMessage(RundownDTO rundown)
-            {
-                var messageObject = new
-                {
-                    Action = "update",
-                    Rundown = rundown
-                };
-                return JsonSerializer.Serialize(messageObject);
-            }
+        //public string BuildRundownUpdateMessage(RundownDTO rundown)
+        //    {
+        //        var messageObject = new
+        //        {
+        //            Action = "update",
+        //            Rundown = rundown
+        //        };
+        //        return JsonSerializer.Serialize(messageObject);
+        //    }
 
-        public string BuildItemMessage(RundownItemDTO item)
+        //public string BuildItemMessage(RundownItemDTO item)
+        //{
+        //    var messageObject = new
+        //    {
+        //        Action = "selected_item",
+        //        Item = item
+        //    };
+        //    return JsonSerializer.Serialize(messageObject);
+        //}
+
+        public string BuildLogMessage(string message, LogLevel logLevel)
         {
-            var messageObject = new
+            var messageObject = new LogMessageDTO
             {
-                Action = "selected_item",
-                Item = item
+                TimeStamp = System.DateTime.Now,
+                Message = message,
+                LogLevel = logLevel
             };
             return JsonSerializer.Serialize(messageObject);
         }

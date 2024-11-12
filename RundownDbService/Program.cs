@@ -7,6 +7,7 @@ using RundownDbService.DAL;
 using RundownDbService.DAL.Interfaces;
 using RundownDbService.DAL.Repositories;
 using RundownDbService.Models;
+using LogStoreService.Services;
 
 
 
@@ -36,6 +37,7 @@ builder.Services.AddScoped<IItemDetailService, ItemDetailService>();
 builder.Services.AddSingleton<IKafkaService, KafkaService>();
 builder.Services.AddSingleton<ResilienceService>();
 
+//builder.Services.AddSingleton<LogStoreLogger>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -120,4 +122,6 @@ void RegisterMongoClassMaps()
         });
     }
 }
+
+
 

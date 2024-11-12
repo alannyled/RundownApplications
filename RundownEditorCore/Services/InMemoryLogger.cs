@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
+
 namespace RundownEditorCore.Services
 {
     public class InMemoryLogger(string name) : ILogger
@@ -27,7 +28,7 @@ namespace RundownEditorCore.Services
                     var simpleLogMessage = $"<strong>{DateTime.Now:HH:mm:ss}</strong> {formatter(state, exception)}";
                     _simpleLogs.Enqueue(simpleLogMessage);
                 }
-                
+
             }
         }
 

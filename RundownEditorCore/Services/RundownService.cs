@@ -21,12 +21,12 @@ namespace RundownEditorCore.Services
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-rundowns-with-controlrooms");
-                _logger.LogInformation("FETCHED All Rundowns");
+                //_logger.LogInformation("FETCHED All Rundowns");
                 return response ?? new List<RundownDTO>();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Der skete en fejl under hentning af alle rundowns.");
+                //_logger.LogError(ex, "Der skete en fejl under hentning af alle rundowns.");
                 _toastState.FireToast("Der skete en fejl under hentning af alle rundowns", "text-bg-warning");
                 return new List<RundownDTO>();
             }
@@ -37,12 +37,12 @@ namespace RundownEditorCore.Services
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<RundownDTO>($"fetch-rundown/{uuid}");
-                _logger.LogInformation($"FETCHED Rundown {response?.Name} {response.BroadcastDate.DateTime.ToShortDateString()}");
+               // _logger.LogInformation($"FETCHED Rundown {response?.Name} {response.BroadcastDate.DateTime.ToShortDateString()}");
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Der skete en fejl under hentning af rundown med ID {uuid}.");
+               // _logger.LogError(ex, $"Der skete en fejl under hentning af rundown med ID {uuid}.");
                 _toastState.FireToast("Der skete en fejl under hentning af rundown med ID {uuid}", "text-bg-warning");
                 return null;
             }
@@ -59,12 +59,12 @@ namespace RundownEditorCore.Services
                 };
                 var createdRundown = await _httpClient.PostAsJsonAsync($"create-rundown-from-template/{templateId}", request);
                 var response = await createdRundown.Content.ReadFromJsonAsync<RundownDTO>();
-                _logger.LogInformation($"CREATED Rundown {response?.Name} {response?.BroadcastDate.DateTime.ToShortDateString()}");
+              //  _logger.LogInformation($"CREATED Rundown {response?.Name} {response?.BroadcastDate.DateTime.ToShortDateString()}");
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Der skete en fejl under oprettelse af rundown fra template.");
+               // _logger.LogError(ex, "Der skete en fejl under oprettelse af rundown fra template.");
                 _toastState.FireToast("Der skete en fejl under oprettelse af rundown fra template", "text-bg-warning");
                 return null;
             }
@@ -86,7 +86,7 @@ namespace RundownEditorCore.Services
                     var rundown = await response.Content.ReadFromJsonAsync<RundownDTO>();
                      var allUpdatedRundowns = await GetRundownsAsync();
                      _sharedStates.SharedAllRundowns(allUpdatedRundowns);
-                    _logger.LogInformation($"UPDATED Rundown {rundown?.Name}");
+                  //  _logger.LogInformation($"UPDATED Rundown {rundown?.Name}");
                     return rundown;
                 }
                 _logger.LogWarning($"ERROR updating controlroom: {response.ReasonPhrase}");
@@ -94,7 +94,7 @@ namespace RundownEditorCore.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Der skete en fejl under opdatering af controlroom til rundown med ID {rundownId}.");
+               // _logger.LogError(ex, $"Der skete en fejl under opdatering af controlroom til rundown med ID {rundownId}.");
                 _toastState.FireToast("Der skete en fejl under opdatering af controlroom til rundown", "text-bg-warning");
                 return null;
             }
@@ -108,7 +108,7 @@ namespace RundownEditorCore.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("ADDED Item to Rundown");
+                  //  _logger.LogInformation("ADDED Item to Rundown");
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
                 _logger.LogWarning($"ERROR adding item to rundown: {response.ReasonPhrase}");
@@ -116,7 +116,7 @@ namespace RundownEditorCore.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Der skete en fejl under tilføjelse af item til rundown med ID {rundownId}.");
+               // _logger.LogError(ex, $"Der skete en fejl under tilføjelse af item til rundown med ID {rundownId}.");
                 _toastState.FireToast("Der skete en fejl under tilføjelse af item til rundown", "text-bg-warning");
                 return null;
             }
@@ -141,7 +141,7 @@ namespace RundownEditorCore.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Der skete en fejl under tilføjelse af detail til item i rundown med ID {rundownId}.");
+              //  _logger.LogError(ex, $"Der skete en fejl under tilføjelse af detail til item i rundown med ID {rundownId}.");
                 _toastState.FireToast("Der skete en fejl under tilføjelse af detail til item i rundown", "text-bg-warning");
                 return null;
             }
@@ -155,15 +155,15 @@ namespace RundownEditorCore.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("UPDATED Detail in item");
+                   // _logger.LogInformation("UPDATED Detail in item");
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
-                _logger.LogWarning($"ERROR updating detail in item: {response.ReasonPhrase}");
+              //  _logger.LogWarning($"ERROR updating detail in item: {response.ReasonPhrase}");
                 return null;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Der skete en fejl under opdatering af detail i rundown med ID {rundownId}.");
+              //  _logger.LogError(ex, $"Der skete en fejl under opdatering af detail i rundown med ID {rundownId}.");
                 _toastState.FireToast("Der skete en fejl under opdatering af detail i rundown", "text-bg-warning");
                 return null;
             }
@@ -177,7 +177,7 @@ namespace RundownEditorCore.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"UPDATED {rundown.Name} {rundown.BroadcastDate.DateTime.ToShortDateString()}");
+                  //  _logger.LogInformation($"UPDATED {rundown.Name} {rundown.BroadcastDate.DateTime.ToShortDateString()}");
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
                 _logger.LogWarning($"ERROR updating rundown: {response.ReasonPhrase}");
@@ -185,7 +185,7 @@ namespace RundownEditorCore.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Der skete en fejl under opdatering af rundown med ID {rundownId}.");
+              //  _logger.LogError(ex, $"Der skete en fejl under opdatering af rundown med ID {rundownId}.");
                 _toastState.FireToast("Der skete en fejl under opdatering af rundown", "text-bg-warning");
                 return null;
             }

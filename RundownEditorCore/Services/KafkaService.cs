@@ -64,7 +64,7 @@ namespace RundownEditorCore.Services
             return JsonConvert.DeserializeObject<T>(message.Message.Value);
         }
 
-        private readonly string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error" };
+        private readonly string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error", "log" };
         private async Task InitializeTopics() {
            await _kafkaService.CreateMissingTopicsAsync(topics, numPartitions: 3, replicationFactor: 1);
         }
@@ -91,7 +91,7 @@ namespace RundownEditorCore.Services
                                 var messageObject = ConvertMessageToJson<DetailMessage>(message);
                                 if (messageObject != null)
                                 {
-                                    _logger.LogInformation($"MESSAGE: {(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail?.UUID.ToString()}'");
+                                    _logger.LogInformation($"{(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail?.UUID.ToString()}'");
                                     _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
                                 }
                             }
@@ -100,7 +100,7 @@ namespace RundownEditorCore.Services
                                 var messageObject = ConvertMessageToJson<ItemMessage>(message);
                                 if (messageObject != null)
                                 {
-                                    _logger.LogInformation($"MESSAGE: Ny detail tilføjet {messageObject.Item.Name}");
+                                   // _logger.LogInformation($"MESSAGE: Ny detail tilføjet {messageObject.Item.Name}");
                                     _sharedStates.SharedItem(messageObject.Item);
 
                                 }
@@ -113,7 +113,7 @@ namespace RundownEditorCore.Services
 
                             if (message.Topic == "controlroom")
                             {
-                                _logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
+                                //_logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 //var controlrooms = messageObject.ControlRooms; (der mangler hardware her)                       
                                 var controlrooms = await _controlRoomService.GetControlRoomsAsync();
@@ -125,6 +125,18 @@ namespace RundownEditorCore.Services
                                 var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message);
                                 _sharedStates.SharedError(messageObject);
                                 _logger.LogError($"Kritisk Fejlbesked: {message.Message.Value}");
+                            }
+                            if(message.Topic == "log")
+                            {
+                                if (message.Topic == "log")
+                                {
+                                    var msg = ConvertMessageToJson<LogMessageDTO>(message);
+                                    if(msg != null)
+                                    {
+                                        _logger.Log(msg.LogLevel, $"{msg.TimeStamp.ToLongTimeString()}: {msg.Message}");
+                                    }
+                                }
+
                             }
                         }
                         catch (JsonException ex)
@@ -147,12 +159,12 @@ namespace RundownEditorCore.Services
 
             if (messageObject?.Action == "update" && messageObject?.Rundown != null)
             {
-                _logger.LogInformation($"MESSAGE: Rundown {messageObject.Rundown.Name} opdateret");
+               // _logger.LogInformation($"MESSAGE: Rundown {messageObject.Rundown.Name} opdateret");
                 UpdateRundownInSharedStates(messageObject.Rundown);
             }
             if (messageObject?.Action == "create" && messageObject?.Rundown != null)
             {
-                _logger.LogInformation($"MESSAGE: Ny Rundown oprettet: {messageObject.Rundown.Name}");
+               // _logger.LogInformation($"MESSAGE: Ny Rundown oprettet: {messageObject.Rundown.Name}");
                 AddNewRundownToSharedStates(messageObject.Rundown);
             }
         }

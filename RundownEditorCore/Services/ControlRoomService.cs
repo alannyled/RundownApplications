@@ -14,12 +14,12 @@ namespace RundownEditorCore.Services
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<List<ControlRoomDTO>>("fetch-controlroom-with-hardware");
-                _logger.LogInformation($"FETCHED Controlrooms");
+               // _logger.LogInformation($"FETCHED Controlrooms");
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error fetching control rooms: {ex.Message}");               
+               // _logger.LogInformation($"Error fetching control rooms: {ex.Message}");               
                 return null;
             }
         }
@@ -33,18 +33,18 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var createdControlRoom = await response.Content.ReadFromJsonAsync<ControlRoomDTO>();
-                    _logger.LogInformation($"CREATED Controlroom {createdControlRoom.Name}");
+                   // _logger.LogInformation($"CREATED Controlroom {createdControlRoom.Name}");
                     return createdControlRoom;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"ERROR creating control room: {response.StatusCode}, {errorContent}");
+                  //  _logger.LogInformation($"ERROR creating control room: {response.StatusCode}, {errorContent}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"ERROR creating control room: {ex.Message}");
+               // _logger.LogInformation($"ERROR creating control room: {ex.Message}");
                 
             }
             return null;
@@ -60,18 +60,18 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var updatedControlRoomResponse = await response.Content.ReadFromJsonAsync<ControlRoomDTO>();
-                    _logger.LogInformation($"UPDATED Controlroom {updatedControlRoomResponse.Name}");
+                  //  _logger.LogInformation($"UPDATED Controlroom {updatedControlRoomResponse.Name}");
                     return updatedControlRoomResponse;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"ERROR updating control room: {response.StatusCode}, {errorContent}");
+                   // _logger.LogInformation($"ERROR updating control room: {response.StatusCode}, {errorContent}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"ERROR during control room update: {ex.Message}");
+               // _logger.LogInformation($"ERROR during control room update: {ex.Message}");
             
             }
             return null;
@@ -87,18 +87,18 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var deletedControlRoom = await response.Content.ReadFromJsonAsync<ControlRoomDTO>();
-                    _logger.LogInformation($"DELETED Controlroom {deletedControlRoom.Name}");
+                  //  _logger.LogInformation($"DELETED Controlroom {deletedControlRoom.Name}");
                     return deletedControlRoom;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"ERROR deleting control room: {response.StatusCode}, {errorContent}");
+                   // _logger.LogInformation($"ERROR deleting control room: {response.StatusCode}, {errorContent}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"ERROR during control room deletion: {ex.Message}");
+              //  _logger.LogInformation($"ERROR during control room deletion: {ex.Message}");
 
             }
             return null;

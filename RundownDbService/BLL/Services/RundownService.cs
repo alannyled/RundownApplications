@@ -28,7 +28,7 @@ namespace RundownDbService.BLL.Services
             {
                 _logger.LogWarning($"Rundown med UUID = {uuid} blev ikke fundet i databasen");
             }
-            _logger.LogInformation($"Rundown med UUID = {uuid} hentet i databasen");
+            _logger.LogInformation($"{rundown.Name} {rundown.BroadcastDate.ToShortDateString()} er hentet i databasen");
             return rundown;
         }
 
@@ -44,7 +44,7 @@ namespace RundownDbService.BLL.Services
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 _kafkaService.SendMessage("rundown", message);
-                _logger.LogInformation($"Rundown oprettet: {rundown.BroadcastDate.ToShortDateString()} {rundown.Name}");
+                _logger.LogInformation($"{rundown.BroadcastDate.ToShortDateString()} {rundown.Name} er oprettet");
             });
         }
 
@@ -60,7 +60,7 @@ namespace RundownDbService.BLL.Services
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 _kafkaService.SendMessage("rundown", message);
-                _logger.LogInformation($"Rundown opdateret: {rundown.BroadcastDate.ToShortDateString()} {rundown.Name}");
+                _logger.LogInformation($"{rundown.BroadcastDate.ToShortDateString()} {rundown.Name} er opdateret");
                 return rundown;
             });
         }

@@ -25,7 +25,7 @@ namespace RundownEditorCore.Services
 
                 if (_name.Contains("RundownEditorCore"))
                 {
-                    var simpleLogMessage = $"<strong>{DateTime.Now:HH:mm:ss}</strong> {formatter(state, exception)}";
+                    var simpleLogMessage = $"{formatter(state, exception)}";
                     _simpleLogs.Enqueue(simpleLogMessage);
                 }
 

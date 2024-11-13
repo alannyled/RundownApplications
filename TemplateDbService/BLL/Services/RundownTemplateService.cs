@@ -1,20 +1,23 @@
-﻿using TemplateDbService.BLL.Interfaces;
+﻿using CommonClassLibrary.Services;
+using TemplateDbService.BLL.Interfaces;
 using TemplateDbService.DAL.Interfaces;
 using TemplateDbService.DAL.Repositories;
 using TemplateDbService.Models;
 
 namespace TemplateDbService.BLL.Services
 {
-    public class RundownTemplateService : IRundownTemplateService
+    public class RundownTemplateService(IRundownTemplateRepository repository, ResilienceService resilienceService, ILogger<RundownTemplateService> logger) : IRundownTemplateService
     {
-        private readonly IRundownTemplateRepository _repository;
+        private readonly IRundownTemplateRepository _repository = repository;
+        private readonly ResilienceService _resilienceService = resilienceService;
+        private readonly ILogger<RundownTemplateService> _logger = logger;
 
-        public RundownTemplateService(IRundownTemplateRepository repository)
+        public async Task<List<RundownTemplate>> GetAllAsync()
         {
-            _repository = repository;
+            var templates = await _resilienceService.ExecuteWithResilienceAsync(() => _repository.GetAllAsync());
+            _logger.LogInformation("Alle templates er hentet i databasen");
+            return templates;
         }
-
-        public async Task<List<RundownTemplate>> GetAllAsync() => await _repository.GetAllAsync();
 
         public async Task<RundownTemplate> GetByIdAsync(Guid uuid) => await _repository.GetByIdAsync(uuid);
 

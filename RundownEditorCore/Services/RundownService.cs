@@ -22,8 +22,6 @@ namespace RundownEditorCore.Services
             {
                 var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-rundowns-with-controlrooms");
                 _logger.LogInformation("FETCHED All Rundowns");
-                var message = _messageBuilderService.BuildLogMessage("FETCHED All Rundowns - KAkfa besked", LogLevel.Information);
-                _kafkaService.SendMessage("log", message);
                 return response ?? new List<RundownDTO>();
             }
             catch (Exception ex)

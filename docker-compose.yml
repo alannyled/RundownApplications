@@ -83,6 +83,18 @@ services:
     networks:
       - shared-mongo-net
 
+  log-database:
+    image: mongo
+    container_name: log-database
+    restart: always
+    ports:
+      - "27047:27017"
+    volumes:
+      - log-mongo-data:/data/db
+    #command: mongod --replSet template-replica-set --bind_ip_all
+    networks:
+      - shared-mongo-net
+
   zookeeper:
     image: bitnami/zookeeper:latest 
     container_name: zookeeper

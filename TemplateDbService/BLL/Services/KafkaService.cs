@@ -1,10 +1,8 @@
 ﻿using KafkaServiceLibrary;
-
 using Confluent.Kafka;
-using RundownDbService.BLL.Interfaces;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using TemplateDbService.BLL.Interfaces;
 
-namespace RundownDbService.BLL.Services
+namespace TemplateDbService.BLL.Services
 {
     public class KafkaService : IKafkaService
     {
@@ -21,7 +19,7 @@ namespace RundownDbService.BLL.Services
 
             _kafkaService = new KafkaServiceLibrary.KafkaService(configuration);
             _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
-           // _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "RundownDbService", ["rundown"]);
+           // _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "TemplateDbService", ["rundown"]);
 
         }
 

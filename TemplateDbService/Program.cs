@@ -1,3 +1,6 @@
+using CommonClassLibrary.Interfaces;
+using CommonClassLibrary.Providers;
+using CommonClassLibrary.Services;
 using MongoDB.Driver;
 using TemplateDbService.BLL.Interfaces;
 using TemplateDbService.BLL.Services;
@@ -22,6 +25,24 @@ builder.Services.AddScoped<IItemTemplateRepository, ItemTemplateRepository>();
 builder.Services.AddScoped<IRundownTemplateService, RundownTemplateService>();
 builder.Services.AddScoped<IItemTemplateService, ItemTemplateService>();
 
+builder.Services.AddSingleton<ResilienceService>();
+builder.Services.AddSingleton<IKafkaService, KafkaService>();
+
+builder.Services.AddSingleton<ILogService, LogService>();
+builder.Services.AddSingleton<RemoteLogger>();
+builder.Services.AddSingleton<RemoteLoggerProvider>();
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    var serviceProvider = builder.Services.BuildServiceProvider();
+    var remoteLoggerProvider = serviceProvider.GetRequiredService<RemoteLoggerProvider>();
+
+    loggingBuilder.AddProvider(remoteLoggerProvider);
+
+    //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning);
+    //loggingBuilder.AddFilter("System", LogLevel.Warning);
+    //loggingBuilder.AddFilter("TemplateDbService", LogLevel.Information);
+});
 
 
 var app = builder.Build();

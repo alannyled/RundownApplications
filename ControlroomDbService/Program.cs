@@ -5,6 +5,8 @@ using ControlRoomDbService.DAL.Interfaces;
 using ControlRoomDbService.DAL.Repositories;
 using ControlRoomDbService.BLL.Interfaces;
 using ControlRoomDbService.BLL.Services;
+using CommonClassLibrary.Interfaces;
+using CommonClassLibrary.Providers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,22 @@ builder.Services.AddScoped<IControlRoomService, ControlRoomService>();
 builder.Services.AddScoped<IHardwareService, HardwareService>();
 
 builder.Services.AddSingleton<IKafkaService, KafkaService>();
+
+builder.Services.AddSingleton<ILogService, LogService>();
+builder.Services.AddSingleton<RemoteLogger>();
+builder.Services.AddSingleton<RemoteLoggerProvider>();
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    var serviceProvider = builder.Services.BuildServiceProvider();
+    var remoteLoggerProvider = serviceProvider.GetRequiredService<RemoteLoggerProvider>();
+
+    loggingBuilder.AddProvider(remoteLoggerProvider);
+
+    //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning);
+    //loggingBuilder.AddFilter("System", LogLevel.Warning);
+    //loggingBuilder.AddFilter("ControlRoomDbService", LogLevel.Information);
+});
 
 builder.Services.AddControllers();
 

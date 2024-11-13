@@ -1,3 +1,5 @@
+using CommonClassLibrary.Interfaces;
+using CommonClassLibrary.Providers;
 using CommonClassLibrary.Services;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization;
@@ -36,19 +38,25 @@ builder.Services.AddScoped<IItemDetailService, ItemDetailService>();
 builder.Services.AddSingleton<IKafkaService, KafkaService>();
 builder.Services.AddSingleton<ResilienceService>();
 
+builder.Services.AddSingleton<ILogService, LogService>();
 builder.Services.AddSingleton<RemoteLogger>();
+builder.Services.AddSingleton<RemoteLoggerProvider>();
+builder.Services.AddLogging(loggingBuilder =>
+{
+    var serviceProvider = builder.Services.BuildServiceProvider();
+    var remoteLoggerProvider = serviceProvider.GetRequiredService<RemoteLoggerProvider>();
+
+    loggingBuilder.AddProvider(remoteLoggerProvider);
+
+    //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning);
+    //loggingBuilder.AddFilter("System", LogLevel.Warning);
+    //loggingBuilder.AddFilter("RundownDbService", LogLevel.Information);
+});
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-//builder.Services.AddSwaggerGen(c =>
-//{
-//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Rundown API", Version = "v1" });
-
-//    // Tilføj PolymorphismSchemaFilter for nedarvede ItemDetails
-//    c.SchemaFilter<PolymorphismSchemaFilter<ItemDetail>>();
-//});
 
 
 var app = builder.Build();
@@ -66,6 +74,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 RegisterMongoClassMaps();
+
+
 
 app.Run();
 

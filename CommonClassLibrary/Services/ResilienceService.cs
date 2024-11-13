@@ -22,14 +22,17 @@ namespace CommonClassLibrary.Services
             // Retry
             _retryPolicy = Policy
                 .Handle<Exception>()
-                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                .WaitAndRetryAsync(3, retryAttempt =>
+                {
+                    return retryAttempt == 1 ? TimeSpan.FromSeconds(1) : TimeSpan.FromSeconds(Math.Pow(2, retryAttempt - 1));
+                },
                     (exception, timeSpan, retryCount, context) =>
                     {
                         Console.WriteLine($"Retry {retryCount} efter fejl: {exception.Message}. Forsøger igen om {timeSpan.Seconds} sekunder.");
                         var messageObject = new
                         {
                             Action = "retry",
-                            Count= retryCount,
+                            Count = retryCount,
                             Time = timeSpan.Seconds,
                             Message = exception.Message
                         };
@@ -41,14 +44,29 @@ namespace CommonClassLibrary.Services
             // Circuit breaker
             _circuitBreakerPolicy = Policy
                 .Handle<Exception>()
-                .CircuitBreakerAsync(2, TimeSpan.FromMinutes(1),
+                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30),
                     onBreak: (exception, timespan) =>
                     {
                         Console.WriteLine($"Circuit Breaker aktiveret! Ingen forsøg de næste {timespan.TotalSeconds} sekunder. Fejl: {exception.Message}");
+                        var messageObject = new
+                        {
+                            Action = "circuit_breaker_activated",
+                            Duration = timespan.TotalSeconds,
+                            Message = exception.Message
+                        };
+                        string message = JsonConvert.SerializeObject(messageObject);
+                        SendMessage("error", message);
                     },
                     onReset: () =>
                     {
                         Console.WriteLine("Circuit Breaker reset! Klar til at modtage forespørgsler igen.");
+                        var messageObject = new
+                        {
+                            Action = "circuit_breaker_reset",
+                            Message = "Circuit Breaker reset! Klar til at modtage forespørgsler igen."
+                        };
+                        string message = JsonConvert.SerializeObject(messageObject);
+                        SendMessage("info", message);
                     });
 
             // Kafka producer
@@ -63,25 +81,53 @@ namespace CommonClassLibrary.Services
 
         public async Task ExecuteWithResilienceAsync(Func<Task> action)
         {
-            await _circuitBreakerPolicy.ExecuteAsync(async () =>
+            try
             {
-                await _retryPolicy.ExecuteAsync(action);
-            });
+                await _circuitBreakerPolicy.ExecuteAsync(async () =>
+                {
+                    await _retryPolicy.ExecuteAsync(action);
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Handling mislykkedes efter alle forsøg: {ex.Message}");
+                var messageObject = new
+                {
+                    Action = "final_failure",
+                    Message = ex.Message
+                };
+                string message = JsonConvert.SerializeObject(messageObject);
+                SendMessage("error", message);
+            }
         }
 
         public async Task<T> ExecuteWithResilienceAsync<T>(Func<Task<T>> action)
         {
-            return await _circuitBreakerPolicy.ExecuteAsync(async () =>
+            try
             {
-                return await _retryPolicy.ExecuteAsync(action);
-            });
+                return await _circuitBreakerPolicy.ExecuteAsync(async () =>
+                {
+                    return await _retryPolicy.ExecuteAsync(action);
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Handling mislykkedes efter alle forsøg: {ex.Message}");
+                var messageObject = new
+                {
+                    Action = "final_failure",
+                    Message = ex.Message
+                };
+                string message = JsonConvert.SerializeObject(messageObject);
+                SendMessage("error", message);
+                throw;
+            }
         }
+
         public virtual void SendMessage(string topic, string message)
         {
             string key = Guid.NewGuid().ToString();
             _producerClient.Producer.Produce(topic, new Message<string, string> { Key = key, Value = message });
-            //Console.WriteLine($"Sending message to TOPIC: {topic}, KEY: {key}, VALUE: {message}");
         }
     }
 }
-

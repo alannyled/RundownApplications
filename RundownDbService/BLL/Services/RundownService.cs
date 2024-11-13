@@ -7,12 +7,12 @@ using CommonClassLibrary.DTO;
 
 namespace RundownDbService.BLL.Services
 {
-    public class RundownService(IRundownRepository rundownRepository, IKafkaService kafkaService, ResilienceService resilienceService, RemoteLogger logger) : IRundownService
+    public class RundownService(IRundownRepository rundownRepository, IKafkaService kafkaService, ResilienceService resilienceService, ILogger<RundownService> logger) : IRundownService
     {
         private readonly IRundownRepository _rundownRepository = rundownRepository;
         private readonly IKafkaService _kafkaService = kafkaService;
         private readonly ResilienceService _resilienceService = resilienceService;
-        private readonly RemoteLogger _logger = logger;
+        private readonly ILogger<RundownService> _logger = logger;
 
         public async Task<List<Rundown>> GetAllRundownsAsync()
         {  
@@ -26,7 +26,7 @@ namespace RundownDbService.BLL.Services
             var rundown = await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.GetByIdAsync(uuid));
             if (rundown == null)
             {
-                _logger.LogInformation($"Rundown med UUID = {uuid} blev ikke fundet i databasen");
+                _logger.LogWarning($"Rundown med UUID = {uuid} blev ikke fundet i databasen");
             }
             _logger.LogInformation($"Rundown med UUID = {uuid} hentet i databasen");
             return rundown;
@@ -67,6 +67,7 @@ namespace RundownDbService.BLL.Services
 
         public async Task DeleteRundownAsync(Guid uuid)
         {
+            _logger.LogWarning($"Rundown med UUID = {uuid} slettes fra databasen");
             await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.DeleteAsync(uuid));
         }
     }

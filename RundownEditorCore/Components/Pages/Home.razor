@@ -104,8 +104,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var message = MessageBuilderService.BuildLogMessage("Så er HOME reloaded igen", LogLevel.Warning);
-        KafkaService.SendMessage("log", message);
 
         if(SharedStates.ControlRooms.Count == 0)
         {

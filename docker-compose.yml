@@ -91,7 +91,6 @@ services:
       - "27047:27017"
     volumes:
       - log-mongo-data:/data/db
-    #command: mongod --replSet template-replica-set --bind_ip_all
     networks:
       - shared-mongo-net
 
@@ -145,4 +144,6 @@ volumes:
   template-mongo-data:
     driver: local
   template-mongo-data-secondary:
+    driver: local
+  log-mongo-data:
     driver: local

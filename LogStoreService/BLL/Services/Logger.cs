@@ -3,7 +3,7 @@ using Confluent.Kafka;
 using CommonClassLibrary.DTO;
 
 
-namespace LogStoreService.Services
+namespace LogStoreService.BLL.Services
 {
     public class Logger
     {

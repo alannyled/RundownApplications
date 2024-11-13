@@ -66,7 +66,7 @@ namespace CommonClassLibrary.Services
                             Message = "Circuit Breaker reset! Klar til at modtage forespørgsler igen."
                         };
                         string message = JsonConvert.SerializeObject(messageObject);
-                        SendMessage("info", message);
+                        SendMessage("error", message);
                     });
 
             // Kafka producer

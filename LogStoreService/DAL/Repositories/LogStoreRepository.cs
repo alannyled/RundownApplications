@@ -25,5 +25,10 @@ namespace LogStoreService.DAL.Repositories
         {
             await _logCollection.InsertOneAsync(newLog);
         }
+
+        public async Task DeleteAllLogsAsync()
+        {
+            await _logCollection.DeleteManyAsync(log => true);
+        }
     }
 }

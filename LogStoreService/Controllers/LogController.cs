@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using LogStoreService.BLL.Interfaces;
-using CommonClassLibrary.DTO;
 using LogStoreService.Models;
 
 namespace LogStoreService.Controllers
@@ -19,6 +18,12 @@ namespace LogStoreService.Controllers
                 var logs = await _logService.GetLogsAsync();
                 return Ok(logs);
             }
+        [HttpDelete]
+        public async Task<ActionResult> DeleteAllLogs()
+        {
+            await _logService.DeleteAllLogsAsync();
+            return Ok();
         }
+    }
    
 }

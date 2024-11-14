@@ -6,5 +6,6 @@ namespace LogStoreService.BLL.Interfaces
     {
         Task<List<Log>> GetLogsAsync();
         Task CreateLogAsync(Log newLog);
+        Task DeleteAllLogsAsync();
     }
 }

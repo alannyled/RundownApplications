@@ -20,5 +20,10 @@ namespace LogStoreService.BLL.Services
             Console.WriteLine($"{newLog.TimeStamp} - {newLog.LogLevel} From {newLog.Host}: {newLog.Message}");
             await _logStoreRepository.CreateAsync(newLog);
         }
+
+        public async Task DeleteAllLogsAsync()
+        {
+            await _logStoreRepository.DeleteAllLogsAsync();
+        }
     }
 }

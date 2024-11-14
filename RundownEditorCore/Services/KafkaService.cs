@@ -128,15 +128,11 @@ namespace RundownEditorCore.Services
                             }
                             if(message.Topic == "log")
                             {
-                                if (message.Topic == "log")
+                                var msg = ConvertMessageToJson<LogMessageDTO>(message);
+                                if(msg != null)
                                 {
-                                    var msg = ConvertMessageToJson<LogMessageDTO>(message);
-                                    if(msg != null)
-                                    {
-                                        _logger.Log(msg.LogLevel, $"{msg.TimeStamp.ToLongTimeString()}: {msg.Message}");
-                                    }
+                                    _logger.Log(msg.LogLevel, $"{msg.TimeStamp.ToLongTimeString()}: {msg.Message}");
                                 }
-
                             }
                         }
                         catch (JsonException ex)

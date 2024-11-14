@@ -6,5 +6,6 @@ namespace LogStoreService.DAL.Interfaces
     {
         Task<List<Log>> GetAllLogsAsync();
         Task CreateAsync(Log newLog);
+        Task DeleteAllLogsAsync();
     }
 }

@@ -5,6 +5,8 @@ using RundownEditorCore.Interfaces;
 using CommonClassLibrary.DTO;
 using Newtonsoft.Json;
 using System.Linq;
+using RundownEditorCore.Components.Account.Pages.Manage;
+using System.Net.Sockets;
 
 namespace RundownEditorCore.Services
 {
@@ -41,7 +43,8 @@ namespace RundownEditorCore.Services
         DetailLockState detailLockState,
         SharedStates sharedStates,
         ILogger<RundownService> logger,
-        IControlRoomService controlRoomService
+        IControlRoomService controlRoomService,
+        IMessageBuilderService messageBuilderService
             ) : BackgroundService
     {
 
@@ -50,6 +53,7 @@ namespace RundownEditorCore.Services
         private readonly SharedStates _sharedStates = sharedStates;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IControlRoomService _controlRoomService = controlRoomService;
+        private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
         private static readonly LogRingBuffer<LogMessageDTO> _logBuffer = new(100); // Buffer med plads til 100 beskeder
         public static event Action<LogMessageDTO>? LogMessageAdded;
         public static IEnumerable<LogMessageDTO> RecentLogs => _logBuffer;
@@ -67,11 +71,12 @@ namespace RundownEditorCore.Services
         }
 
         private readonly string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error", "log" };
-        private async Task InitializeTopics() {
-           await _kafkaService.CreateMissingTopicsAsync(topics, numPartitions: 3, replicationFactor: 1);
+        private async Task InitializeTopics()
+        {
+            await _kafkaService.CreateMissingTopicsAsync(topics, numPartitions: 3, replicationFactor: 1);
         }
 
-    
+
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -94,8 +99,16 @@ namespace RundownEditorCore.Services
                                 var messageObject = ConvertMessageToJson<DetailMessage>(message);
                                 if (messageObject != null)
                                 {
-                                    _logger.LogInformation($"{(messageObject.Locked ? "lås" : "oplås")} Detail Id '{messageObject.Detail?.UUID.ToString()}'");
+
                                     _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
+                                    var log =  new LogMessageDTO
+                                    {
+                                        TimeStamp = DateTime.UtcNow,
+                                        Message = $"{messageObject.Name} er blevet {(messageObject.Locked ? $"låst for redigering af {messageObject.UserName}" : "låst op")}",
+                                        LogLevel = LogLevel.Information,
+                                    };
+                                    _logBuffer.Add(log);
+                                    LogMessageAdded?.Invoke(log);
                                 }
                             }
                             if (message.Topic == "story")
@@ -126,14 +139,13 @@ namespace RundownEditorCore.Services
                                 _sharedStates.SharedError(messageObject);
                                 _logger.LogError($"Kritisk Fejlbesked: {message.Message.Value}");
                             }
-                            if(message.Topic == "log")
+                            if (message.Topic == "log")
                             {
                                 var msg = ConvertMessageToJson<LogMessageDTO>(message);
-                                if(msg != null)
+                                if (msg != null)
                                 {
                                     _logBuffer.Add(msg);
                                     LogMessageAdded?.Invoke(msg);
-                                    //_logger.Log(msg.LogLevel, $"{msg.TimeStamp.ToLongTimeString()}: {msg.Message}");
                                 }
                             }
                         }
@@ -157,12 +169,12 @@ namespace RundownEditorCore.Services
 
             if (messageObject?.Action == "update" && messageObject?.Rundown != null)
             {
-               // _logger.LogInformation($"MESSAGE: Rundown {messageObject.Rundown.Name} opdateret");
+                // _logger.LogInformation($"MESSAGE: Rundown {messageObject.Rundown.Name} opdateret");
                 UpdateRundownInSharedStates(messageObject.Rundown);
             }
             if (messageObject?.Action == "create" && messageObject?.Rundown != null)
             {
-               // _logger.LogInformation($"MESSAGE: Ny Rundown oprettet: {messageObject.Rundown.Name}");
+                // _logger.LogInformation($"MESSAGE: Ny Rundown oprettet: {messageObject.Rundown.Name}");
                 AddNewRundownToSharedStates(messageObject.Rundown);
             }
         }
@@ -171,7 +183,7 @@ namespace RundownEditorCore.Services
         {
             var allRundowns = new List<RundownDTO>(sharedStates.AllRundowns);
             var updatedRundown = allRundowns.Find(r => r.UUID == rundown.UUID);
-            var index = allRundowns.FindIndex(r => r.UUID == rundown.UUID);            
+            var index = allRundowns.FindIndex(r => r.UUID == rundown.UUID);
 
             if (index >= 0 && updatedRundown != null)
             {
@@ -183,13 +195,13 @@ namespace RundownEditorCore.Services
         }
 
         private void AddNewRundownToSharedStates(RundownDTO rundown)
-        {            
+        {
             var controlRoom = sharedStates.ControlRooms.FirstOrDefault(c => c.Uuid.ToString() == rundown.ControlRoomId);
             rundown.ControlRoomName = controlRoom?.Name;
             var allRundowns = new List<RundownDTO>(sharedStates.AllRundowns)
-            {
-                rundown
-            };
+                {
+                    rundown
+                };
             sharedStates.SharedAllRundowns(allRundowns);
         }
     }

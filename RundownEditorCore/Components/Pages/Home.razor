@@ -80,7 +80,7 @@
                             <ul>
                                 @foreach (var log in LogMessages.AsEnumerable().Reverse())
                                 {
-                                    <li><small>@log.TimeStamp.ToLongTimeString() @log.LogLevel @log.Message</small></li>
+                                    <li><small><em>@log.TimeStamp.ToLongTimeString() @log.LogLevel:</em> @log.Message</small></li>
                                 }
                             </ul>
                         </div>

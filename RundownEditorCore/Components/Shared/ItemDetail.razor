@@ -167,7 +167,7 @@
             DetailLockState.SetLockState(Detail, false, userName);
         }
         var message = MessageBuilderService.BuildDetailLockMessage(Detail, locked, userName);
-        KafkaService.SendMessage("detail_lock", message);
+        KafkaService.SendMessage("detail_lock", message);        
     }
 
     private string SetContent()

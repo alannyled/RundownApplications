@@ -78,9 +78,9 @@
                         <SystemStatus />
                         <div class="card-body overflow-auto log-text">
                             <ul>
-                                @foreach (var log in InMemoryLogger.GetSimpleLogs().Reverse())
+                                @foreach (var log in LogMessages.AsEnumerable().Reverse())
                                 {
-                                    <li><small>@((MarkupString)log)</small></li>
+                                    <li><small>@log.TimeStamp.ToLongTimeString() @log.LogLevel @log.Message</small></li>
                                 }
                             </ul>
                         </div>
@@ -101,6 +101,7 @@
     private List<RundownDTO> AllRundowns = new();
     private List<RundownDTO> ActiveRundowns = new();
     private List<TemplateDTO> AllTemplates = new();
+    private List<LogMessageDTO> LogMessages = new List<LogMessageDTO>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -117,13 +118,24 @@
         }
         if(SharedStates.AllRundowns.Count == 0)
         {
-            _logger.LogInformation($"Henter alle rundowns fra databasen");
             AllRundowns = await RundownService.GetRundownsAsync();
             SharedStates.SharedAllRundowns(AllRundowns);
         }
         await FilterActiveRundowns();
-        SharedStates.OnChange += HandleSharedStateChange;   
 
+        SharedStates.OnChange += HandleSharedStateChange; 
+        LogMessages = KafkaBackgroundService.RecentLogs.ToList();
+        KafkaBackgroundService.LogMessageAdded += OnLogMessageAdded;
+
+    }
+
+    /// <summary>
+    /// Tilføjer nye logs til listen
+    /// </summary>
+    private void OnLogMessageAdded(LogMessageDTO logMessage)
+    {
+        LogMessages.Add(logMessage);
+        InvokeAsync(StateHasChanged); 
     }
     /// <summary>
     /// Håndtere ændringer i SharedStates forårsaget af Kafka beskeder
@@ -226,6 +238,7 @@
     public void Dispose()
     {
         SharedStates.OnChange -= HandleSharedStateChange;
+        KafkaBackgroundService.LogMessageAdded -= OnLogMessageAdded;
     }
 
 }

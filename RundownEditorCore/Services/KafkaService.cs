@@ -14,8 +14,7 @@ namespace RundownEditorCore.Services
     public class KafkaService : IKafkaService
     {
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
-        private readonly KafkaProducerClient _producerClient;
-
+        private readonly KafkaProducerClient _producerClient;        
 
         public KafkaService()
         {
@@ -51,6 +50,9 @@ namespace RundownEditorCore.Services
         private readonly SharedStates _sharedStates = sharedStates;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IControlRoomService _controlRoomService = controlRoomService;
+        private static readonly LogRingBuffer<LogMessageDTO> _logBuffer = new(100); // Buffer med plads til 100 beskeder
+        public static event Action<LogMessageDTO>? LogMessageAdded;
+        public static IEnumerable<LogMessageDTO> RecentLogs => _logBuffer;
 
 
         private KafkaConsumerClient? _consumerClient;
@@ -68,6 +70,7 @@ namespace RundownEditorCore.Services
         private async Task InitializeTopics() {
            await _kafkaService.CreateMissingTopicsAsync(topics, numPartitions: 3, replicationFactor: 1);
         }
+
     
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -100,9 +103,7 @@ namespace RundownEditorCore.Services
                                 var messageObject = ConvertMessageToJson<ItemMessage>(message);
                                 if (messageObject != null)
                                 {
-                                   // _logger.LogInformation($"MESSAGE: Ny detail tilføjet {messageObject.Item.Name}");
                                     _sharedStates.SharedItem(messageObject.Item);
-
                                 }
 
                             }
@@ -113,7 +114,6 @@ namespace RundownEditorCore.Services
 
                             if (message.Topic == "controlroom")
                             {
-                                //_logger.LogInformation($"MESSAGE: Kontrolrum opdateret");
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 //var controlrooms = messageObject.ControlRooms; (der mangler hardware her)                       
                                 var controlrooms = await _controlRoomService.GetControlRoomsAsync();
@@ -131,7 +131,9 @@ namespace RundownEditorCore.Services
                                 var msg = ConvertMessageToJson<LogMessageDTO>(message);
                                 if(msg != null)
                                 {
-                                    _logger.Log(msg.LogLevel, $"{msg.TimeStamp.ToLongTimeString()}: {msg.Message}");
+                                    _logBuffer.Add(msg);
+                                    LogMessageAdded?.Invoke(msg);
+                                    //_logger.Log(msg.LogLevel, $"{msg.TimeStamp.ToLongTimeString()}: {msg.Message}");
                                 }
                             }
                         }

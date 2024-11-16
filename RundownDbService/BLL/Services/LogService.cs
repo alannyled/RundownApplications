@@ -1,4 +1,4 @@
-﻿using CommonClassLibrary.Interfaces;
+﻿using RemoteLoggerLibrary.Interfaces;
 using RundownDbService.BLL.Interfaces;
 
 namespace RundownDbService.BLL.Services

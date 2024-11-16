@@ -1,9 +1,9 @@
 ﻿using CommonClassLibrary.DTO;
-using CommonClassLibrary.Interfaces;
+using RemoteLoggerLibrary.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace CommonClassLibrary.Providers
+namespace RemoteLoggerLibrary.Providers
 {
     public class RemoteLogger : ILogger
     {

@@ -74,7 +74,7 @@ builder.Services.AddHostedService(provider =>
             {"Kafka Message Broker", "tcp://localhost:9092" },
             {"API Gateway", "tcp://localhost:3000" },
             {"MicroService LogStore SSL", "https://localhost:3050/api/Log" },
-             {"MicroService LogStore", "http://localhost:3051/api/Log" },
+            {"MicroService LogStore", "http://localhost:3051/api/Log" },
             {"MicroService Aggregator SSL", "https://localhost:3010/health" },
             {"MicroService Aggregator", "http://localhost:3011/health" },
             {"MicroService ControlRoom SSL", "https://localhost:3020/health" },

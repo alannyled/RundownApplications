@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using RundownEditorCore.Components.Account.Pages.Manage;
 using System.Net.Sockets;
+using CommonClassLibrary.Enum;
 
 namespace RundownEditorCore.Services
 {
@@ -16,7 +17,7 @@ namespace RundownEditorCore.Services
     public class KafkaService : IKafkaService
     {
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
-        private readonly KafkaProducerClient _producerClient;        
+        private readonly KafkaProducerClient _producerClient;
 
         public KafkaService()
         {
@@ -70,7 +71,13 @@ namespace RundownEditorCore.Services
             return JsonConvert.DeserializeObject<T>(message.Message.Value);
         }
 
-        private readonly string[] topics = { "rundown", "detail_lock", "story", "controlroom", "error", "log" };
+        private readonly string[] topics = [
+                    MessageTopic.DetailLock.ToKafkaTopic(),
+                    MessageTopic.Rundown.ToKafkaTopic(),
+                    MessageTopic.ControlRoom.ToKafkaTopic(),
+                    MessageTopic.Error.ToKafkaTopic(),
+                    MessageTopic.Log.ToKafkaTopic()
+                ];
         private async Task InitializeTopics()
         {
             await _kafkaService.CreateMissingTopicsAsync(topics, numPartitions: 3, replicationFactor: 1);
@@ -94,14 +101,14 @@ namespace RundownEditorCore.Services
                     {
                         try
                         {
-                            if (message.Topic == "detail_lock")
+                            if (message.Topic == MessageTopic.DetailLock.ToKafkaTopic())
                             {
                                 var messageObject = ConvertMessageToJson<DetailMessage>(message);
                                 if (messageObject != null)
                                 {
 
                                     _detailLockState.SetLockState(messageObject.Detail, messageObject.Locked, messageObject.UserName);
-                                    var log =  new LogMessageDTO
+                                    var log = new LogMessageDTO
                                     {
                                         TimeStamp = DateTime.UtcNow,
                                         Message = $"{messageObject.Name} er blevet {(messageObject.Locked ? $"låst for redigering af {messageObject.UserName}" : "låst op")}",
@@ -111,21 +118,21 @@ namespace RundownEditorCore.Services
                                     LogMessageAdded?.Invoke(log);
                                 }
                             }
-                            if (message.Topic == "story")
-                            {
-                                var messageObject = ConvertMessageToJson<ItemMessage>(message);
-                                if (messageObject != null)
-                                {
-                                    _sharedStates.SharedItem(messageObject.Item);
-                                }
+                            //if (message.Topic == "story")
+                            //{
+                            //    var messageObject = ConvertMessageToJson<ItemMessage>(message);
+                            //    if (messageObject != null)
+                            //    {
+                            //        _sharedStates.SharedItem(messageObject.Item);
+                            //    }
 
-                            }
-                            if (message.Topic == "rundown")
+                            //}
+                            if (message.Topic == MessageTopic.Rundown.ToKafkaTopic())
                             {
                                 HandleRundownMessage(message);
                             }
 
-                            if (message.Topic == "controlroom")
+                            if (message.Topic == MessageTopic.ControlRoom.ToKafkaTopic())
                             {
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 //var controlrooms = messageObject.ControlRooms; (der mangler hardware her)                       
@@ -133,13 +140,13 @@ namespace RundownEditorCore.Services
                                 _sharedStates.SharedControlRoom(controlrooms);
                             }
 
-                            if (message.Topic == "error")
+                            if (message.Topic == MessageTopic.Error.ToKafkaTopic())
                             {
                                 var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message);
                                 _sharedStates.SharedError(messageObject);
                                 _logger.LogError($"Kritisk Fejlbesked: {message.Message.Value}");
                             }
-                            if (message.Topic == "log")
+                            if (message.Topic == MessageTopic.Log.ToKafkaTopic())
                             {
                                 var msg = ConvertMessageToJson<LogMessageDTO>(message);
                                 if (msg != null)
@@ -167,14 +174,12 @@ namespace RundownEditorCore.Services
         {
             var messageObject = ConvertMessageToJson<RundownMessage>(message);
 
-            if (messageObject?.Action == "update" && messageObject?.Rundown != null)
+            if (messageObject?.Action == MessageAction.Update.ToString() && messageObject?.Rundown != null)
             {
-                // _logger.LogInformation($"MESSAGE: Rundown {messageObject.Rundown.Name} opdateret");
                 UpdateRundownInSharedStates(messageObject.Rundown);
             }
-            if (messageObject?.Action == "create" && messageObject?.Rundown != null)
+            if (messageObject?.Action == MessageAction.Create.ToString() && messageObject?.Rundown != null)
             {
-                // _logger.LogInformation($"MESSAGE: Ny Rundown oprettet: {messageObject.Rundown.Name}");
                 AddNewRundownToSharedStates(messageObject.Rundown);
             }
         }

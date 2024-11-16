@@ -9,7 +9,6 @@ namespace ControlRoomDbService.BLL.Services
     {
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
         private readonly KafkaProducerClient _producerClient;
-      //  private readonly KafkaConsumerClient _consumerClient;
 
         public KafkaService()
         {
@@ -20,7 +19,6 @@ namespace ControlRoomDbService.BLL.Services
 
             _kafkaService = new KafkaServiceLibrary.KafkaService(configuration);
             _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
-           // _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "controlroom", ["controlroom", "hardware"]);
 
         }
 
@@ -28,7 +26,6 @@ namespace ControlRoomDbService.BLL.Services
         {
             string key = Guid.NewGuid().ToString();
             _producerClient.Producer.Produce(topic, new Message<string, string> { Key = key, Value = message });
-            Console.WriteLine($"Sending message to TOPIC: {topic}, KEY: {key}, VALUE: {message}");
         }
     }
 

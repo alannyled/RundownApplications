@@ -7,6 +7,7 @@
 @inject DetailLockState DetailLockState
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.EntityFrameworkCore
+@using CommonClassLibrary.Enum;
 @using CommonClassLibrary.DTO;
 
 <div>
@@ -39,7 +40,7 @@
                 <textarea class="form-control rounded-0 rounded-bottom"
                     rows="@CalculateRows()"
                     cols="@(Math.Ceiling((double)content.Count()))"
-                    @oninput="HandleContentInput"
+                    @bind="content"
                     disabled="@(!active)" 
                     style="resize: both;">
                     @content
@@ -61,6 +62,7 @@
     public string userName = "";
     public string lockedByUser = "";
     public string lockedClass = "";
+    public Guid updatedDetailUuid = Guid.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,24 +104,23 @@
         if (Detail != null && action == RundownState.StateAction.ItemUpdated)
         {
             var updatedDetail = RundownState.Item.Details.FirstOrDefault(d => d.UUID == Detail.UUID);
-            if (updatedDetail != null)
+            if (updatedDetail != null && updatedDetail.UUID == updatedDetailUuid)
             {
                 Detail = updatedDetail;
+                content = SetContent();
+                updatedDetailUuid = Guid.Empty;
             }
-        }
-
-        content = SetContent();
-        InvokeAsync(StateHasChanged);
+        }        
+        InvokeAsync(StateHasChanged); // muligvis overflødig, fordi @bind gør det samme?
     }
     private void HandleDurationInput(ChangeEventArgs e)
     {
         Detail.Duration = e.Value?.ToString();
     }
-    private void HandleContentInput(ChangeEventArgs e)
-    {
-
-        content = e.Value?.ToString();
-    }
+    // private void HandleContentInput(ChangeEventArgs e)
+    // {
+    //     content = e.Value?.ToString();
+    // }
 
     public async Task ActivateInput()
     {
@@ -135,7 +136,8 @@
     }
 
     private async Task SaveChanges()
-    {
+    { 
+        updatedDetailUuid = Detail.UUID;
         var contentType = Detail.Type switch
         {
             "Teleprompter" => Detail.PrompterText = content,
@@ -146,9 +148,20 @@
             _ => "Noget gik helt galt her??!!"
         };
 
-        await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
-        var item = RundownState.Rundown.Items.FirstOrDefault(i => i.UUID == Detail.ItemId);
-        SharedStates.SharedItem(item); // skal laves om til en event driven løsning
+        var updatedRundown = await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
+
+        var rundown = SharedStates.AllRundowns.Find(r => r.UUID == updatedRundown.UUID);
+        if (rundown == null) return;
+        
+        var item = rundown?.Items.FirstOrDefault(i => i.UUID == Detail.ItemId);
+        if (item == null) return;
+
+        var detailIndex = item.Details.FindIndex(d => d.UUID == Detail.UUID);
+        if (detailIndex != -1)
+        {
+            item.Details[detailIndex] = Detail;
+        }
+        SharedStates.SharedAllRundowns(SharedStates.AllRundowns);
     }
 
     /// <summary>
@@ -167,7 +180,8 @@
             DetailLockState.SetLockState(Detail, false, userName);
         }
         var message = MessageBuilderService.BuildDetailLockMessage(Detail, locked, userName);
-        KafkaService.SendMessage("detail_lock", message);        
+        string topic = MessageTopic.DetailLock.ToKafkaTopic();
+        KafkaService.SendMessage(topic, message);
     }
 
     private string SetContent()

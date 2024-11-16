@@ -1,5 +1,5 @@
-using CommonClassLibrary.Interfaces;
-using CommonClassLibrary.Providers;
+using RemoteLoggerLibrary.Interfaces;
+using RemoteLoggerLibrary.Providers;
 using CommonClassLibrary.Services;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization;

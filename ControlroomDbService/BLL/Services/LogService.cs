@@ -1,4 +1,4 @@
-﻿using CommonClassLibrary.Interfaces;
+﻿using RemoteLoggerLibrary.Interfaces;
 using ControlRoomDbService.BLL.Interfaces;
 
 namespace ControlRoomDbService.BLL.Services

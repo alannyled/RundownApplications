@@ -1,9 +1,9 @@
 ﻿
-using CommonClassLibrary.Interfaces;
-using CommonClassLibrary.Providers;
+using RemoteLoggerLibrary.Interfaces;
+using RemoteLoggerLibrary.Providers;
 using Microsoft.Extensions.Logging;
 
-namespace CommonClassLibrary.Providers
+namespace RemoteLoggerLibrary.Providers
 {
     public class RemoteLoggerProvider : ILoggerProvider
     {

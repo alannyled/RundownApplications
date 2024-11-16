@@ -26,7 +26,7 @@
         <div class="card-body">
             @foreach (DetailDTO detail in RundownItem.Details)
             {
-                <ItemDetail Detail="detail"></ItemDetail>
+                <ItemDetail Detail="detail" @key="detail.UUID"></ItemDetail>
             }
             @if (isCreating )
             {
@@ -72,13 +72,10 @@
         {
             var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown?.UUID);
             if(currentRundown == null) return;
-            SharedStates.SharedRundown(currentRundown); // er ddet nødevendigt? Udløser et event!
-            RundownItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
-            if (RundownItem == null) return;
-
-            RundownState.SelectedItem(RundownItem);
-            SharedStates.SharedItem(RundownItem);
-
+            var currenItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
+            if (currenItem == null) return;
+            RundownItem = currenItem;
+            RundownState.SelectedItem(currenItem);
             isCreating = false;
             await InvokeAsync(StateHasChanged);
         }

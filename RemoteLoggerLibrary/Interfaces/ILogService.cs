@@ -1,4 +1,4 @@
-﻿namespace CommonClassLibrary.Interfaces
+﻿namespace RemoteLoggerLibrary.Interfaces
 {
     public interface ILogService
     {

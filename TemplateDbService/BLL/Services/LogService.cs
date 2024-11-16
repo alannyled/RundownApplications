@@ -1,4 +1,4 @@
-﻿using CommonClassLibrary.Interfaces;
+﻿using RemoteLoggerLibrary.Interfaces;
 using TemplateDbService.BLL.Interfaces;
 
 namespace TemplateDbService.BLL.Services

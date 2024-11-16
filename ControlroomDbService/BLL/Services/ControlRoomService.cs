@@ -1,4 +1,5 @@
-﻿using ControlRoomDbService.BLL.Interfaces;
+﻿using CommonClassLibrary.Enum;
+using ControlRoomDbService.BLL.Interfaces;
 using ControlRoomDbService.DAL.Interfaces;
 using ControlRoomDbService.Models;
 using Newtonsoft.Json;
@@ -23,8 +24,13 @@ namespace ControlRoomDbService.BLL.Services
         public async Task CreateControlRoomAsync(ControlRoom controlRoom)
         {
             await _controlRoomRepository.CreateAsync(controlRoom);
-            string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = "create" });
-            _kafkaService.SendMessage("controlroom", message);
+            string message = JsonConvert.SerializeObject(new 
+            { 
+                TimeStamp = DateTime.Now, 
+                Action = MessageAction.Create.ToString() 
+            });
+            string topic = MessageTopic.ControlRoom.ToKafkaTopic();
+            _kafkaService.SendMessage(topic, message);
         }
 
         public async Task UpdateControlRoomAsync(string id, ControlRoom updatedControlRoom)
@@ -33,19 +39,24 @@ namespace ControlRoomDbService.BLL.Services
             string message = JsonConvert.SerializeObject(new
             {
                 TimeStamp = DateTime.Now,
-                Action = "update",
+                Action = MessageAction.Update.ToString(),
                 ControlRooms = controlRooms
             });
-
-            _kafkaService.SendMessage("controlroom", message);
+            string topic = MessageTopic.ControlRoom.ToKafkaTopic();
+            _kafkaService.SendMessage(topic, message);
         }
 
 
         public async Task DeleteControlRoomAsync(string id)
         {
             await _controlRoomRepository.RemoveAsync(id);
-            string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = "delete" });
-            _kafkaService.SendMessage("controlroom", message);
+            string message = JsonConvert.SerializeObject(new 
+            { 
+                TimeStamp = DateTime.Now, 
+                Action = MessageAction.Delete.ToString() 
+            });
+            string topic = MessageTopic.ControlRoom.ToKafkaTopic();
+            _kafkaService.SendMessage(topic, message);
         }
 
         public async Task DeleteAllControlRoomsAsync()

@@ -5,8 +5,8 @@ using ControlRoomDbService.DAL.Interfaces;
 using ControlRoomDbService.DAL.Repositories;
 using ControlRoomDbService.BLL.Interfaces;
 using ControlRoomDbService.BLL.Services;
-using CommonClassLibrary.Interfaces;
-using CommonClassLibrary.Providers;
+using RemoteLoggerLibrary.Interfaces;
+using RemoteLoggerLibrary.Providers;
 
 var builder = WebApplication.CreateBuilder(args);
 

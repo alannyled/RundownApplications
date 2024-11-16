@@ -10,7 +10,6 @@ namespace RundownDbService.BLL.Services
     {
         private readonly KafkaServiceLibrary.KafkaService _kafkaService;
         private readonly KafkaProducerClient _producerClient;
-       // private readonly KafkaConsumerClient _consumerClient;
 
         public KafkaService()
         {
@@ -21,7 +20,6 @@ namespace RundownDbService.BLL.Services
 
             _kafkaService = new KafkaServiceLibrary.KafkaService(configuration);
             _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
-           // _consumerClient = (KafkaConsumerClient)_kafkaService.CreateKafkaClient("consumer", "RundownDbService", ["rundown"]);
 
         }
 

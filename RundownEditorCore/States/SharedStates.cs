@@ -58,6 +58,11 @@ namespace RundownEditorCore.States
         {
             AllRundowns = rundowns;
             NotifyStateChanged(StateAction.AllRundownsUpdated);
+            Console.WriteLine("AllRundowns opdateret:");
+            foreach (var rundown in AllRundowns)
+            {
+                Console.WriteLine($" - {rundown.Name} ({rundown.UUID})");
+            }
         }
 
         public void SharedControlRoom(List<ControlRoomDTO> controlRooms)

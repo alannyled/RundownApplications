@@ -3,7 +3,7 @@ using RundownDbService.DAL.Interfaces;
 using RundownDbService.Models;
 using Newtonsoft.Json;
 using CommonClassLibrary.Services;
-using CommonClassLibrary.DTO;
+using CommonClassLibrary.Enum;
 
 namespace RundownDbService.BLL.Services
 {
@@ -39,12 +39,13 @@ namespace RundownDbService.BLL.Services
                 var rundown = await _rundownRepository.CreateAsync(newRundown);
                 var messageObject = new
                 {
-                    Action = "create",
+                    Action = MessageAction.Create.ToString(),
                     Rundown = rundown
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
-                _kafkaService.SendMessage("rundown", message);
-                _logger.LogInformation($"{rundown.BroadcastDate.ToShortDateString()} {rundown.Name} er oprettet");
+                string topic = MessageTopic.Rundown.ToKafkaTopic();
+                _kafkaService.SendMessage(topic, message);
+                _logger.LogInformation($"{rundown.Name} {rundown.BroadcastDate.ToShortDateString()} er oprettet");
             });
         }
 
@@ -55,12 +56,13 @@ namespace RundownDbService.BLL.Services
                 var rundown = await _rundownRepository.UpdateAsync(uuid, updatedRundown);
                 var messageObject = new
                 {
-                    Action = "update",
+                    Action = MessageAction.Update.ToString(),
                     Rundown = rundown
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
-                _kafkaService.SendMessage("rundown", message);
-                _logger.LogInformation($"{rundown.BroadcastDate.ToShortDateString()} {rundown.Name} er opdateret");
+                string topic = MessageTopic.Rundown.ToKafkaTopic();
+                _kafkaService.SendMessage(topic, message);
+                _logger.LogInformation($"{rundown.Name} {rundown.BroadcastDate.ToShortDateString()} er opdateret");
                 return rundown;
             });
         }

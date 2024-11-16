@@ -3,6 +3,7 @@ using RundownDbService.DAL.Interfaces;
 using RundownDbService.DAL.Repositories;
 using RundownDbService.Models;
 using Newtonsoft.Json;
+using CommonClassLibrary.Enum;
 
 namespace RundownDbService.BLL.Services
 {
@@ -28,12 +29,13 @@ namespace RundownDbService.BLL.Services
             await _rundownRepository.UpdateItemAsync(rundown.UUID, existingItem);
             var messageObject = new
             {
-                Action = "update",
+                Action = MessageAction.Update.ToString(),
                 Item = existingItem,
                 Rundown = rundown
             };
             string message = JsonConvert.SerializeObject(messageObject);
-            _kafkaService.SendMessage("rundown", message);
+            string topic = MessageTopic.Rundown.ToKafkaTopic();
+            _kafkaService.SendMessage(topic, message);
             return rundown;
         }
     }

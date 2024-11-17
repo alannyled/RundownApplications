@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaRelationDialogApp", "M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogStoreService", "LogStoreService\LogStoreService.csproj", "{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteLoggerLibrary", "RemoteLoggerLibrary\RemoteLoggerLibrary.csproj", "{A87E40CE-6633-41A9-A0E8-3C456CDFBD82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteLoggerLibrary", "RemoteLoggerLibrary\RemoteLoggerLibrary.csproj", "{A87E40CE-6633-41A9-A0E8-3C456CDFBD82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

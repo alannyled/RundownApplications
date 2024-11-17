@@ -6,10 +6,16 @@
 <PageTitle>Rækkefølger</PageTitle>
 <Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
-    <RundownTable Rundowns="AllRundowns" ShowArchived="true" />
+    <h3>Alle rækkefølger</h3>
+    <DatePicker />
+    <div class="card mb-3">
+        <div class="card-body">
+            <RundownTable Rundowns="AllRundowns" ShowArchived="true" />
+        </div>
+    </div>
 </div>
 
-@code{
+@code {
 
     private List<RundownDTO> AllRundowns = new();
 

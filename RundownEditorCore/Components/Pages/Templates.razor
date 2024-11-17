@@ -5,7 +5,12 @@
 
 <PageTitle>Templates</PageTitle>
 <div class="container-fluid" style="max-width:1600px">
-    <TemplatesTable Templates="SharedStates.Templates" />
+    <h3>Templates</h3>
+    <div class="card mb-3">
+        <div class="card-body">
+            <TemplatesTable Templates="SharedStates.Templates" />
+        </div>
+    </div>
 </div>
 @code {
 
@@ -29,4 +34,4 @@
             await InvokeAsync(StateHasChanged);
         }
     }
- }
+}

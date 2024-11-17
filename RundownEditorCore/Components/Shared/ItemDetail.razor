@@ -33,7 +33,7 @@
             <div class="input-group">
                 @if(Detail.Type == "Video")
                 {
-                    <input class="form-control rounded-0 rounded-bottom" type="text" value="@Detail.VideoPath" readonly style="width:@($"{Detail.VideoPath.Length}ch")">
+                    <input class="form-control rounded-0 rounded-bottom" type="text" value="@Detail.VideoPath" readonly style="width:@($"{Detail.VideoPath?.Length}ch")">
                 }
                 else
                 {
@@ -41,6 +41,7 @@
                     rows="@CalculateRows()"
                     cols="@(Math.Ceiling((double)content.Count()))"
                     @bind="content"
+                    @bind:event="oninput"
                     disabled="@(!active)" 
                     style="resize: both;">
                     @content
@@ -109,18 +110,19 @@
                 Detail = updatedDetail;
                 content = SetContent();
                 updatedDetailUuid = Guid.Empty;
+                InvokeAsync(StateHasChanged);
             }
-        }        
-        InvokeAsync(StateHasChanged); // muligvis overflødig, fordi @bind gør det samme?
+        } 
+        
     }
+
+    /// <summary>
+    /// Desværre nødvendigt, fordi Blazor ikke kan håndtere @bind med sekunder i input type="time"
+    /// </summary>
     private void HandleDurationInput(ChangeEventArgs e)
     {
         Detail.Duration = e.Value?.ToString();
     }
-    // private void HandleContentInput(ChangeEventArgs e)
-    // {
-    //     content = e.Value?.ToString();
-    // }
 
     public async Task ActivateInput()
     {

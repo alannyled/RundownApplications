@@ -6,6 +6,17 @@
 @inject ModalState ModalState
 @inject ToastState ToastState
 
+@if (isCreating)
+{
+    <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <p class="text-center my-5">Opretter ny rækkefølge.</p>
+}
+else
+{
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
         <label for="broadcastdate" class="form-label">Udsendelsedato</label>
@@ -40,6 +51,7 @@
         <button type="submit" class="btn btn-sm btn-primary">Opret rækkefølge</button>
     </div>
 </form>
+}
 
 @code {
 
@@ -48,24 +60,37 @@
 
     public string Template { get; set; } = string.Empty;
     public string ControlRoom { get; set; } = string.Empty;
+    public bool isCreating { get; set; } = false;
 
-    private async Task<bool> HandleSubmit()
+    private async Task HandleSubmit()
     {
         if (string.IsNullOrEmpty(Template))
         {
             ToastState.FireToast("Vælg Skabelon", "text-bg-warning");
-            return false;
+            return;
         }
         if (string.IsNullOrEmpty(ControlRoom))
         {
             ToastState.FireToast("Vælg Kontrolrum", "text-bg-warning");
+            return;
+        }
+        isCreating = true;
+        bool success = await CreateRundown();
+        isCreating = false;
+        if(success) ModalState.Close();
+    }
+
+    private async Task<bool> CreateRundown()
+    {
+        await Task.Delay(1500); // Simulere at der går lidt tid før det er oprettet
+        var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
+        if (rundown == null)
+        {
+            ToastState.FireToast("Der skete en fejl. Prøv igen", "text-bg-danger");
             return false;
         }
-        var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
+        ToastState.FireToast($"Ny rækkefølge er oprettet.", "text-bg-success");
         RundownState.SelectedRundown(rundown);
-        ModalState.Close();
-        // var activeRundowns = await RundownService.GetRundownsAsync();
-        // SharedStates.SharedAllRundowns(activeRundowns);
         return true;
     }
 }

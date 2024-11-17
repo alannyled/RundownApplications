@@ -27,18 +27,7 @@
             @foreach (DetailDTO detail in RundownItem.Details)
             {
                 <ItemDetail Detail="detail" @key="detail.UUID"></ItemDetail>
-            }
-            @if (isCreating )
-            {
-                <div class="card d-inline-block">
-                    <div class="card-header">
-                        Opretter nyt element...
-                    </div>
-                    <div class="card-body bg-secondary-subtle">
-                        <p class="card-text">.....................</p>                        
-                    </div>
-                </div>
-            }
+            }            
         </div>
     </div>
 </div>
@@ -54,7 +43,6 @@
     public EventCallback<string> OnRemove { get; set; }
 
     public RundownItemDTO? RundownItem { get; set; } = new();
-    public bool isCreating { get; set; } = false;
 
     protected override void OnInitialized()
     {
@@ -72,11 +60,12 @@
         {
             var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown?.UUID);
             if(currentRundown == null) return;
+
             var currenItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
             if (currenItem == null) return;
+
             RundownItem = currenItem;
             RundownState.SelectedItem(currenItem);
-            isCreating = false;
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -95,7 +84,6 @@
     /// </summary>
     public void AddSelected(string type)
     {
-        isCreating = true;
         var content = new RenderFragment(builder =>
         {
             builder.AddContent(0, FormRenderservice.RenderItemDetailForm(

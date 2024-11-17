@@ -4,6 +4,17 @@
 @inject ToastState ToastState
 @inject ModalState ModalState
 
+@if (isCreating)
+{
+    <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <p class="text-center my-5">Opretter @Title</p>
+}
+else
+{
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
         <label for="title" class="form-label">Titel</label>
@@ -45,6 +56,7 @@
         <button type="submit" class="btn btn-sm btn-primary">Opret rækkefølge objekt</button>
     </div>
 </form>
+}
 
 @code {
     [Parameter]
@@ -56,7 +68,8 @@
     public string Graphic { get; set; } = string.Empty;
     public string Template { get; set; } = string.Empty;
     public string SelectedCamera { get; set; } = string.Empty;
-    public List<string> Cameras { get; set; } = ["Kamera 1", "Kamera 2", "Kamera 3"];
+    public List<string> Cameras { get; set; } = ["Kamera 1", "Kamera 2", "Kamera 3"]; // skal komme fra controlRoom.Hardware
+    public bool isCreating { get; set; } = false;
 
 
     public ItemDetailDTO.ItemDetail? GetModel(string type) =>
@@ -88,6 +101,7 @@
         {
             return;
         }
+        isCreating = true;
         var newRundownItem = GetModel(DetailType);
 
         newRundownItem.UUID = Guid.NewGuid();
@@ -109,8 +123,22 @@
             case ItemDetailDTO.ItemDetailComment commentItem:
                 commentItem.Comment = Text;
                 break;
-        }      
+        }
+        bool success = await SaveNewDetail(newRundownItem);
+        isCreating = false;
+        if (success) ModalState.Close();        
+    }
+
+    private async Task<bool> SaveNewDetail(ItemDetailDTO.ItemDetail newRundownItem)
+    {
+        await Task.Delay(1500); // Simulere at der går lidt tid før det er oprettet
         var rundown = await RundownService.AddDetailToItemAsync(RundownState.Rundown.UUID, newRundownItem);
-        ModalState.Close();
+        if (rundown == null)
+        {
+            ToastState.FireToast("Der skete en fejl. Prøv igen", "text-bg-danger");
+            return false;
+        }        
+        ToastState.FireToast($"{Title} er oprettet.", "text-bg-success");
+        return true;
     }
 }

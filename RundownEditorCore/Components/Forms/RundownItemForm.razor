@@ -4,6 +4,17 @@
 @inject ToastState ToastState
 @inject ModalState ModalState
 
+@if (isCreating)
+{
+    <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <p class="text-center my-5">Opretter @ItemName</p>
+}
+else
+{
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
         <label for="itemname" class="form-label">Titel</label>
@@ -27,6 +38,7 @@
         <button type="submit" class="btn btn-sm btn-primary">Opret historie</button>
     </div>
 </form>
+}
 
 @code {
 
@@ -36,6 +48,7 @@
     public string ItemName { get; set; } = string.Empty;
     public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
     public string Template { get; set; } = string.Empty;
+    public bool isCreating { get; set; } = false;
 
     private async Task HandleSubmit()
     {
@@ -45,7 +58,7 @@
             ToastState.FireToast("Du skal angive en titel", "text-bg-warning");
             return;
         }
-
+        isCreating = true;
         var newRundownItem = new RundownItemDTO
             {
                 UUID = Guid.NewGuid(),
@@ -56,10 +69,22 @@
             };
 
 
-        var rundown = await RundownService.AddItemToRundownAsync(selectedRundown.UUID, newRundownItem);
-       // RundownState.SelectedRundown(rundown);
-        ModalState.Close();
+        //var rundown = await RundownService.AddItemToRundownAsync(selectedRundown.UUID, newRundownItem);
+        bool success = await SaveNewItem(selectedRundown.UUID, newRundownItem);
+        isCreating = false;
+        if (success) ModalState.Close();
     }
 
-
+    private async Task<bool> SaveNewItem(string UUID, RundownItemDTO newRundownItem)
+    {
+        await Task.Delay(1500); // Simulere at der går lidt tid før det er oprettet
+        var rundown = await RundownService.AddItemToRundownAsync(UUID, newRundownItem);
+        if (rundown == null)
+        {
+            ToastState.FireToast("Der skete en fejl. Prøv igen", "text-bg-danger");
+            return false;
+        }
+        ToastState.FireToast($"{ItemName} er oprettet.", "text-bg-success");
+        return true;
+    }
 }

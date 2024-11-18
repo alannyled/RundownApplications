@@ -14,7 +14,6 @@ namespace RundownEditorCore.States
         {
             ItemUpdated,
             RundownUpdated,
-         //   NewRundownAdded,
             ControlRoomsUpdated,
             TemplatesUpdated,
             OnlineStatusUpdated,
@@ -25,7 +24,6 @@ namespace RundownEditorCore.States
         public event Action<StateAction>? OnChange;
         public RundownItemDTO ItemUpdated { get; private set; } = new();
         public RundownDTO RundownUpdated { get; private set; } = new();
-       // public RundownDTO NewRundown { get; private set; } = new();
         public List<RundownDTO> AllRundowns { get; private set; } = [];
         public List<ControlRoomDTO> ControlRooms { get; private set; } = [];
         public List<TemplateDTO> Templates { get; private set; } = [];
@@ -48,21 +46,10 @@ namespace RundownEditorCore.States
             NotifyStateChanged(StateAction.RundownUpdated);
         }
 
-        //public void SharedNewRundown(RundownDTO rundown)
-        //{
-        //    NewRundown = rundown;
-        //    NotifyStateChanged(StateAction.NewRundownAdded);
-        //}
-
         public void SharedAllRundowns(List<RundownDTO> rundowns)
         {
             AllRundowns = rundowns;
             NotifyStateChanged(StateAction.AllRundownsUpdated);
-            Console.WriteLine("AllRundowns opdateret:");
-            foreach (var rundown in AllRundowns)
-            {
-                Console.WriteLine($" - {rundown.Name} ({rundown.UUID})");
-            }
         }
 
         public void SharedControlRoom(List<ControlRoomDTO> controlRooms)

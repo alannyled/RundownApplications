@@ -118,15 +118,6 @@ namespace RundownEditorCore.Services
                                     LogMessageAdded?.Invoke(log);
                                 }
                             }
-                            //if (message.Topic == "story")
-                            //{
-                            //    var messageObject = ConvertMessageToJson<ItemMessage>(message);
-                            //    if (messageObject != null)
-                            //    {
-                            //        _sharedStates.SharedItem(messageObject.Item);
-                            //    }
-
-                            //}
                             if (message.Topic == MessageTopic.Rundown.ToKafkaTopic())
                             {
                                 HandleRundownMessage(message);

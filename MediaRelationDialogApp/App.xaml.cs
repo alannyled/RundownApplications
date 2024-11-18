@@ -3,12 +3,12 @@ namespace MediaRelationDialogApp
 {
     public partial class App : Application
     {
-        public App()
+        public App(AppTheme userAppTheme)
         {
             InitializeComponent();
-            Current.UserAppTheme = AppTheme.Dark;
+            userAppTheme = AppTheme.Dark;
         }
-        protected override Window CreateWindow(IActivationState activationState) =>
+        protected override Window CreateWindow(IActivationState? activationState) =>
             new(new AppShell())
             {
                 Width = 1000,

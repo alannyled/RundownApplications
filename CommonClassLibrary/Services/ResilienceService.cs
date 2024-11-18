@@ -101,7 +101,7 @@ namespace CommonClassLibrary.Services
             }
         }
 
-        public async Task<T> ExecuteWithResilienceAsync<T>(Func<Task<T>> action)
+        public async Task<T?> ExecuteWithResilienceAsync<T>(Func<Task<T>> action)
         {
             try
             {
@@ -120,7 +120,8 @@ namespace CommonClassLibrary.Services
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 SendMessage("error", message);
-                throw;
+                return default;
+                //throw;
             }
         }
 

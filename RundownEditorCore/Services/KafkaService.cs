@@ -51,7 +51,7 @@ namespace RundownEditorCore.Services
 
         private readonly KafkaServiceLibrary.KafkaService _kafkaService = kafkaService;
         private readonly DetailLockState _detailLockState = detailLockState;
-        private readonly SharedStates _sharedStates = sharedStates;
+       // private readonly SharedStates _sharedStates = sharedStates;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IControlRoomService _controlRoomService = controlRoomService;
         private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
@@ -128,13 +128,13 @@ namespace RundownEditorCore.Services
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 //var controlrooms = messageObject.ControlRooms; (der mangler hardware her)                       
                                 var controlrooms = await _controlRoomService.GetControlRoomsAsync();
-                                _sharedStates.SharedControlRoom(controlrooms);
+                                sharedStates.SharedControlRoom(controlrooms);
                             }
 
                             if (message.Topic == MessageTopic.Error.ToKafkaTopic())
                             {
                                 var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message);
-                                _sharedStates.SharedError(messageObject);
+                                sharedStates.SharedError(messageObject);
                                 _logger.LogError($"Kritisk Fejlbesked: {message.Message.Value}");
                             }
                             if (message.Topic == MessageTopic.Log.ToKafkaTopic())
@@ -206,7 +206,7 @@ namespace RundownEditorCore.Services
     {
         public string? Action { get; set; }
         public DateTime TimeStamp { get; set; }
-        public List<ControlRoomDTO> ControlRooms { get; set; }
+        public List<ControlRoomDTO>? ControlRooms { get; set; }
     }
     public class ItemMessage
     {

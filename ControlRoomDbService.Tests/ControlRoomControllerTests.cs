@@ -1,124 +1,203 @@
 using Xunit;
 using Moq;
-using RundownDbService.Models;
-using RundownDbService.BLL.Services;
-using RundownDbService.BLL.Interfaces;
-using CommonClassLibrary.Services;
-using Microsoft.Extensions.Logging.Abstractions; // Til NullLogger
+using ControlRoomDbService.Controllers;
+using ControlRoomDbService.BLL.Interfaces;
+using ControlRoomDbService.Models;
+using ControlRoomDbService.DTO;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RundownDbService.DAL.Interfaces;
 
-public class RundownServiceTests
+namespace ControlRoomDbService.Tests.Controllers
 {
-    private readonly Mock<IRundownRepository> _mockRundownRepository;
-    private readonly Mock<IKafkaService> _mockKafkaService;
-    private readonly Mock<IResilienceService> _mockResilienceService;
-    private readonly RundownService _rundownService;
-
-    public RundownServiceTests()
+    public class ControlRoomControllerTests
     {
-        _mockRundownRepository = new Mock<IRundownRepository>();
-        _mockKafkaService = new Mock<IKafkaService>();
-        _mockResilienceService = new Mock<IResilienceService>();
+        private readonly Mock<IControlRoomService> _mockControlRoomService;
+        private readonly ControlRoomController _controlRoomController;
 
-        // Brug en NullLogger for at undgå logging
-        var nullLogger = NullLogger<RundownService>.Instance;
-
-        _rundownService = new RundownService(
-            _mockRundownRepository.Object,
-            _mockKafkaService.Object,
-            _mockResilienceService.Object,
-            nullLogger);
-    }
-
-    [Fact]
-    public async Task GetAllRundownsAsync_ReturnsListOfRundowns()
-    {
-        // Arrange
-        var mockRundowns = new List<Rundown>
+        public ControlRoomControllerTests()
         {
-            new Rundown { UUID = Guid.NewGuid(), Name = "Rundown 1" },
-            new Rundown { UUID = Guid.NewGuid(), Name = "Rundown 2" }
-        };
+            _mockControlRoomService = new Mock<IControlRoomService>();
+            _controlRoomController = new ControlRoomController(_mockControlRoomService.Object);
+        }
 
-        _mockResilienceService
-            .Setup(r => r.ExecuteWithResilienceAsync(It.IsAny<Func<Task<List<Rundown>>>>()))
-            .ReturnsAsync(mockRundowns);
+        [Fact]
+        public async Task Get_ReturnsListOfControlRooms()
+        {
+            // Arrange
+            var mockControlRooms = new List<ControlRoom>
+            {
+                new ControlRoom { UUID = Guid.NewGuid(), Name = "Control Room 1" },
+                new ControlRoom { UUID = Guid.NewGuid(), Name = "Control Room 2" }
+            };
 
-        // Act
-        var result = await _rundownService.GetAllRundownsAsync();
+            // Mock setup - Sørg for at mock'en returnerer de ønskede kontrolrum
+            _mockControlRoomService.Setup(service => service.GetControlRoomsAsync())
+                                   .ReturnsAsync(mockControlRooms);
 
-        // Assert
-        Assert.Equal(2, result.Count);
-        _mockResilienceService.Verify(r => r.ExecuteWithResilienceAsync(It.IsAny<Func<Task<List<Rundown>>>>()), Times.Once);
-    }
+            // Act
+            var result = await _controlRoomController.Get();
 
-    [Fact]
-    public async Task CreateRundownAsync_CallsRepositoryAndSendsMessage()
-    {
-        // Arrange
-        var newRundown = new Rundown { UUID = Guid.NewGuid(), Name = "New Rundown" };
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result); // Tjek at resultatet er af typen OkObjectResult
+            var controlRooms = Assert.IsType<List<ControlRoom>>(okResult.Value); // Tjek at værdien er en liste af ControlRoom
+            Assert.Equal(2, controlRooms.Count); // Kontrollerer at der er to elementer i listen
+            _mockControlRoomService.Verify(service => service.GetControlRoomsAsync(), Times.Once);
+        }
 
-        _mockResilienceService
-            .Setup(r => r.ExecuteWithResilienceAsync(It.IsAny<Func<Task>>()))
-            .Returns(async (Func<Task> action) => await action());
 
-        _mockRundownRepository
-            .Setup(repo => repo.CreateAsync(newRundown))
-            .ReturnsAsync(newRundown);
+        [Fact]
+        public async Task Get_WithValidId_ReturnsControlRoom()
+        {
+            // Arrange
+            var controlRoomId = Guid.NewGuid();
+            var mockControlRoom = new ControlRoom { UUID = controlRoomId, Name = "Control Room 1", Location = "DR1" };
 
-        // Act
-        await _rundownService.CreateRundownAsync(newRundown);
+            // Brug nullable type for mocken, så den matcher nullability på interfacet
+            _mockControlRoomService
+                .Setup(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()))
+                .ReturnsAsync(mockControlRoom);
 
-        // Assert
-        _mockRundownRepository.Verify(repo => repo.CreateAsync(newRundown), Times.Once);
-        _mockKafkaService.Verify(kafka => kafka.SendMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-    }
+            // Act
+            var result = await _controlRoomController.Get(controlRoomId.ToString());
 
-    [Fact]
-    public async Task UpdateRundownAsync_CallsRepositoryAndSendsMessage()
-    {
-        // Arrange
-        var rundownId = Guid.NewGuid();
-        var updatedRundown = new Rundown { UUID = rundownId, Name = "Updated Rundown" };
+            // Assert
+            Assert.NotNull(result); // Kontrollerer at resultatet ikke er null
+            Assert.NotNull(result.Result); // Kontrollerer at resultatets 'Result' ikke er null
 
-        _mockResilienceService
-            .Setup(r => r.ExecuteWithResilienceAsync(It.IsAny<Func<Task<Rundown>>>()))
-            .Returns(async (Func<Task<Rundown>> action) => await action());
+            var okResult = Assert.IsType<OkObjectResult>(result.Result); // Kontrollerer at det er af typen OkObjectResult
 
-        _mockRundownRepository
-            .Setup(repo => repo.UpdateAsync(rundownId, updatedRundown))
-            .ReturnsAsync(updatedRundown);
+            Assert.NotNull(okResult.Value); // Kontrollerer at værdien i OkResult ikke er null
+            var controlRoom = Assert.IsType<ControlRoom>(okResult.Value); // Kontrollerer at værdien er af typen ControlRoom
 
-        // Act
-        var result = await _rundownService.UpdateRundownAsync(rundownId, updatedRundown);
+            Assert.Equal(mockControlRoom.UUID, controlRoom.UUID);
+            Assert.Equal(mockControlRoom.Name, controlRoom.Name);
 
-        // Assert
-        Assert.Equal("Updated Rundown", result.Name);
-        _mockRundownRepository.Verify(repo => repo.UpdateAsync(rundownId, updatedRundown), Times.Once);
-        _mockKafkaService.Verify(kafka => kafka.SendMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-    }
+            _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()), Times.Once);
+        }
 
-    [Fact]
-    public async Task DeleteRundownAsync_CallsRepository()
-    {
-        // Arrange
-        var rundownId = Guid.NewGuid();
 
-        _mockResilienceService
-            .Setup(r => r.ExecuteWithResilienceAsync(It.IsAny<Func<Task>>()))
-            .Returns(async (Func<Task> action) => await action());
 
-        _mockRundownRepository
-            .Setup(repo => repo.DeleteAsync(rundownId))
-            .Returns(Task.CompletedTask);
+        [Fact]
+        public async Task Get_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            var controlRoomId = Guid.NewGuid().ToString();
 
-        // Act
-        await _rundownService.DeleteRundownAsync(rundownId);
+            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId)).ReturnsAsync((ControlRoom)null);
 
-        // Assert
-        _mockRundownRepository.Verify(repo => repo.DeleteAsync(rundownId), Times.Once);
+            // Act
+            var result = await _controlRoomController.Get(controlRoomId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result.Result);
+            _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId), Times.Once);
+        }
+
+        [Fact]
+        public async Task Create_ValidControlRoom_ReturnsCreatedAtAction()
+        {
+            // Arrange
+            var newControlRoomDto = new CreateControlRoomDto { Name = "New Control Room", Location = "DR1" };
+            var newControlRoom = new ControlRoom { UUID = Guid.NewGuid(), Name = newControlRoomDto.Name, Location = newControlRoomDto.Location, CreatedDate = DateTime.Now };
+
+            _mockControlRoomService.Setup(service => service.CreateControlRoomAsync(It.IsAny<ControlRoom>())).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _controlRoomController.Create(newControlRoomDto);
+
+            // Assert
+            var actionResult = Assert.IsType<CreatedAtActionResult>(result);
+            Assert.Equal(nameof(_controlRoomController.Get), actionResult.ActionName);
+            _mockControlRoomService.Verify(service => service.CreateControlRoomAsync(It.IsAny<ControlRoom>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Update_WithValidId_ReturnsOkResult()
+        {
+            // Arrange
+            var controlRoomId = Guid.NewGuid();
+            var updatedControlRoom = new ControlRoom { UUID = controlRoomId, Name = "Updated Control Room", Location = "DR1" };
+
+            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId.ToString())).ReturnsAsync(updatedControlRoom);
+            _mockControlRoomService.Setup(service => service.UpdateControlRoomAsync(controlRoomId.ToString(), updatedControlRoom)).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _controlRoomController.Update(controlRoomId.ToString(), updatedControlRoom);
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()), Times.Once);
+            _mockControlRoomService.Verify(service => service.UpdateControlRoomAsync(controlRoomId.ToString(), updatedControlRoom), Times.Once);
+        }
+
+        [Fact]
+        public async Task Update_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            var controlRoomId = Guid.NewGuid();
+            var updatedControlRoom = new ControlRoom { UUID = controlRoomId, Name = "Updated Control Room", Location = "DR1" };
+
+            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId.ToString())).ReturnsAsync((ControlRoom)null);
+
+            // Act
+            var result = await _controlRoomController.Update(controlRoomId.ToString(), updatedControlRoom);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+            _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()), Times.Once);
+            _mockControlRoomService.Verify(service => service.UpdateControlRoomAsync(It.IsAny<string>(), It.IsAny<ControlRoom>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Delete_WithValidId_ReturnsOkResult()
+        {
+            // Arrange
+            var controlRoomId = Guid.NewGuid();
+            var mockControlRoom = new ControlRoom { UUID = controlRoomId, Name = "Control Room to Delete" };
+
+            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId.ToString())).ReturnsAsync(mockControlRoom);
+            _mockControlRoomService.Setup(service => service.DeleteControlRoomAsync(controlRoomId.ToString())).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _controlRoomController.Delete(controlRoomId.ToString());
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()), Times.Once);
+            _mockControlRoomService.Verify(service => service.DeleteControlRoomAsync(controlRoomId.ToString()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Delete_WithInvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            var controlRoomId = Guid.NewGuid().ToString();
+
+            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId)).ReturnsAsync((ControlRoom)null);
+
+            // Act
+            var result = await _controlRoomController.Delete(controlRoomId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+            _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId), Times.Once);
+            _mockControlRoomService.Verify(service => service.DeleteControlRoomAsync(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteAll_ReturnsNoContentResult()
+        {
+            // Arrange
+            _mockControlRoomService.Setup(service => service.DeleteAllControlRoomsAsync()).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _controlRoomController.DeleteAll();
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+            _mockControlRoomService.Verify(service => service.DeleteAllControlRoomsAsync(), Times.Once);
+        }
     }
 }

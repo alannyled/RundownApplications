@@ -79,7 +79,7 @@ namespace CommonClassLibrary.Services
             _producerClient = (KafkaProducerClient)_kafkaService.CreateKafkaClient("producer");
         }
 
-        public async Task ExecuteWithResilienceAsync(Func<Task> action)
+        public virtual async Task ExecuteWithResilienceAsync(Func<Task> action)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace CommonClassLibrary.Services
             }
         }
 
-        public async Task<T?> ExecuteWithResilienceAsync<T>(Func<Task<T>> action)
+        public virtual async Task<T?> ExecuteWithResilienceAsync<T>(Func<Task<T>> action)
         {
             try
             {

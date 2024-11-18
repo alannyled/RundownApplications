@@ -18,7 +18,7 @@ namespace ControlRoomDbService.BLL.Services
 
         public async Task<ControlRoom> GetControlRoomByIdAsync(string id)
         {
-            return await _controlRoomRepository.GetByIdAsync(id) ?? new ControlRoom();
+            return await _controlRoomRepository.GetByIdAsync(id) ?? new ControlRoom { UUID = Guid.Empty };
         }
 
         public async Task CreateControlRoomAsync(ControlRoom controlRoom)

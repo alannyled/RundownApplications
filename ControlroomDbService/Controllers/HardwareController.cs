@@ -17,7 +17,11 @@ namespace ControlRoomDbService.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Hardware>> Get() => await _hardwareService.GetAllHardwareAsync();
+        public async Task<ActionResult<List<Hardware>>> Get()
+        {
+           var hardwares =  await _hardwareService.GetAllHardwareAsync();
+            return Ok(hardwares);
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Hardware>> Get(string id)
@@ -29,7 +33,7 @@ namespace ControlRoomDbService.Controllers
                 return NotFound();
             }
 
-            return hardware;
+            return Ok(hardware);
         }
 
         [HttpPost]

@@ -17,7 +17,11 @@ namespace ControlRoomDbService.Controllers
         }
 
         [HttpGet]
-        public async Task<List<ControlRoom>> Get() => await _controlRoomService.GetControlRoomsAsync();
+        public async Task<ActionResult<List<ControlRoom>>> Get()
+        {
+            var controlRooms = await _controlRoomService.GetControlRoomsAsync();
+            return Ok(controlRooms);
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ControlRoom>> Get(string id)
@@ -29,7 +33,7 @@ namespace ControlRoomDbService.Controllers
                 return NotFound();
             }
 
-            return controlRoom;
+            return Ok(controlRoom);
         }
 
         [HttpPost]

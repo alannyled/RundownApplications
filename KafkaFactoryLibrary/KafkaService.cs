@@ -13,7 +13,7 @@ namespace KafkaServiceLibrary
 
         public KafkaService(IConfiguration configuration)
         {
-            _bootstrapServers = configuration.GetValue<string>("Kafka:BootstrapServers");
+            _bootstrapServers = configuration.GetValue<string>("Kafka:BootstrapServers") ?? throw new ArgumentNullException(nameof(_bootstrapServers));
 
             _producerConfig = new ProducerConfig { BootstrapServers = _bootstrapServers };
             _consumerConfig = new ConsumerConfig
@@ -22,12 +22,12 @@ namespace KafkaServiceLibrary
                 AutoOffsetReset = AutoOffsetReset.Latest,
                 EnableAutoCommit = true,
                 AutoCommitIntervalMs = 100,
-                FetchMinBytes = 1,        
+                FetchMinBytes = 1,
                 FetchWaitMaxMs = 100
             };
         }
 
-        public IKafkaClient CreateKafkaClient(string type, string groupId = null, IEnumerable<string> topics = null)
+        public IKafkaClient CreateKafkaClient(string type, string? groupId = null, IEnumerable<string>? topics = null)
         {
             if (type.Equals("producer", StringComparison.OrdinalIgnoreCase))
             {
@@ -52,7 +52,7 @@ namespace KafkaServiceLibrary
                 {
                     topicSpecifications.Add(new TopicSpecification
                     {
-                        Name = topic.Trim(), 
+                        Name = topic.Trim(),
                         NumPartitions = numPartitions,
                         ReplicationFactor = replicationFactor
                     });
@@ -131,7 +131,7 @@ namespace KafkaServiceLibrary
             }
         }
 
-        public async Task<bool> TopicExistsAsync(string topicName)
+        public bool TopicExistsAsync(string topicName)
         {
             using (var adminClient = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrapServers }).Build())
             {
@@ -156,7 +156,7 @@ namespace KafkaServiceLibrary
 
                 foreach (var topic in topics)
                 {
-                    if (!await TopicExistsAsync(topic))
+                    if (!TopicExistsAsync(topic))
                     {
                         missingTopics.Add(topic);
                     }

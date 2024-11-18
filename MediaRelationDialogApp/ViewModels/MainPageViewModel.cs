@@ -13,8 +13,8 @@ namespace MediaRelationDialogApp.ViewModels
 
         public ObservableCollection<RundownDTO> Rundowns { get; set; } = [];
 
-        private RundownDTO _selectedRundown;
-        public RundownDTO SelectedRundown
+        private RundownDTO? _selectedRundown;
+        public RundownDTO? SelectedRundown
         {
             get => _selectedRundown;
             set
@@ -37,8 +37,8 @@ namespace MediaRelationDialogApp.ViewModels
             }
         }        
 
-        private RundownItemDTO _selectedItem;
-        public RundownItemDTO SelectedItem
+        private RundownItemDTO? _selectedItem;
+        public RundownItemDTO? SelectedItem
         {
             get => _selectedItem;
             set
@@ -60,8 +60,8 @@ namespace MediaRelationDialogApp.ViewModels
             }
         }
 
-        private DetailDTO _selectedDetail;
-        public DetailDTO SelectedDetail
+        private DetailDTO? _selectedDetail;
+        public DetailDTO? SelectedDetail
         {
             get => _selectedDetail;
             set
@@ -87,16 +87,13 @@ namespace MediaRelationDialogApp.ViewModels
         public bool IsDetailSelected => SelectedDetail != null;
         public bool IsFileSelected => _selectedFile != null;
 
-        private FileResult _selectedFile;
+        private FileResult? _selectedFile;
 
         public ICommand PickFileCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand ReloadCommand { get; }
 
 
-        /// <summary>
-        /// Opsætning af MainPageViewModel
-        /// </summary>
         public MainPageViewModel(ApiService apiService)
         {
             _apiService = apiService;
@@ -104,7 +101,12 @@ namespace MediaRelationDialogApp.ViewModels
             SaveCommand = new Command(async () => await SaveDetailAsync(), () => CanSaveDetail);
             ReloadCommand = new Command(async () => await ReloadDataAsync());
 
-            LoadDataAsync();
+            InitializeAsync();
+        }
+
+        private async void InitializeAsync()
+        {
+            await LoadDataAsync();
         }
 
         /// <summary>
@@ -206,7 +208,6 @@ namespace MediaRelationDialogApp.ViewModels
         /// Gemmer valgt historie med tilhørende fil
         /// Nullstiller valgte elementer
         /// </summary>
-        /// <returns></returns>
         public async Task SaveDetailAsync()
         {
             if (!CanSaveDetail)
@@ -237,8 +238,8 @@ namespace MediaRelationDialogApp.ViewModels
             }
         }
 
-        private string _statusMessage;
-        public string StatusMessage
+        private string? _statusMessage;
+        public string? StatusMessage
         {
             get => _statusMessage;
             set
@@ -248,12 +249,11 @@ namespace MediaRelationDialogApp.ViewModels
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Eventhandler til at opdatere view ved ændringer
         /// </summary>
-        /// <param name="propertyName"></param>
         protected virtual void OnPropertyChanged(string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

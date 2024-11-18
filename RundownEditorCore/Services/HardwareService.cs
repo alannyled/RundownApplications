@@ -15,7 +15,6 @@ namespace RundownEditorCore.Services
             return await Task.FromResult(new List<HardwareDTO>());
         }
 
-
         public async Task<HardwareDTO> AddHardwareAsync(HardwareDTO newHardware)
         {
             try
@@ -25,19 +24,17 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var createdHardware = await response.Content.ReadFromJsonAsync<HardwareDTO>();
-                   // _logger.LogInformation($"CREATED Hardware {createdHardware.Name}");
-                    return createdHardware;
+                    if(createdHardware != null ) return createdHardware;
                 }
                 var errorContent = await response.Content.ReadAsStringAsync();
-               // _logger.LogInformation($"ERROR creating Hardware: {response.StatusCode}, {errorContent}");
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-              //  _logger.LogInformation($"Exception during hardware creation: {ex.Message}");
                 return null;
             }
         }
+
         public async Task<HardwareDTO> UpdateHardwareAsync(string hardwareId, HardwareDTO updatedHardware)
         {
             try
@@ -47,19 +44,17 @@ namespace RundownEditorCore.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var updatedHardwareResponse = await response.Content.ReadFromJsonAsync<HardwareDTO>();
-                  //  _logger.LogInformation($"UPDATED Hardware {updatedHardwareResponse.Name}");
-                    return updatedHardwareResponse;
+                    if (updatedHardwareResponse != null) return updatedHardwareResponse;
                 }
                 var errorContent = await response.Content.ReadAsStringAsync();
-              //  _logger.LogInformation($"ERROR updating hardware: {response.StatusCode}, {errorContent}");
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-               // _logger.LogInformation($"Exception during hardware update: {ex.Message}");
                 return null;
             }
         }
+
         public async Task DeleteHardwareAsync(string hardwareId)
         {
             try
@@ -69,15 +64,11 @@ namespace RundownEditorCore.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                  //  _logger.LogInformation($"Error deleting hardware: {response.StatusCode}, {errorContent}");   
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-               // _logger.LogInformation($"Exception during hardware deletion: {ex.Message}");
             }
         }
-
-
     }
 }

@@ -123,7 +123,7 @@ namespace ControlRoomDbService.Tests.Controllers
             var hardwareId = Guid.NewGuid();
             var updatedHardware = new Hardware { UUID = hardwareId, Name = "Updated Hardware", ControlRoomId = Guid.NewGuid().ToString() };
 
-            _mockHardwareService.Setup(service => service.GetHardwareByIdAsync(hardwareId.ToString())).ReturnsAsync((Hardware?)null);
+            _mockHardwareService.Setup(service => service.GetHardwareByIdAsync(hardwareId.ToString())).ReturnsAsync(new Hardware { UUID = Guid.Empty });
 
             // Act
             var result = await _hardwareController.Update(hardwareId.ToString(), updatedHardware);
@@ -159,7 +159,7 @@ namespace ControlRoomDbService.Tests.Controllers
             // Arrange
             var hardwareId = Guid.NewGuid().ToString();
 
-            _mockHardwareService.Setup(service => service.GetHardwareByIdAsync(hardwareId)).ReturnsAsync((Hardware)null);
+            _mockHardwareService.Setup(service => service.GetHardwareByIdAsync(hardwareId)).ReturnsAsync(new Hardware { UUID = Guid.Empty });
 
             // Act
             var result = await _hardwareController.Delete(hardwareId);

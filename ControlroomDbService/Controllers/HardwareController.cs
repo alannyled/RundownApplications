@@ -67,7 +67,7 @@ namespace ControlRoomDbService.Controllers
         {
             var existingHardware = await _hardwareService.GetHardwareByIdAsync(id);
 
-            if (existingHardware == null)
+            if (existingHardware == null || existingHardware.UUID == Guid.Empty)
             {
                 return NotFound();
             }
@@ -83,7 +83,7 @@ namespace ControlRoomDbService.Controllers
         {
             var hardware = await _hardwareService.GetHardwareByIdAsync(id);
 
-            if (hardware == null)
+            if (hardware == null || hardware.UUID == Guid.Empty)
             {
                 return NotFound();
             }

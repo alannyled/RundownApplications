@@ -3,18 +3,33 @@
 @inject ToastState ToastState
 @inject RundownState RundownState
 @inject SharedStates SharedStates
+@inject DetailLockState DetailLockState
 
-<PageTitle>Nulstil databaser</PageTitle>
+<PageTitle>Nulstil App data</PageTitle>
 <Toast></Toast>
 <div class="container-fluid" style="max-width:1600px">
-    <h3>Reset Data</h3>
+
     <div class="row mt-2">
-        <div class="col-xl-12">
-            <p>Reset data er en funktion der sletter alt data i databasen og opretter demo data.<br />Dette er en irreversible handling og kan ikke fortrydes.</p>
-            <button class="btn btn-danger" @onclick="ResetDataAsync">Reset Data</button>
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Nulstil databaser med demodata</h3>
+                    <p>Nulstil databaser sletter alt data i databasen og opretter demo data.<br />Dette er en irreversible handling og kan ikke fortrydes.</p>
+                    <button class="btn btn-danger" @onclick="ResetDataAsync">Reset Data</button>
+                </div>
             </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Nulstil alle app data</h3>
+                    <p>Fjerner alle gemte states i Blazor Server, så data indlæses påny.</p>
+                    <button class="btn btn-danger" @onclick="ResetStatesAsync">Reset App Data</button>
+                </div>
             </div>
-            </div>
+        </div>
+    </div>
+</div>
 @code {
 
     public async Task ResetDataAsync()
@@ -52,5 +67,14 @@
         }
     }
 
-
+    public async Task ResetStatesAsync()
+    {
+        RundownState.SelectedRundown(new());
+        SharedStates.SharedAllRundowns(new List<RundownDTO>());
+        SharedStates.SharedControlRoom(new List<ControlRoomDTO>());
+        SharedStates.SharedTemplates(new List<TemplateDTO>());
+        DetailLockState.ClearLocks();
+        ToastState.FireToast("Nulstilling af app data lykkedes", "text-bg-success");
+        Navigation.NavigateTo("/");
+    }
 }

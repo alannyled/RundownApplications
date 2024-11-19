@@ -66,6 +66,7 @@ namespace AggregatorService.Controllers
         [HttpPut("update-detail-in-item/{rundownId}")]
         public async Task<IActionResult> UpdateDetailInItem(string rundownId, [FromBody] ItemDetailDTO itemDetailDto)
         {
+            Console.WriteLine("Updating detail in item: " + JsonSerializer.Serialize(itemDetailDto));
             var rundown = await _rundownManager.UpdateItemDetailAsync(Guid.Parse(rundownId), itemDetailDto);
             return Ok(rundown);
         }

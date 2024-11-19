@@ -41,5 +41,10 @@ namespace RundownEditorCore.States
                 return false; 
             }
         }
+
+        public void ClearLocks()
+        {
+            _lockedDetails.Clear();
+        }
     }
 }

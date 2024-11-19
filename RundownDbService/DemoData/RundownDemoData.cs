@@ -27,8 +27,8 @@ namespace RundownDbService.DemoData
                             ]},
                         new RundownItem { UUID = Item2Uuid, RundownId = Rundown1Uuid, Name = "Velkomst", Duration = TimeSpan.FromSeconds(15), Order = 1, Details = [
                             new ItemDetailTeleprompter { UUID = Guid.NewGuid(), ItemId = Item2Uuid, Type= "Teleprompter", Title="Velkommen", Duration = TimeSpan.FromSeconds(8), Order = 0, PrompterText = "Klokken er 1830, Velkommen til TV Avisen"},
-                            new ItemDetailVideo { UUID = Guid.NewGuid(), ItemId = Item3Uuid, Type= "Video", Title="Kommuner skal spare", Duration = TimeSpan.FromSeconds(12), Order = 1, VideoPath = "Ingen video tilknyttet"},
-                            new ItemDetailTeleprompter { UUID = Guid.NewGuid(), ItemId = Item4Uuid, Type= "Voiceover", Title="VO Kommuner", Duration = TimeSpan.FromSeconds(12), Order = 0, PrompterText = "Der skal spares millioner i kommunerne. Borgmester frygter at det vil påvirke årets julefrokost på rådhuset"}
+                            new ItemDetailVideo { UUID = Guid.NewGuid(), ItemId = Item2Uuid, Type= "Video", Title="Kommuner skal spare", Duration = TimeSpan.FromSeconds(12), Order = 1, VideoPath = "Ingen video tilknyttet"},
+                            new ItemDetailTeleprompter { UUID = Guid.NewGuid(), ItemId = Item2Uuid, Type= "Voiceover", Title="VO Kommuner", Duration = TimeSpan.FromSeconds(12), Order = 0, PrompterText = "Der skal spares millioner i kommunerne. Borgmester frygter at det vil påvirke årets julefrokost på rådhuset"}
                             ] },
                         new RundownItem { UUID = Guid.NewGuid(), RundownId = Rundown1Uuid, Name = "Vejr", Duration = TimeSpan.FromSeconds(113), Order = 2, Details = [] },
                         new RundownItem { UUID = Guid.NewGuid(), RundownId = Rundown1Uuid, Name = "Sport", Duration = TimeSpan.FromSeconds(198), Order = 3, Details = [] }

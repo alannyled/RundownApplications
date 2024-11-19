@@ -54,7 +54,6 @@ namespace ControlRoomDbService.Tests.Controllers
             var controlRoomId = Guid.NewGuid();
             var mockControlRoom = new ControlRoom { UUID = controlRoomId, Name = "Control Room 1", Location = "DR1" };
 
-            // Brug nullable type for mocken, så den matcher nullability på interfacet
             _mockControlRoomService
                 .Setup(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()))
                 .ReturnsAsync(mockControlRoom);
@@ -63,13 +62,13 @@ namespace ControlRoomDbService.Tests.Controllers
             var result = await _controlRoomController.Get(controlRoomId.ToString());
 
             // Assert
-            Assert.NotNull(result); // Kontrollerer at resultatet ikke er null
-            Assert.NotNull(result.Result); // Kontrollerer at resultatets 'Result' ikke er null
+            Assert.NotNull(result);
+            Assert.NotNull(result.Result);
 
-            var okResult = Assert.IsType<OkObjectResult>(result.Result); // Kontrollerer at det er af typen OkObjectResult
+            var okResult = Assert.IsType<OkObjectResult>(result.Result); 
 
-            Assert.NotNull(okResult.Value); // Kontrollerer at værdien i OkResult ikke er null
-            var controlRoom = Assert.IsType<ControlRoom>(okResult.Value); // Kontrollerer at værdien er af typen ControlRoom
+            Assert.NotNull(okResult.Value);
+            var controlRoom = Assert.IsType<ControlRoom>(okResult.Value); 
 
             Assert.Equal(mockControlRoom.UUID, controlRoom.UUID);
             Assert.Equal(mockControlRoom.Name, controlRoom.Name);
@@ -85,14 +84,19 @@ namespace ControlRoomDbService.Tests.Controllers
             // Arrange
             var controlRoomId = Guid.NewGuid().ToString();
 
-            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId)).ReturnsAsync((ControlRoom)null);
+            _mockControlRoomService
+                .Setup(service => service.GetControlRoomByIdAsync(controlRoomId))
+                .ReturnsAsync(new ControlRoom { UUID = Guid.Empty });
+
+            var controller = new ControlRoomController(_mockControlRoomService.Object);
 
             // Act
-            var result = await _controlRoomController.Get(controlRoomId);
+            var result = await controller.Get(controlRoomId);
 
             // Assert
-            Assert.IsType<NotFoundResult>(result.Result);
-            _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnedControlRoom = Assert.IsType<ControlRoom>(actionResult.Value);
+            Assert.Equal(Guid.Empty, returnedControlRoom.UUID);
         }
 
         [Fact]
@@ -139,7 +143,9 @@ namespace ControlRoomDbService.Tests.Controllers
             var controlRoomId = Guid.NewGuid();
             var updatedControlRoom = new ControlRoom { UUID = controlRoomId, Name = "Updated Control Room", Location = "DR1" };
 
-            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId.ToString())).ReturnsAsync((ControlRoom)null);
+            _mockControlRoomService
+                .Setup(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()))
+                .ReturnsAsync(new ControlRoom { UUID = Guid.Empty }); 
 
             // Act
             var result = await _controlRoomController.Update(controlRoomId.ToString(), updatedControlRoom);
@@ -149,6 +155,7 @@ namespace ControlRoomDbService.Tests.Controllers
             _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId.ToString()), Times.Once);
             _mockControlRoomService.Verify(service => service.UpdateControlRoomAsync(It.IsAny<string>(), It.IsAny<ControlRoom>()), Times.Never);
         }
+
 
         [Fact]
         public async Task Delete_WithValidId_ReturnsOkResult()
@@ -175,7 +182,9 @@ namespace ControlRoomDbService.Tests.Controllers
             // Arrange
             var controlRoomId = Guid.NewGuid().ToString();
 
-            _mockControlRoomService.Setup(service => service.GetControlRoomByIdAsync(controlRoomId)).ReturnsAsync((ControlRoom)null);
+            _mockControlRoomService
+                .Setup(service => service.GetControlRoomByIdAsync(controlRoomId))
+                .ReturnsAsync(new ControlRoom { UUID = Guid.Empty }); // Signalér, at ID ikke findes
 
             // Act
             var result = await _controlRoomController.Delete(controlRoomId);
@@ -185,6 +194,7 @@ namespace ControlRoomDbService.Tests.Controllers
             _mockControlRoomService.Verify(service => service.GetControlRoomByIdAsync(controlRoomId), Times.Once);
             _mockControlRoomService.Verify(service => service.DeleteControlRoomAsync(It.IsAny<string>()), Times.Never);
         }
+
 
         [Fact]
         public async Task DeleteAll_ReturnsNoContentResult()

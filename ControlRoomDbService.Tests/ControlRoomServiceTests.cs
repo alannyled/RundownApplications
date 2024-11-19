@@ -67,7 +67,7 @@ namespace ControlRoomDbService.Tests.Services
         {
             // Arrange
             var controlRoomId = Guid.NewGuid().ToString();
-            _mockControlRoomRepository.Setup(repo => repo.GetByIdAsync(controlRoomId)).ReturnsAsync((ControlRoom)null);
+            _mockControlRoomRepository.Setup(repo => repo.GetByIdAsync(controlRoomId)).ReturnsAsync((ControlRoom?)null);
 
             // Act
             var result = await _controlRoomService.GetControlRoomByIdAsync(controlRoomId);

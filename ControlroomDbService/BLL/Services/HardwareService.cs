@@ -16,7 +16,7 @@ namespace ControlRoomDbService.BLL.Services
             return await _hardwareRepository.GetAsync();
         }
 
-        public async Task<Hardware> GetHardwareByIdAsync(string id)
+        public async Task<Hardware?> GetHardwareByIdAsync(string id)
         {
             return await _hardwareRepository.GetByIdAsync(id);
         }

@@ -67,7 +67,7 @@ namespace ControlRoomDbService.Tests.Services
         {
             // Arrange
             var hardwareId = Guid.NewGuid().ToString();
-            _mockHardwareRepository.Setup(repo => repo.GetByIdAsync(hardwareId)).ReturnsAsync((Hardware)null);
+            _mockHardwareRepository.Setup(repo => repo.GetByIdAsync(hardwareId)).ReturnsAsync((Hardware?)null);
 
             // Act
             var result = await _hardwareService.GetHardwareByIdAsync(hardwareId);

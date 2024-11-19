@@ -56,11 +56,7 @@ namespace RundownDbService.Controllers
                     Console.WriteLine("Fejl: ModelState er ugyldig.");
                     foreach (var key in ModelState.Keys)
                     {
-                        var errors = ModelState[key].Errors;
-                        foreach (var error in errors)
-                        {
-                            Console.WriteLine($"ModelState Fejl for {key}: {error.ErrorMessage}");
-                        }
+                        var errors = ModelState[key]?.Errors;
                     }
                     return BadRequest(ModelState);
                 }

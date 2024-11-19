@@ -10,22 +10,22 @@ namespace ControlRoomDbService.Models
         public Guid UUID { get; set; }
 
         [BsonElement("controlRoomId")]
-        public string ControlRoomId { get; set; }
+        public string ControlRoomId { get; set; } = string.Empty;
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [BsonElement("vendor")]
-        public string Vendor { get; set; }
+        public string? Vendor { get; set; }
 
         [BsonElement("model")]
-        public string Model { get; set; }
+        public string? Model { get; set; }
 
         [BsonElement("macAddress")]
-        public string MacAddress { get; set; }
+        public string? MacAddress { get; set; }
 
         [BsonElement("ipAddress")]
-        public string IpAddress { get; set; }
+        public string? IpAddress { get; set; }
 
         [BsonElement("port")]
         public int Port { get; set; }

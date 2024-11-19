@@ -56,7 +56,7 @@ namespace ControlRoomDbService.Controllers
         {
             var existingControlRoom = await _controlRoomService.GetControlRoomByIdAsync(id);
 
-            if (existingControlRoom == null)
+            if (existingControlRoom.UUID == Guid.Empty)
             {
                 return NotFound();
             }
@@ -72,7 +72,7 @@ namespace ControlRoomDbService.Controllers
         {
             var controlRoom = await _controlRoomService.GetControlRoomByIdAsync(id);
 
-            if (controlRoom == null)
+            if (controlRoom.UUID == Guid.Empty)
             {
                 return NotFound();
             }

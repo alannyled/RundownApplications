@@ -17,6 +17,12 @@ namespace RundownDbService.BLL.Services
         public async Task<List<Rundown>> GetAllRundownsAsync()
         {  
             var rundown = await _resilienceService.ExecuteWithResilienceAsync(() => _rundownRepository.GetAllAsync());
+            
+            if(rundown == null)
+            {
+                _logger.LogWarning("Der blev ikke fundet nogen rundowns i databasen");
+                return [];
+            }
             _logger.LogInformation("Alle rundowns er hentet fra databasen");
             return rundown;            
         }
@@ -28,7 +34,7 @@ namespace RundownDbService.BLL.Services
             {
                 _logger.LogWarning($"Rundown med UUID = {uuid} blev ikke fundet i databasen");
             }
-            _logger.LogInformation($"{rundown.Name} {rundown.BroadcastDate.ToShortDateString()} er hentet i databasen");
+            _logger.LogInformation($"{rundown?.Name} {rundown?.BroadcastDate.ToShortDateString()} er hentet i databasen");
             return rundown;
         }
 
@@ -54,6 +60,11 @@ namespace RundownDbService.BLL.Services
             return await _resilienceService.ExecuteWithResilienceAsync(async () =>
             {
                 var rundown = await _rundownRepository.UpdateAsync(uuid, updatedRundown);
+                if (rundown == null)
+                {
+                    _logger.LogWarning($"Rundown med UUID = {uuid} blev ikke fundet i databasen");
+                    return new Rundown(); 
+                }
                 var messageObject = new
                 {
                     Action = MessageAction.Update.ToString(),
@@ -64,7 +75,7 @@ namespace RundownDbService.BLL.Services
                 _kafkaService.SendMessage(topic, message);
                 _logger.LogInformation($"{rundown.Name} {rundown.BroadcastDate.ToShortDateString()} er opdateret");
                 return rundown;
-            });
+            }) ?? new Rundown(); 
         }
 
         public async Task DeleteRundownAsync(Guid uuid)

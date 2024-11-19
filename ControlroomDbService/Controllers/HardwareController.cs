@@ -39,18 +39,23 @@ namespace ControlRoomDbService.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateHardwareDto newHardwareDto)
         {
+            if (newHardwareDto == null)
+            {
+                return BadRequest("ControlRoomId cannot be null.");
+            }
+
             var newHardware = new Hardware
             {
-                ControlRoomId = newHardwareDto.ControlRoomId,
-                Name = newHardwareDto.Name,
-                Vendor = newHardwareDto.Vendor,  
-                Model = newHardwareDto.Model,
-                MacAddress = newHardwareDto.MacAddress,
-                IpAddress = newHardwareDto.IpAddress,
+                ControlRoomId = newHardwareDto.ControlRoomId ?? string.Empty,
+                Name = newHardwareDto.Name ?? string.Empty,
+                Vendor = newHardwareDto.Vendor ?? string.Empty,
+                Model = newHardwareDto.Model ?? string.Empty,
+                MacAddress = newHardwareDto.MacAddress ?? string.Empty,
+                IpAddress = newHardwareDto.IpAddress ?? string.Empty,
                 Port = newHardwareDto.Port,
                 CreatedDate = DateTime.Now,
-                ArchivedDate  = null,
-                ArchivedBy  = null
+                ArchivedDate = null,
+                ArchivedBy = null
             };
 
             await _hardwareService.CreateHardwareAsync(newHardware);

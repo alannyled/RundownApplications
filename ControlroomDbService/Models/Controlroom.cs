@@ -10,10 +10,10 @@ namespace ControlRoomDbService.Models
         public Guid UUID { get; set; } = Guid.NewGuid();
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [BsonElement("location")]
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
         [BsonElement("createdDate")]
         public DateTime CreatedDate { get; set; }

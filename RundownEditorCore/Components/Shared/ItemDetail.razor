@@ -152,7 +152,7 @@
             _ => "Noget gik helt galt her??!!"
         };
         Console.WriteLine("Content type: " + contentType);
-        var updatedRundown = await RundownService.UpdateDetailAsync(Detail.UUID.ToString(), Detail);
+        var updatedRundown = await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
         Console.WriteLine("Updated rundown: " + updatedRundown.UUID);
         var rundown = SharedStates.AllRundowns.Find(r => r.UUID == updatedRundown.UUID);
        Console.WriteLine("Rundown: " + rundown?.UUID);

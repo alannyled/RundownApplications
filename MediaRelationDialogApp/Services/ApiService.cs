@@ -22,11 +22,11 @@ namespace MediaRelationDialogApp.Services
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
             var rundowns = JsonConvert.DeserializeObject<List<RundownDTO>>(json);
-            return rundowns;
+            return rundowns ?? [];
         }
 
 
-        public async Task<RundownDTO> UpdateDetailAsync(string rundownId, DetailDTO itemDetail)
+        public async Task<RundownDTO?> UpdateDetailAsync(string rundownId, DetailDTO itemDetail)
         {
             var response = await _httpClient.PutAsJsonAsync($"https://localhost:3010/api/Rundown/update-detail-in-item/{rundownId}", itemDetail);
 

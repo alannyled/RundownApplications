@@ -55,7 +55,7 @@ namespace MediaRelationDialogApp.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Valgt historie: {_selectedRundown.Name} \u2192 {_selectedItem.Name}";
+                    StatusMessage = $"Valgt historie: {_selectedRundown?.Name} \u2192 {_selectedItem.Name}";
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace MediaRelationDialogApp.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Valgt element: {_selectedRundown.Name} \u2192 {_selectedItem.Name} \u2192 {_selectedDetail.Title}";
+                    StatusMessage = $"Valgt element: {_selectedRundown?.Name} \u2192 {_selectedItem?.Name} \u2192 {_selectedDetail.Title}";
                 }
             }
         }
@@ -218,18 +218,25 @@ namespace MediaRelationDialogApp.ViewModels
 
             try
             {
-                SelectedDetail.VideoPath = _selectedFile.FullPath;
-
-                var response = await _apiService.UpdateDetailAsync(SelectedRundown.UUID, SelectedDetail);
-
-                if (response != null)
+                if (SelectedDetail != null && _selectedFile != null)
                 {
-                    StatusMessage = "Historie opdateret succesfuldt!";
-                    ResetAllChoices();
+                    SelectedDetail.VideoPath = _selectedFile.FullPath;
+
+                    var response = await _apiService.UpdateDetailAsync(SelectedRundown.UUID, SelectedDetail);
+
+                    if (response != null)
+                    {
+                        StatusMessage = "Historie opdateret succesfuldt!";
+                        ResetAllChoices();
+                    }
+                    else
+                    {
+                        StatusMessage = "Fejl ved opdatering af historie.";
+                    }
                 }
                 else
                 {
-                    StatusMessage = "Fejl ved opdatering af historie.";
+                    StatusMessage = "Fejl: Ingen fil valgt.";
                 }
             }
             catch (Exception ex)
@@ -254,7 +261,7 @@ namespace MediaRelationDialogApp.ViewModels
         /// <summary>
         /// Eventhandler til at opdatere view ved ændringer
         /// </summary>
-        protected virtual void OnPropertyChanged(string propertyName = null)
+        protected virtual void OnPropertyChanged(string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

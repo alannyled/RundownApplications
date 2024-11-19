@@ -71,6 +71,7 @@ namespace RundownDbService.Controllers
                 // Opdater rundown
                 rundown.ControlRoomId = Guid.Parse(dto.ControlRoomId);
                 rundown.ArchivedDate = dto.ArchivedDate;
+                
 
                 foreach (var itemDto in dto.Items)
                 {
@@ -79,11 +80,10 @@ namespace RundownDbService.Controllers
                     {
                         existingItem.Order = itemDto.Order;
                     }
-                    else
-                    {
-                        Console.WriteLine($"Item med UUID: {itemDto.UUID} blev ikke fundet i Rundown.");
-                    }
                 }
+                // Fjern items der er slettede i DTO
+                var dtoUUIDs = dto.Items.Select(item => item.UUID).ToHashSet();
+                rundown.Items.RemoveAll(item => !dtoUUIDs.Contains(item.UUID));
 
                 await _rundownService.UpdateRundownAsync(id, rundown);
                 Console.WriteLine($"Opdatering af Rundown med ID: {id} lykkedes.");
@@ -106,7 +106,6 @@ namespace RundownDbService.Controllers
                 return BadRequest("RundownDTO modellen mangler?");
             }
 
-            // Hent eksisterende rundown baseret på ID
             var existingRundown = await _rundownService.GetRundownByIdAsync(id);
             if (existingRundown == null)
             {
@@ -189,31 +188,30 @@ namespace RundownDbService.Controllers
         [HttpPut("edit-item-detail-in-rundown/{rundownId:guid}")]
         public async Task<IActionResult> EditItemDetailInRundown(Guid rundownId, [FromBody] DetailDTO detailDto)
         {
-            // Hent det eksisterende rundown baseret på ID
+    
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
             if (existingRundown == null)
             {
                 return NotFound("Rundown ikke fundet.");
             }
-            // Find det item, som har den detail, der skal opdateres
+
             var existingItem = existingRundown.Items.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailDto.UUID));
             if (existingItem == null)
             {
                 return NotFound("Item der indeholder detail ikke fundet.");
             }
-            // Find den specifikke detail i itemet og opdater den
+   
             var existingDetail = existingItem.Details.FirstOrDefault(d => d.UUID == detailDto.UUID);
             if (existingDetail == null)
             {
                 return NotFound($"ItemDetail med UUID {detailDto.UUID} blev ikke fundet.");
             }
-            // Opdater de generelle felter for det specifikke detail
+      
             existingDetail.Title = detailDto.Title;
             existingDetail.Duration = TimeSpan.Parse(detailDto.Duration);
             existingDetail.Type = detailDto.Type;
             existingDetail.Order = detailDto.Order;
 
-            // Switch for at håndtere opdateringen af felter afhængig af typen af detail
             switch (existingDetail)
             {
                 case ItemDetailVideo video when detailDto.VideoPath != null:
@@ -241,31 +239,26 @@ namespace RundownDbService.Controllers
         [HttpDelete("delete-item-detail-from-rundown/{rundownId:guid}/{detailId:guid}")]
         public async Task<IActionResult> DeleteItemDetailFromRundown(Guid rundownId, Guid detailId)
         {
-            // Hent eksisterende rundown baseret på ID
+        
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
             if (existingRundown == null)
             {
                 return NotFound("Rundown ikke fundet.");
             }
-
-            // Gennemgå items i rundown
             var existingItem = existingRundown.Items.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailId));
             if (existingItem == null)
             {
                 return NotFound("Item med det ønskede ItemDetail ikke fundet.");
             }
 
-            // Find og fjern detail baseret på detailId (UUID)
             var detailToRemove = existingItem.Details.FirstOrDefault(d => d.UUID == detailId);
             if (detailToRemove == null)
             {
                 return NotFound("ItemDetail ikke fundet.");
             }
 
-            // Fjern det fundne detail
             existingItem.Details.Remove(detailToRemove);
 
-            // Opdater rundown i databasen
             var updatedRundown = await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
 
             return Ok(updatedRundown);

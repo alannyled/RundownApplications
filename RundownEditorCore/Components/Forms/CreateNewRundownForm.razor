@@ -82,7 +82,7 @@ else
 
     private async Task<bool> CreateRundown()
     {
-        await Task.Delay(1500); // Simulere at der går lidt tid før det er oprettet
+        await Task.Delay(1000); // Simulere at der går lidt tid før det er oprettet
         var rundown = await RundownService.CreateRundownFromTemplate(Template, ControlRoom, BroadcastDate);
         if (rundown == null)
         {

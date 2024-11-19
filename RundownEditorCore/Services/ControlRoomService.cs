@@ -9,19 +9,19 @@ namespace RundownEditorCore.Services
         private readonly HttpClient _httpClient = httpClient;
         private readonly ILogger<ControlRoomService> _logger = logger;
 
-        public async Task<List<ControlRoomDTO>> GetControlRoomsAsync()
+        public async Task<List<ControlRoomDTO>?> GetControlRoomsAsync()
         {
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<List<ControlRoomDTO>>("fetch-controlroom-with-hardware");
-                return response;
+                return response ?? [];
             }
             catch (Exception)
             {             
                 return null;
             }
         }
-        public async Task<ControlRoomDTO> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
+        public async Task<ControlRoomDTO?> CreateControlRoomAsync(ControlRoomDTO newControlRoom)
         {
             try
             {            
@@ -45,7 +45,7 @@ namespace RundownEditorCore.Services
             return null;
         }
 
-        public async Task<ControlRoomDTO> UpdateControlRoomAsync(string controlRoomId, ControlRoomDTO updatedControlRoom)
+        public async Task<ControlRoomDTO?> UpdateControlRoomAsync(string controlRoomId, ControlRoomDTO updatedControlRoom)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace RundownEditorCore.Services
             return null;
         }
 
-        public async Task<ControlRoomDTO> DeleteControlRoomAsync(string controlRoomId)
+        public async Task<ControlRoomDTO?> DeleteControlRoomAsync(string controlRoomId)
         {
             try
             {

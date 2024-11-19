@@ -1,7 +1,6 @@
 ﻿using CommonClassLibrary.Services;
 using TemplateDbService.BLL.Interfaces;
 using TemplateDbService.DAL.Interfaces;
-using TemplateDbService.DAL.Repositories;
 using TemplateDbService.Models;
 
 namespace TemplateDbService.BLL.Services

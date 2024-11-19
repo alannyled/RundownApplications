@@ -55,21 +55,21 @@
 @code {
     [Parameter]
     public DetailDTO Detail { get; set; } = new();
-    public string? icon { get; set; }
-    public string? color { get; set; }
-    public string? content { get; set; }
+    public string icon { get; set; } = string.Empty;
+    public string color { get; set; } = string.Empty;
+    public string content { get; set; } = string.Empty;
     public bool active = true;
     public bool locked = false;
-    public string userName = "";
-    public string lockedByUser = "";
-    public string lockedClass = "";
+    public string userName = string.Empty;
+    public string lockedByUser = string.Empty;
+    public string lockedClass = string.Empty;
     public Guid updatedDetailUuid = Guid.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        userName = user.Identity.Name ?? "Ukendt bruger";
+        userName = user?.Identity?.Name ?? "Ukendt bruger";
 
         icon = Detail.Type switch
         {
@@ -113,7 +113,7 @@
                 InvokeAsync(StateHasChanged);
             }
         } 
-        
+
     }
 
     /// <summary>
@@ -121,7 +121,7 @@
     /// </summary>
     private void HandleDurationInput(ChangeEventArgs e)
     {
-        Detail.Duration = e.Value?.ToString();
+        Detail.Duration = e.Value?.ToString() ?? "00:00:00";
     }
 
     public async Task ActivateInput()
@@ -138,10 +138,8 @@
     }
 
     private async Task SaveChanges()
-    { 
-        Console.WriteLine("Saving changes");
+    {
         updatedDetailUuid = Detail.UUID;
-        Console.WriteLine("Updated detail UUID: " + updatedDetailUuid);
         var contentType = Detail.Type switch
         {
             "Teleprompter" => Detail.PrompterText = content,
@@ -151,13 +149,11 @@
             "Kommentar" => Detail.Comment = content,
             _ => "Noget gik helt galt her??!!"
         };
-        Console.WriteLine("Content type: " + contentType);
+
         var updatedRundown = await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
-        Console.WriteLine("Updated rundown: " + updatedRundown.UUID);
         var rundown = SharedStates.AllRundowns.Find(r => r.UUID == updatedRundown.UUID);
-       Console.WriteLine("Rundown: " + rundown?.UUID);
         if (rundown == null) return;
-        
+
         var item = rundown?.Items.FirstOrDefault(i => i.UUID == Detail.ItemId);
         if (item == null) return;
 
@@ -217,8 +213,8 @@
 
     private int CalculateRows()
     {
-        var lineCount = content.Split('\n').Length;
-        var additionalRows = Math.Ceiling((double)content.Length / 150);
+        int lineCount = content.Split('\n').Length;
+        double additionalRows = Math.Ceiling((double)content.Length / 150);
         // Antal rækker (mindst 1 + antal linjeskift + ekstra rækker)
         return Math.Max(1, lineCount + (int)additionalRows);
     }

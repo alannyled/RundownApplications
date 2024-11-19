@@ -1,0 +1,55 @@
+﻿@inject ModalState ModalState
+@inject RundownState RundownState
+@inject IRundownService RundownService
+
+<form @onsubmit="HandleSubmit">
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-sm btn-danger">Slet @Item.Name</button>
+    </div>
+</form>
+
+@code {
+    [Parameter]
+    public RundownItemDTO Item { get; set; } = new();
+
+    private async Task HandleSubmit()
+    {
+        if (Item.RundownId == null)
+        {
+            Console.WriteLine("RundownId er null. Kan ikke fjerne item.");
+            return;
+        }
+
+        var rundown = RundownState.Rundown;
+
+        if (rundown.Items.Contains(Item))
+        {
+            rundown.Items.Remove(Item);
+            Console.WriteLine($"Item med ID {Item.UUID} blev fjernet.");
+        }
+        else
+        {
+            Console.WriteLine("Item blev ikke fundet i listen.");
+            return;
+        }
+
+        try
+        {
+            foreach (var item in rundown.Items)
+            {
+              Console.WriteLine($"Item: {item.Name}");
+            }
+            await RundownService.UpdateRundownAsync(Item.RundownId, rundown);
+            Console.WriteLine("Rundown blev opdateret.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fejl ved opdatering af Rundown: {ex.Message}");
+        }
+
+        ModalState.Close();
+    }
+
+
+}

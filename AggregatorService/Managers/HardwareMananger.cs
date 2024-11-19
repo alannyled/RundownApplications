@@ -18,10 +18,10 @@ namespace AggregatorService.Managers
 
             var hardwareData = await hardwareService.FetchData(_apiUrls.HardwareApi);
 
-            return JsonSerializer.Deserialize<List<Hardware>>(hardwareData);
+            return JsonSerializer.Deserialize<List<Hardware>>(hardwareData) ?? [];
         }
 
-        public async Task<Hardware> CreateHardwareAsync(Hardware newHardware)
+        public async Task<Hardware?> CreateHardwareAsync(Hardware newHardware)
         {
             var hardwareService = _serviceFactory.GetService<HardwareService>();
 
@@ -37,7 +37,7 @@ namespace AggregatorService.Managers
             }
         }
 
-        public async Task<Hardware> UpdateHardwareAsync(string hardwareId, Hardware updatedHardware)
+        public async Task<Hardware?> UpdateHardwareAsync(string hardwareId, Hardware updatedHardware)
         {
             var hardwareService = _serviceFactory.GetService<HardwareService>();
 

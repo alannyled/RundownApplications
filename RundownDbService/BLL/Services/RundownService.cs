@@ -56,7 +56,7 @@ namespace RundownDbService.BLL.Services
         }
 
         public async Task<Rundown> UpdateRundownAsync(Guid uuid, Rundown updatedRundown)
-        {
+        {  
             return await _resilienceService.ExecuteWithResilienceAsync(async () =>
             {
                 var rundown = await _rundownRepository.UpdateAsync(uuid, updatedRundown);

@@ -77,7 +77,7 @@ else
 
     private async Task<bool> SaveNewItem(string UUID, RundownItemDTO newRundownItem)
     {
-        await Task.Delay(1500); // Simulere at der går lidt tid før det er oprettet
+        await Task.Delay(1000); // Simulere at der går lidt tid før det er oprettet
         var rundown = await RundownService.AddItemToRundownAsync(UUID, newRundownItem);
         if (rundown == null)
         {

@@ -54,7 +54,7 @@
             return;
         }
         activeTab = RundownState.Rundown.Name ?? "Unknown";
-        previousRundownName = RundownState.Rundown.Name;
+        previousRundownName = RundownState.Rundown.Name ?? "Unknown";
         menuTabs.Clear();
         tabPanes.Clear();
         await InvokeAsync(StateHasChanged);        
@@ -72,7 +72,7 @@
     /// </summary>
     private async void OpenTabPane(RundownItemDTO item)
     {
-        Console.WriteLine("Opening TabPane: " + item.Name);
+        if(item.Name == null) return;
         activeTab = item.Name;
         RundownState.SelectedItem(item);
 
@@ -141,7 +141,7 @@
     private void RemoveTabPane(string itemId)
     {
         var tabToRemove = tabPanes.FirstOrDefault(tab => tab.ItemId == itemId);
-        if (tabToRemove != null)
+        if (tabToRemove?.Name != null)
         {
             tabPanes.Remove(tabToRemove);
             Console.WriteLine("TabPane removed: " + itemId + " - " + tabToRemove.ItemId);

@@ -13,7 +13,7 @@ namespace AggregatorService.Managers
         private readonly ServiceFactory _serviceFactory = serviceFactory;
         private readonly ApiUrls _apiUrls = apiUrls.Value;
 
-        public async Task<Rundown> CreateRundownFromTemplate(string templateId, string controlroomId, DateTime date)
+        public async Task<Rundown?> CreateRundownFromTemplate(string templateId, string controlroomId, DateTime date)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
             var templateService = _serviceFactory.GetService<TemplateService>();
@@ -53,8 +53,8 @@ namespace AggregatorService.Managers
 
             var rundownData = await rundownService.FetchData(_apiUrls.RundownApi);
 
-            var controlRooms = JsonConvert.DeserializeObject<List<ControlRoom>>(controlRoomData);
-            var rundowns = JsonConvert.DeserializeObject<List<Rundown>>(rundownData);
+            var controlRooms = JsonConvert.DeserializeObject<List<ControlRoom>>(controlRoomData) ?? [];
+            var rundowns = JsonConvert.DeserializeObject<List<Rundown>>(rundownData) ?? [];
 
             foreach (var rundown in rundowns)
             {
@@ -62,14 +62,14 @@ namespace AggregatorService.Managers
                     .FirstOrDefault(c => c.Uuid == rundown.ControlRoomId);
                 if (controlRoom != null)
                 {
-                    rundown.ControlRoomName = controlRoom.Name;
+                    rundown.ControlRoomName = controlRoom.Name ?? string.Empty;
                 }
             }
 
-            return rundowns;
+            return rundowns ?? [];
         }
 
-        public async Task<Rundown> FetchSelectedRundown(string rundownId)
+        public async Task<Rundown?> FetchSelectedRundown(string rundownId)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
@@ -88,7 +88,7 @@ namespace AggregatorService.Managers
             return rundown;
         }
 
-        public async Task<Rundown> UpdateControlRoomAsync(string rundownId, RundownDTO controlRoom)
+        public async Task<Rundown?> UpdateControlRoomAsync(string rundownId, RundownDTO controlRoom)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
 
@@ -106,7 +106,7 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
-        public async Task<Rundown> AddItemToRundownAsync(Guid rundownId, RundownItemDTO itemDto)
+        public async Task<Rundown?> AddItemToRundownAsync(Guid rundownId, RundownItemDTO itemDto)
         {
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
@@ -127,7 +127,7 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
-        public async Task<Rundown> AddDetailToItemAsync(Guid rundownId, ItemDetailDTO itemDetailDto)
+        public async Task<Rundown?> AddDetailToItemAsync(Guid rundownId, ItemDetailDTO itemDetailDto)
         {
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
@@ -141,7 +141,7 @@ namespace AggregatorService.Managers
 
 
 
-        public async Task<Rundown> UpdateItemDetailAsync(Guid rundownId, ItemDetailDTO itemDetailDto)
+        public async Task<Rundown?> UpdateItemDetailAsync(Guid rundownId, ItemDetailDTO itemDetailDto)
         {
             // Hent det eksisterende rundown
             var rundownService = _serviceFactory.GetService<RundownService>();
@@ -152,7 +152,7 @@ namespace AggregatorService.Managers
             {
                 throw new Exception("Rundown not found.");
             }
-            var item = rundown.Items.FirstOrDefault(i => i.UUID == itemDetailDto.ItemId);
+            var item = rundown?.Items.FirstOrDefault(i => i.UUID == itemDetailDto.ItemId);
             if (item is null)
             {
                 throw new Exception("Item not found.");
@@ -179,7 +179,7 @@ namespace AggregatorService.Managers
             return updatedRundown;
         }
 
-        public async Task<Rundown> UpdateRundownAsync(Guid rundownId, Rundown request)
+        public async Task<Rundown?> UpdateRundownAsync(Guid rundownId, Rundown request)
         {
             var rundownService = _serviceFactory.GetService<RundownService>();
             var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}", request);

@@ -98,7 +98,7 @@
 </div>
 
 @code {
-    private List<ControlRoomDTO>? controlRooms;
+    private List<ControlRoomDTO> controlRooms = [];
     private ControlRoomDTO newControlRoom = new ControlRoomDTO();
     private ControlRoomDTO? editingControlRoom;
     private ControlRoomDTO? addingHardwareToRoom;
@@ -136,7 +136,7 @@
     /// hvis de ikke allerede findes der
     /// </summary>
     private void FetchControlRooms(){
-        controlRooms = ControlRoomService.GetControlRoomsAsync().Result;
+        controlRooms = ControlRoomService.GetControlRoomsAsync().Result ?? [];
         SharedStates.SharedControlRoom(controlRooms);
     }
 
@@ -174,6 +174,11 @@
 
     private async Task UpdateControlRoomAsync()
     {
+        if(string.IsNullOrEmpty(editingControlRoom?.Name) || string.IsNullOrEmpty(editingControlRoom.Location))
+        {
+            ToastState.FireToast("Udfyld Navn og Lokation", "text-bg-warning");
+            return;
+        }
         await ControlRoomService.UpdateControlRoomAsync(editingControlRoom.Uuid.ToString(), editingControlRoom);
         editingControlRoom = null; 
     }    
@@ -212,6 +217,11 @@
 
     private async Task UpdateHardwareAsync()
     {
+        if(string.IsNullOrEmpty(editingHardware?.Name) || string.IsNullOrEmpty(editingHardware.Model))
+        {
+            ToastState.FireToast("Udfyld Navn og Model", "text-bg-warning");
+            return;
+        }
         await HardwareService.UpdateHardwareAsync(editingHardware.Uuid, editingHardware);
         editingHardware = null; 
     }

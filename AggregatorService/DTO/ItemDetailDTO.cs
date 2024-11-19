@@ -11,16 +11,16 @@ namespace AggregatorService.DTO
         public Guid ItemId { get; set; }
 
         [JsonPropertyName("title")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
         [JsonPropertyName("order")]
         public int Order { get; set; }
 
         [JsonPropertyName("duration")]
-        public string Duration { get; set; }
+        public string Duration { get; set; } = string.Empty;
 
         [JsonPropertyName("prompterText")]
         public string? PrompterText { get; set; }

@@ -2,11 +2,23 @@
 using RundownEditorCore.Components.Forms;
 using CommonClassLibrary.DTO;
 using RundownEditorCore.DTO;
+using Microsoft.Identity.Client;
 
 namespace RundownEditorCore.Services
 {
     public class FormRenderService
     {
+        public RenderFragment RenderDeleteItemForm(
+            RundownItemDTO Item
+                       )
+        {
+            return builder =>
+            {
+                builder.OpenComponent(0, typeof(DeleteItemForm));
+                builder.AddAttribute(1, "Item", Item);
+                builder.CloseComponent();
+            };
+        }
         public RenderFragment RenderItemDetailForm(
             string DetailType
             )

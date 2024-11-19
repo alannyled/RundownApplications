@@ -8,7 +8,7 @@ namespace AggregatorService.DTO
         public Guid Uuid { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [JsonPropertyName("createdDate")]
         public DateTime CreatedDate { get; set; }

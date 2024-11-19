@@ -39,7 +39,7 @@
                         <th>Details</th>
                         <th>Videos</th>
                         <th>Graphics</th>
-                        <th>Order</th>
+                        <th class="text-danger text-center">Slet</th>
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -59,7 +59,7 @@
                             <td>@item.Details.Count</td>
                             <td>@item.Details.Count(detail => detail.Type == "Video")</td>
                             <td>@item.Details.Count(detail => detail.Type == "Grafik")</td>
-                            <td>@item.Order</td>
+                            <td class="text-danger text-center" role="button" @onclick:stopPropagation @onclick="() => ConfirmDelete(item)"><i class="bi bi-trash"></i></td>
                         </tr>
                     }
                 </tbody>
@@ -83,7 +83,7 @@
     {
         if (SharedStates.ControlRooms.Count == 0)
         {
-            ControlRooms = await ControlRoomService.GetControlRoomsAsync();
+            ControlRooms = await ControlRoomService.GetControlRoomsAsync() ?? [];
             SharedStates.SharedControlRoom(ControlRooms);
         }
         else
@@ -199,6 +199,14 @@
         }
     }
 
+    private void ConfirmDelete(RundownItemDTO item)
+    {
+        var content = new RenderFragment(builder =>
+        {
+            builder.AddContent(0, FormRenderservice.RenderDeleteItemForm(item));
+        });
+        ModalState.SetContent(content, $"Bekræft sletning af {item.Name}");
+    }
 
     /// <summary>
     /// Opdaterer Order-værdien for hvert element i listen konsekvent fra 0 og opefter.
@@ -211,8 +219,6 @@
             item.Order = index++;
         }
     }
-
-
 
     /// <summary>
     /// Fjerner abonnementet for at undgå memory leaks

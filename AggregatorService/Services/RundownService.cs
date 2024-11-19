@@ -1,9 +1,5 @@
 ﻿using AggregatorService.Abstractions;
-using AggregatorService.DTO;
-using AggregatorService.Models;
-using Microsoft.Extensions.Logging.Console;
-using Microsoft.Extensions.Options;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace AggregatorService.Services
 {
@@ -32,7 +28,7 @@ namespace AggregatorService.Services
 
         public override async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T payload)
         {
-            var json = JsonSerializer.Serialize(payload);
+            var json = JsonConvert.SerializeObject(payload);
             Console.WriteLine($"Updating rundown: {json}");
             var response = await _httpClient.PutAsJsonAsync(url, payload);
             response.EnsureSuccessStatusCode();
@@ -47,7 +43,7 @@ namespace AggregatorService.Services
         public override async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T payload)
         {
             var response = await _httpClient.PostAsJsonAsync(url, payload);
-            Console.WriteLine($"Rundown created: {JsonSerializer.Serialize(response)}");
+            Console.WriteLine($"Rundown created: {JsonConvert.SerializeObject(response)}");
             response.EnsureSuccessStatusCode();
             return response;
         }

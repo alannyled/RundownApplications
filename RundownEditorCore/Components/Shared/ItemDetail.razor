@@ -139,7 +139,9 @@
 
     private async Task SaveChanges()
     { 
+        Console.WriteLine("Saving changes");
         updatedDetailUuid = Detail.UUID;
+        Console.WriteLine("Updated detail UUID: " + updatedDetailUuid);
         var contentType = Detail.Type switch
         {
             "Teleprompter" => Detail.PrompterText = content,
@@ -149,10 +151,11 @@
             "Kommentar" => Detail.Comment = content,
             _ => "Noget gik helt galt her??!!"
         };
-
-        var updatedRundown = await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
-
+        Console.WriteLine("Content type: " + contentType);
+        var updatedRundown = await RundownService.UpdateDetailAsync(Detail.UUID.ToString(), Detail);
+        Console.WriteLine("Updated rundown: " + updatedRundown.UUID);
         var rundown = SharedStates.AllRundowns.Find(r => r.UUID == updatedRundown.UUID);
+       Console.WriteLine("Rundown: " + rundown?.UUID);
         if (rundown == null) return;
         
         var item = rundown?.Items.FirstOrDefault(i => i.UUID == Detail.ItemId);

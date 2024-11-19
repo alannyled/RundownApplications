@@ -56,7 +56,7 @@ namespace LogStoreService.BLL.Services
                                 var messageObject = ConvertMessageToJson<Log>(message);
                                 if (messageObject != null)
                                 {
-                                    _logStoreService.CreateLogAsync(messageObject);
+                                    await _logStoreService.CreateLogAsync(messageObject);
                                 }
                             }
                         }

@@ -22,8 +22,7 @@ namespace TemplateDbService.BLL.Services
         public async Task<RundownTemplate> GetByIdAsync(Guid uuid) => await _repository.GetByIdAsync(uuid);
 
         public async Task CreateAsync(RundownTemplate template)
-        {
-            
+        {            
             template.UUID = Guid.NewGuid();
             template.CreatedDate = DateTime.UtcNow;
             await _repository.CreateAsync(template);

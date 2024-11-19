@@ -20,7 +20,11 @@
     public async Task ResetDataAsync()
     {
         using var httpClient = new HttpClient();
-
+        var responseTemplates = await httpClient.PostAsync("https://localhost:3040/api/DataSeed/reset-data", null);
+        if (responseTemplates.IsSuccessStatusCode)
+        {
+            SharedStates.SharedTemplates(new List<TemplateDTO>());
+        }
         var responseControlRoom = await httpClient.PostAsync("https://localhost:3020/api/DataSeed/reset-data", null);
 
         if (responseControlRoom.IsSuccessStatusCode)

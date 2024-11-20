@@ -5,6 +5,7 @@
 @inject RundownState RundownState
 @inject SharedStates SharedStates
 @inject DetailLockState DetailLockState
+@inject ToastState ToastState
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.EntityFrameworkCore
 @using CommonClassLibrary.Enum;
@@ -14,15 +15,15 @@
     <div class="card mb-3 d-inline-block
         @(locked && lockedByUser != userName ? "border border-3 border-danger" : "")
         @(active ? "border border-3 border-success": "")">
-        <div class="card-header d-flex justify-content-between @color">
-            @Detail.Title<i class="ms-5 bi @icon"></i>
+        <div role="@(active ? "button" : "")" class="card-header d-flex justify-content-between @color" @onclick="() => RemoveLock()">
+            @Detail.Title<i class="ms-5 bi @(active ? "bi-x-square-fill text-success" : icon)"></i>
         </div>
         <div class="p-0">
-       
+
             <div class="input-group">
                 <span class="input-group-text rounded-0 @color">Duration</span>
                 <input id="duration" type="time" class="form-control form-control-sm" step="1" value="@Detail.Duration" @oninput="HandleDurationInput" disabled="@(!active)">
-     
+
                 <button class="btn rounded-0 @color" type="button" disabled="@(locked && lockedByUser != userName)" @onclick="() => ActivateInput()">
                     <i class="bi @(!active ? "bi-pencil-fill" : "bi-floppy-fill")"></i>
                 </button>
@@ -31,21 +32,21 @@
         <div class="card-body p-0">
             <p class="@(locked && lockedByUser != userName ? "bg-danger text-white text-center px-5 py-2 m-0" : "d-none")">@(locked && lockedByUser != userName ? $"Låst af {lockedByUser}" : "")</p>
             <div class="input-group">
-                @if(Detail.Type == "Video")
+                @if (Detail.Type == "Video")
                 {
                     <input class="form-control rounded-0 rounded-bottom" type="text" value="@Detail.VideoPath" readonly style="width:@($"{Detail.VideoPath?.Length}ch")">
                 }
                 else
                 {
-                <textarea class="form-control rounded-0 rounded-bottom"
-                    rows="@CalculateRows()"
-                    cols="@(Math.Ceiling((double)content.Count()))"
-                    @bind="content"
-                    @bind:event="oninput"
-                    disabled="@(!active)" 
-                    style="resize: both;">
-                    @content
-                </textarea>
+                    <textarea class="form-control rounded-0 rounded-bottom"
+                              rows="@CalculateRows()"
+                              cols="@(Math.Ceiling((double)content.Count()))"
+                              @bind="content"
+                              @bind:event="oninput"
+                              disabled="@(!active)"
+                              style="resize: both;">
+                        @content
+                    </textarea>
                 }
             </div>
         </div>
@@ -101,7 +102,7 @@
     }
 
     private void HandleRundownStateChange(RundownState.StateAction action)
-    {       
+    {
         if (Detail != null && action == RundownState.StateAction.ItemUpdated)
         {
             var updatedDetail = RundownState.Item.Details.FirstOrDefault(d => d.UUID == Detail.UUID);
@@ -112,7 +113,7 @@
                 updatedDetailUuid = Guid.Empty;
                 InvokeAsync(StateHasChanged);
             }
-        } 
+        }
 
     }
 
@@ -121,7 +122,15 @@
     /// </summary>
     private void HandleDurationInput(ChangeEventArgs e)
     {
-        Detail.Duration = e.Value?.ToString() ?? "00:00:00";
+        if (e.Value == null)
+        {
+            ToastState.FireToast("Varigheden er ugyldig", "text-bg-warning");
+        }
+        else
+        {
+            Detail.Duration = e.Value?.ToString() ?? "00:00:00";
+            ToastState.FireToast($"Ny varighed: {Detail.Duration}", "text-bg-info");
+        }
     }
 
     public async Task ActivateInput()
@@ -130,11 +139,19 @@
 
         if (saveChanges)
         {
-            await SaveChanges();            
+            await SaveChanges();
         }
 
-        SetLockOnElement();      
+        SetLockOnElement();
 
+    }
+
+    public void RemoveLock()
+    {
+        if (locked && lockedByUser == userName)
+        {
+            SetLockOnElement();
+        }
     }
 
     private async Task SaveChanges()
@@ -163,6 +180,7 @@
             item.Details[detailIndex] = Detail;
         }
         SharedStates.SharedAllRundowns(SharedStates.AllRundowns);
+        ToastState.FireToast($"Ændringerne i {Detail.Title} er gemt", "text-bg-success");
     }
 
     /// <summary>

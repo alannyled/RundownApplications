@@ -1,7 +1,12 @@
 ﻿@using CommonClassLibrary.DTO
 @inject IRundownService RundownService
+@inject IKafkaService KafkaService
+@inject IMessageBuilderService MessageBuilderService
 @inject RundownState RundownState
 @inject SharedStates SharedStates
+@inject DetailLockState DetailLockState
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using CommonClassLibrary.Enum;
 
 @if (!string.IsNullOrEmpty(RundownState.Rundown.Name))
 {
@@ -93,6 +98,7 @@
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabItem>(0);
+            builder.SetKey(itemId);
             builder.AddAttribute(1, "MenuItem", tabName);
             builder.AddAttribute(2, "ItemId", itemId);
             builder.AddAttribute(3, "ActiveTab", activeTab);
@@ -138,27 +144,50 @@
     /// <summary>
     /// Fjerne en TabPane, når der klikkes på luk-knappen
     /// </summary>
-    private void RemoveTabPane(string itemId)
+    private async Task RemoveTabPane(string itemId)
     {
         var tabToRemove = tabPanes.FirstOrDefault(tab => tab.ItemId == itemId);
         if (tabToRemove?.Name != null)
         {
             tabPanes.Remove(tabToRemove);
             Console.WriteLine("TabPane removed: " + itemId + " - " + tabToRemove.ItemId);
-            RemoveTab(tabToRemove.Name);
+            await RemoveTab(tabToRemove);
         }
     }
     /// <summary>
     /// Fjerne en Tab fra menuen, når der klikkes på luk-knappen
     /// </summary>
-    private void RemoveTab(string tabName)
+    private async Task RemoveTab(TabFragment removedTab)
     {
-        var tabToRemove = menuTabs.FirstOrDefault(tab => tab.Name == tabName);
+        var tabToRemove = menuTabs.FirstOrDefault(tab => tab.Name == removedTab.Name);
         if (tabToRemove != null)
         {
             menuTabs.Remove(tabToRemove);
             activeTab = menuTabs.FirstOrDefault()?.Name ?? RundownState.Rundown.Name;
-            StateHasChanged();
+            await UnlockDetailsOnTabPaneRemove(removedTab.ItemId);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    /// <summary>
+    /// Oplåse evt. låste details, når tabben fjernes
+    /// </summary>
+    private async Task UnlockDetailsOnTabPaneRemove(string itemId)
+    {
+        var rundownItem = RundownState.Rundown.Items.FirstOrDefault(item => item.UUID == Guid.Parse(itemId));
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var currentUserName = authState.User?.Identity?.Name ?? "Ukendt bruger";
+
+        foreach (var detail in rundownItem?.Details ?? Enumerable.Empty<DetailDTO>())
+        {
+            if (DetailLockState.IsLocked(detail.UUID.ToString(), out var lockedByUser) && lockedByUser == currentUserName)
+            {
+                DetailLockState.SetLockState(detail, false, currentUserName);
+
+                var message = MessageBuilderService.BuildDetailLockMessage(detail, false, currentUserName);
+                string topic = MessageTopic.DetailLock.ToKafkaTopic();
+                KafkaService.SendMessage(topic, message);
+            }
         }
     }
     /// <summary>

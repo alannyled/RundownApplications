@@ -1,9 +1,12 @@
 ﻿@inject ModalState ModalState
 @inject RundownState RundownState
+@inject ToastState ToastState
 @inject FormRenderService FormRenderservice
 @inject IKafkaService KafkaService
 @inject IMessageBuilderService MessageBuilderService
 @inject SharedStates SharedStates
+
+
 
 <div class="tab-pane @(ActiveTab == Name ? "show active" : "fade")">
     <div class="card card-height-100 mb-2">
@@ -53,32 +56,43 @@
     /// <summary>
     /// Håndterer ændringer i SharedStates forårsaget af Kafka beskeder
     /// Hvis det påvirker det aktuelle RundownItem, opdateres det
+    /// Hvis den er blevet slettet, lukkes tabben
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
         if (action == SharedStates.StateAction.AllRundownsUpdated)
-        {
-            var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown?.UUID);
-            if(currentRundown == null) return;
+        {            
+            await InvokeAsync(async () =>
+            {
+                var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown?.UUID);
+                if (currentRundown == null) return;
 
-            var currenItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
-            if (currenItem == null) return;
-
-            RundownItem = currenItem;
-            RundownState.SelectedItem(currenItem);
-            await InvokeAsync(StateHasChanged);
+                var currenItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
+                if (currenItem == null)
+                {
+                    string msg = $"{RundownItem?.Name} blev fjernet fra Rundown. Lukker historien.";
+                    ToastState.FireToast(msg, "text-bg-info");
+                    await RemoveTabPane();
+                }
+                else
+                {
+                    RundownItem = currenItem;
+                    RundownState.SelectedItem(currenItem);
+                    StateHasChanged(); 
+                }
+            });
         }
     }
 
-  
+
     /// <summary>
     /// Kalder callback for at fjerne lukket items tabpane fra UI
     /// </summary>
     public async Task RemoveTabPane()
     {
         await OnRemove.InvokeAsync(ItemId);
-
     }
+    
     /// <summary>
     /// Renderer formen til at oprette en ny detail og åbner modalen
     /// </summary>

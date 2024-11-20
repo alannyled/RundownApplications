@@ -33,11 +33,11 @@ namespace RundownDbService.Tests
 
             _mockResilienceService.Setup(r =>
                 r.ExecuteWithResilienceAsync(It.IsAny<Func<Task<List<Rundown>>>>()))
-                .Returns<Func<Task<List<Rundown>>>>(action => action());
+                .Returns<Func<Task<List<Rundown>?>>>(action => action());
 
             _mockResilienceService.Setup(r =>
                 r.ExecuteWithResilienceAsync(It.IsAny<Func<Task<Rundown>>>()))
-                .Returns<Func<Task<Rundown>>>(action => action());
+                .Returns<Func<Task<Rundown?>>>(action => action());
 
             _rundownService = new RundownService(
                 _mockRundownRepository.Object,

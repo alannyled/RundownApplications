@@ -24,6 +24,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\KafkaFactoryLibrary\KafkaServiceLibrary.csproj" />
 		<ProjectReference Include="..\CommonClassLibrary\CommonClassLibrary.csproj" />
+		<ProjectReference Include="..\RemoteLoggerLibrary\RemoteLoggerLibrary.csproj" />
 	</ItemGroup>
 
 </Project>

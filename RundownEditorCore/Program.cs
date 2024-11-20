@@ -12,6 +12,8 @@ using Microsoft.Extensions.Options;
 using RundownEditorCore.Services;
 using RundownEditorCore.Interfaces;
 using RundownEditorCore.States;
+using RemoteLoggerLibrary.Interfaces;
+using RemoteLoggerLibrary.Providers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,14 +36,32 @@ builder.Services.AddHttpClient<ITemplateService, TemplateService>(client =>
     client.BaseAddress = new Uri("https://localhost:3000/api/Template/"); // APIGateway adressen!
 });
 
+
+builder.Services.AddSingleton<IKafkaService, KafkaService>();
+builder.Services.AddSingleton<ILogService, LogService>();
+builder.Services.AddSingleton<RemoteLogger>();
+builder.Services.AddSingleton<RemoteLoggerProvider>();
+
 builder.Services.AddLogging(loggingBuilder =>
 {
-    //loggingBuilder.ClearProviders(); // Fjern standard loggere
-    loggingBuilder.AddProvider(new InMemoryLoggerProvider()); // Tilføj  custom logger
-    //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning); // Logger kun advarsler eller højere fra Microsoft namespace
-    //loggingBuilder.AddFilter("System", LogLevel.Warning); // Logger kun advarsler eller højere fra System namespace
-    //loggingBuilder.AddFilter("RundownEditorCore", LogLevel.Information); // Log kun for app namespace
+    var serviceProvider = builder.Services.BuildServiceProvider();
+    var remoteLoggerProvider = serviceProvider.GetRequiredService<RemoteLoggerProvider>();
+
+    loggingBuilder.AddProvider(remoteLoggerProvider);
+
+    //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning);
+    //loggingBuilder.AddFilter("System", LogLevel.Warning);
+    //loggingBuilder.AddFilter("ControlRoomDbService", LogLevel.Information);
 });
+
+//builder.Services.AddLogging(loggingBuilder =>
+//{
+//    //loggingBuilder.ClearProviders(); // Fjern standard loggere
+//    loggingBuilder.AddProvider(new InMemoryLoggerProvider()); // Tilføj  custom logger
+//    //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning); // Logger kun advarsler eller højere fra Microsoft namespace
+//    //loggingBuilder.AddFilter("System", LogLevel.Warning); // Logger kun advarsler eller højere fra System namespace
+//    //loggingBuilder.AddFilter("RundownEditorCore", LogLevel.Information); // Log kun for app namespace
+//});
 
 builder.Services.AddScoped<RundownState>();
 builder.Services.AddScoped<ModalState>();
@@ -54,7 +74,7 @@ builder.Services.AddSingleton(serviceProvider =>
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     return new KafkaServiceLibrary.KafkaService(configuration);
 });
-builder.Services.AddSingleton<IKafkaService, KafkaService>();
+
 builder.Services.AddSingleton<IMessageBuilderService, MessageBuilderService>();
 
 builder.Services.AddHostedService<KafkaBackgroundService>();
@@ -86,8 +106,6 @@ builder.Services.AddHostedService(provider =>
         },
         provider.GetRequiredService<SharedStates>()
     ));
-
-
 
 builder.Services.AddRazorPages();
 

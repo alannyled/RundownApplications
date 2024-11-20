@@ -69,9 +69,7 @@
 
                 var currenItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
                 if (currenItem == null)
-                {
-                    string msg = $"{RundownItem?.Name} blev fjernet fra Rundown. Lukker historien.";
-                    ToastState.FireToast(msg, "text-bg-info");
+                {                    
                     await RemoveTabPane();
                 }
                 else

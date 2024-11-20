@@ -4,8 +4,10 @@
 @inject IMessageBuilderService MessageBuilderService
 @inject RundownState RundownState
 @inject SharedStates SharedStates
+@inject ToastState ToastState
 @inject DetailLockState DetailLockState
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<RundownService> Logger
 @using CommonClassLibrary.Enum;
 
 @if (!string.IsNullOrEmpty(RundownState.Rundown.Name))
@@ -150,8 +152,11 @@
         if (tabToRemove?.Name != null)
         {
             tabPanes.Remove(tabToRemove);
-            Console.WriteLine("TabPane removed: " + itemId + " - " + tabToRemove.ItemId);
             await RemoveTab(tabToRemove);
+            // den skal ikke være her ha ha!
+            string msg = $"Historien {tabToRemove?.Name} blev fjernet fra {RundownState.Rundown.Name}. Åbne versioner lukkes.";
+            ToastState.FireToast(msg, "text-bg-info");
+            Logger.LogWarning(msg);
         }
     }
     /// <summary>

@@ -18,7 +18,7 @@
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>MediaRelationDialogApp</RootNamespace>
-		<!--<TargetFramework>net8.0</TargetFramework>-->
+		<TargetFramework>net8.0</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>

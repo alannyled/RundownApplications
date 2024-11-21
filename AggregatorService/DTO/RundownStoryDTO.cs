@@ -2,7 +2,7 @@
 
 namespace AggregatorService.DTO
 {
-    public class RundownItemDTO
+    public class RundownStoryDTO
     {
         [JsonPropertyName("uuid")]
         public Guid UUID { get; set; }
@@ -20,7 +20,7 @@ namespace AggregatorService.DTO
         public int Order { get; set; }
 
         [JsonPropertyName("details")]
-        public List<ItemDetailDTO> Details { get; set; } = [];
+        public List<StoryDetailDTO> Details { get; set; } = [];
 
     }
 }

@@ -28,12 +28,12 @@ builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
 
 builder.Services.AddScoped<IRundownRepository, RundownRepository>();
-builder.Services.AddScoped<IRundownItemRepository, RundownItemRepository>();
-builder.Services.AddScoped<IItemDetailRepository, ItemDetailRepository>();
+builder.Services.AddScoped<IRundownStoryRepository, RundownStoryRepository>();
+builder.Services.AddScoped<IStoryDetailRepository, StoryDetailRepository>();
 
 builder.Services.AddScoped<IRundownService, RundownService>();
-builder.Services.AddScoped<IRundownItemService, RundownItemService>();
-builder.Services.AddScoped<IItemDetailService, ItemDetailService>();
+builder.Services.AddScoped<IRundownStoryService, RundownStoryService>();
+builder.Services.AddScoped<IStoryDetailService, StoryDetailService>();
 
 builder.Services.AddSingleton<IKafkaService, KafkaService>();
 builder.Services.AddSingleton<ResilienceService>();
@@ -81,52 +81,52 @@ app.Run();
 
 static void RegisterMongoClassMaps()
 {
-    if (!BsonClassMap.IsClassMapRegistered(typeof(ItemDetail)))
+    if (!BsonClassMap.IsClassMapRegistered(typeof(StoryDetail)))
     {
-        BsonClassMap.RegisterClassMap<ItemDetail>(cm =>
+        BsonClassMap.RegisterClassMap<StoryDetail>(cm =>
         {
             cm.AutoMap();
             cm.SetIsRootClass(true);
-            cm.SetDiscriminator("ItemDetail");
+            cm.SetDiscriminator("StoryDetail");
         });
     }
 
-    if (!BsonClassMap.IsClassMapRegistered(typeof(ItemDetailVideo)))
+    if (!BsonClassMap.IsClassMapRegistered(typeof(StoryDetailVideo)))
     {
-        BsonClassMap.RegisterClassMap<ItemDetailVideo>(cm =>
+        BsonClassMap.RegisterClassMap<StoryDetailVideo>(cm =>
         {
             cm.AutoMap();
-            cm.SetDiscriminator("ItemDetailVideo");
+            cm.SetDiscriminator("StoryDetailVideo");
             cm.MapMember(c => c.VideoPath).SetElementName("videoPath");
         });
     }
 
-    if (!BsonClassMap.IsClassMapRegistered(typeof(ItemDetailTeleprompter)))
+    if (!BsonClassMap.IsClassMapRegistered(typeof(StoryDetailTeleprompter)))
     {
-        BsonClassMap.RegisterClassMap<ItemDetailTeleprompter>(cm =>
+        BsonClassMap.RegisterClassMap<StoryDetailTeleprompter>(cm =>
         {
             cm.AutoMap();
-            cm.SetDiscriminator("ItemDetailTeleprompter");
+            cm.SetDiscriminator("StoryDetailTeleprompter");
             cm.MapMember(c => c.PrompterText).SetElementName("prompterText");
         });
     }
 
-    if (!BsonClassMap.IsClassMapRegistered(typeof(ItemDetailGraphic)))
+    if (!BsonClassMap.IsClassMapRegistered(typeof(StoryDetailGraphic)))
     {
-        BsonClassMap.RegisterClassMap<ItemDetailGraphic>(cm =>
+        BsonClassMap.RegisterClassMap<StoryDetailGraphic>(cm =>
         {
             cm.AutoMap();
-            cm.SetDiscriminator("ItemDetailGraphic");
+            cm.SetDiscriminator("StoryDetailGraphic");
             cm.MapMember(c => c.GraphicId).SetElementName("graphicId");
         });
     }
 
-    if (!BsonClassMap.IsClassMapRegistered(typeof(ItemDetailComment)))
+    if (!BsonClassMap.IsClassMapRegistered(typeof(StoryDetailComment)))
     {
-        BsonClassMap.RegisterClassMap<ItemDetailComment>(cm =>
+        BsonClassMap.RegisterClassMap<StoryDetailComment>(cm =>
         {
             cm.AutoMap();
-            cm.SetDiscriminator("ItemDetailComment");
+            cm.SetDiscriminator("StoryDetailComment");
             cm.MapMember(c => c.Comment).SetElementName("comment");
         });
     }

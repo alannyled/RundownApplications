@@ -18,14 +18,14 @@ namespace TemplateDbService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ItemTemplate>>> GetAll()
+        public async Task<ActionResult<List<StoryTemplate>>> GetAll()
         {
             var items = await _service.GetAllAsync();
             return Ok(items);
         }
 
         [HttpGet("{uuid}")]
-        public async Task<ActionResult<ItemTemplate>> GetById(Guid uuid)
+        public async Task<ActionResult<StoryTemplate>> GetById(Guid uuid)
         {
             var item = await _service.GetByIdAsync(uuid);
             if (item == null)
@@ -36,14 +36,14 @@ namespace TemplateDbService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(ItemTemplate itemTemplate)
+        public async Task<ActionResult> Create(StoryTemplate itemTemplate)
         {
             await _service.CreateAsync(itemTemplate);
             return CreatedAtAction(nameof(GetById), new { uuid = itemTemplate.UUID }, itemTemplate);
         }
 
         [HttpPut("{uuid}")]
-        public async Task<ActionResult> Update(Guid uuid, ItemTemplate itemTemplate)
+        public async Task<ActionResult> Update(Guid uuid, StoryTemplate itemTemplate)
         {
             var existingItem = await _service.GetByIdAsync(uuid);
             if (existingItem == null)

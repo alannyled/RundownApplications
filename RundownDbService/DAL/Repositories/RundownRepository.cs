@@ -39,14 +39,14 @@ namespace RundownDbService.DAL.Repositories
             return rundown;
         }
 
-        public async Task UpdateItemAsync(Guid rundownId, RundownItem updatedItem)
+        public async Task UpdateStoryAsync(Guid rundownId, RundownStory updatedStory)
         {
             var filter = Builders<Rundown>.Filter.And(
                 Builders<Rundown>.Filter.Eq(r => r.UUID, rundownId),
-                Builders<Rundown>.Filter.ElemMatch(r => r.Items, i => i.UUID == updatedItem.UUID)
+                Builders<Rundown>.Filter.ElemMatch(r => r.Stories, i => i.UUID == updatedStory.UUID)
             );
 
-            var update = Builders<Rundown>.Update.Set("Items.$", updatedItem);  // Opdaterer hele item'et
+            var update = Builders<Rundown>.Update.Set("Stories.$", updatedStory);  // Opdaterer hele story
 
             await _rundownCollection.UpdateOneAsync(filter, update);
         }

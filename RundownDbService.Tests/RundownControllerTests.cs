@@ -10,15 +10,15 @@ namespace RundownDbService.Tests
     public class RundownControllerTests
     {
         private readonly Mock<IRundownService> _mockRundownService;
-        private readonly Mock<IItemDetailService> _mockItemDetailService;
-        private readonly Mock<IRundownItemService> _mockRundownItemService; 
+        private readonly Mock<IStoryDetailService> _mockItemDetailService;
+        private readonly Mock<IRundownStoryService> _mockRundownItemService; 
         private readonly RundownController _controller;
 
         public RundownControllerTests()
         {
             _mockRundownService = new Mock<IRundownService>();
-            _mockItemDetailService = new Mock<IItemDetailService>(); 
-            _mockRundownItemService = new Mock<IRundownItemService>(); 
+            _mockItemDetailService = new Mock<IStoryDetailService>(); 
+            _mockRundownItemService = new Mock<IRundownStoryService>(); 
 
             _controller = new RundownController(_mockRundownService.Object, _mockItemDetailService.Object, _mockRundownItemService.Object);
         }

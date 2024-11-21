@@ -3,7 +3,7 @@ using AggregatorService.DTO;
 
 namespace AggregatorService.Models
 {
-    public class RundownItem
+    public class RundownStory
     {
         [JsonPropertyName("uuid")]
         public Guid UUID { get; set; }
@@ -21,7 +21,7 @@ namespace AggregatorService.Models
         public int Order { get; set; }
 
         [JsonPropertyName("details")]
-        public List<ItemDetailDTO> Details { get; set; } = new List<ItemDetailDTO>();
+        public List<StoryDetailDTO> Details { get; set; } = new List<StoryDetailDTO>();
 
 
     }

@@ -12,6 +12,6 @@ namespace CommonClassLibrary.DTO
         public string? ArchivedBy { get; set; } = null;
         public string ControlRoomId { get; set; } = string.Empty;
         public string? ControlRoomName { get; set;} = null;
-        public List<RundownItemDTO> Items { get; set; } = [];
+        public List<RundownStoryDTO> Stories { get; set; } = [];
     }
 }

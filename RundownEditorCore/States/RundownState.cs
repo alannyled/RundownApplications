@@ -7,17 +7,17 @@ namespace RundownEditorCore.States
     {
         public enum StateAction
         {
-            ItemUpdated,
+            StoryUpdated,
             RundownUpdated
         }
         public event Action<StateAction>? OnChange;
-        public RundownItemDTO Item { get; private set; } = new();
+        public RundownStoryDTO Story { get; private set; } = new();
         public RundownDTO Rundown { get; private set; } = new();
         
-        public void SelectedItem(RundownItemDTO item)
+        public void SelectedStory(RundownStoryDTO story)
         {
-            Item = item;
-            NotifyStateChanged(StateAction.ItemUpdated);
+            Story = story;
+            NotifyStateChanged(StateAction.StoryUpdated);
         }
         public void SelectedRundown(RundownDTO rundown)
         {

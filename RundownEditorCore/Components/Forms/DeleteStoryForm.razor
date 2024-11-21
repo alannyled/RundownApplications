@@ -7,17 +7,17 @@
 <form @onsubmit="HandleSubmit">
 
     <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-sm btn-danger">Slet @Item.Name</button>
+        <button type="submit" class="btn btn-sm btn-danger">Slet @Story.Name</button>
     </div>
 </form>
 
 @code {
     [Parameter]
-    public RundownItemDTO Item { get; set; } = new();
+    public RundownStoryDTO Story { get; set; } = new();
 
     private async Task HandleSubmit()
     {
-        if (Item.RundownId == null)
+        if (Story.RundownId == null)
         {
             Logger.LogError("RundownId er null. Kan ikke fjerne historien.");
             return;
@@ -25,11 +25,11 @@
 
         var rundown = RundownState.Rundown;
 
-        if (rundown.Items.Contains(Item))
+        if (rundown.Stories.Contains(Story))
         {
-            rundown.Items.Remove(Item);
+            rundown.Stories.Remove(Story);
          
-            string msg = $"Historien {Item.Name} blev fjernet fra {RundownState.Rundown.Name}. Åbne versioner lukkes.";
+            string msg = $"Historien {Story.Name} blev fjernet fra {RundownState.Rundown.Name}. Åbne versioner lukkes.";
             ToastState.FireToast(msg, "text-bg-info");
             Logger.LogWarning(msg);
         }
@@ -41,7 +41,7 @@
 
         try
         {
-            await RundownService.UpdateRundownAsync(Item.RundownId, rundown);
+            await RundownService.UpdateRundownAsync(Story.RundownId, rundown);
         }
         catch (Exception ex)
         {

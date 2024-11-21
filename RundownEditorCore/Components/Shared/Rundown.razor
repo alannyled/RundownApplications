@@ -33,7 +33,7 @@
 
 @code {
     private string activeTab = string.Empty;
-    private string openItemId = string.Empty;
+    private string openStoryId = string.Empty;
 
     private List<TabFragment> menuTabs = new();
     private List<TabFragment> tabPanes = new();
@@ -77,32 +77,32 @@
     /// <summary>
     /// Viser en TabPane, hvis den findes. Ellers kaldes rendering af en ny TabPane
     /// </summary>
-    private async void OpenTabPane(RundownItemDTO item)
+    private async void OpenTabPane(RundownStoryDTO story)
     {
-        if(item.Name == null) return;
-        activeTab = item.Name;
-        RundownState.SelectedItem(item);
+        if(story.Name == null) return;
+        activeTab = story.Name;
+        RundownState.SelectedStory(story);
 
-        openItemId = item.UUID.ToString();
+        openStoryId = story.UUID.ToString();
 
-        if (!menuTabs.Any(tab => tab.ItemId == item.UUID.ToString()))
+        if (!menuTabs.Any(tab => tab.StoryId == story.UUID.ToString()))
         {
-            AddMenuTab(item.UUID.ToString());
+            AddMenuTab(story.UUID.ToString());
         }
         await InvokeAsync(StateHasChanged);
     }
     /// <summary>
     /// Renderer en Tab til menuen
     /// </summary>
-    private void AddMenuTab(string itemId)
+    private void AddMenuTab(string storyId)
     {
         string tabName = activeTab;
         var newChild = new RenderFragment(builder =>
         {
             builder.OpenComponent<TabItem>(0);
-            builder.SetKey(itemId);
+            builder.SetKey(storyId);
             builder.AddAttribute(1, "MenuItem", tabName);
-            builder.AddAttribute(2, "ItemId", itemId);
+            builder.AddAttribute(2, "StoryId", storyId);
             builder.AddAttribute(3, "ActiveTab", activeTab);
             builder.AddAttribute(4, "SelectTab", EventCallback.Factory.Create<string>(this, SelectTab));
             builder.AddAttribute(5, "CloseTab", EventCallback.Factory.Create<string>(this, RemoveTabPane));
@@ -112,24 +112,24 @@
         menuTabs.Add(new TabFragment
             {
                 Name = tabName,
-                ItemId = openItemId,
+                StoryId = openStoryId,
                 Content = newChild
             });
 
-        AddTabPane(itemId);
+        AddTabPane(storyId);
     }
     /// <summary>
     /// Renderer en ny TabPane
     /// </summary>
-    private void AddTabPane(string itemId)
+    private void AddTabPane(string storyId)
     {
         string tabName = activeTab;
         var newChild = new RenderFragment(builder =>
         {
-            builder.OpenComponent<TabPaneRundownItem>(0);
-            builder.SetKey(itemId);
+            builder.OpenComponent<TabPaneRundownStory>(0);
+            builder.SetKey(storyId);
             builder.AddAttribute(1, "ActiveTab", activeTab);
-            builder.AddAttribute(2, "ItemId", itemId);
+            builder.AddAttribute(2, "StoryId", storyId);
             builder.AddAttribute(3, "Name", tabName);
             builder.AddAttribute(4, "OnRemove", EventCallback.Factory.Create<string>(this, RemoveTabPane));
             builder.CloseComponent();
@@ -138,7 +138,7 @@
         tabPanes.Add(new TabFragment
             {
                 Name = tabName,
-                ItemId = itemId,
+                StoryId = storyId,
                 Content = newChild
             });
 
@@ -146,9 +146,9 @@
     /// <summary>
     /// Fjerne en TabPane, når der klikkes på luk-knappen
     /// </summary>
-    private async Task RemoveTabPane(string itemId)
+    private async Task RemoveTabPane(string storyId)
     {
-        var tabToRemove = tabPanes.FirstOrDefault(tab => tab.ItemId == itemId);
+        var tabToRemove = tabPanes.FirstOrDefault(tab => tab.StoryId == storyId);
         if (tabToRemove?.Name != null)
         {
             tabPanes.Remove(tabToRemove);
@@ -166,7 +166,7 @@
         {
             menuTabs.Remove(tabToRemove);
             activeTab = menuTabs.FirstOrDefault()?.Name ?? RundownState.Rundown.Name;
-            await UnlockDetailsOnTabPaneRemove(removedTab.ItemId);
+            await UnlockDetailsOnTabPaneRemove(removedTab.StoryId);
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -174,13 +174,13 @@
     /// <summary>
     /// Oplåse evt. låste details, når tabben fjernes
     /// </summary>
-    private async Task UnlockDetailsOnTabPaneRemove(string itemId)
+    private async Task UnlockDetailsOnTabPaneRemove(string storyId)
     {
-        var rundownItem = RundownState.Rundown.Items.FirstOrDefault(item => item.UUID == Guid.Parse(itemId));
+        var rundownStory = RundownState.Rundown.Stories.FirstOrDefault(story => story.UUID == Guid.Parse(storyId));
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var currentUserName = authState.User?.Identity?.Name ?? "Ukendt bruger";
 
-        foreach (var detail in rundownItem?.Details ?? Enumerable.Empty<DetailDTO>())
+        foreach (var detail in rundownStory?.Details ?? Enumerable.Empty<DetailDTO>())
         {
             if (DetailLockState.IsLocked(detail.UUID.ToString(), out var lockedByUser) && lockedByUser == currentUserName)
             {
@@ -198,7 +198,7 @@
     public class TabFragment
     {
         public string? Name { get; set; }
-        public string? ItemId { get; set; }
+        public string? StoryId { get; set; }
         public RenderFragment? Content { get; set; }
     }
 

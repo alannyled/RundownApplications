@@ -5,15 +5,15 @@ using System;
 namespace RundownDbService.Models
 {
     [BsonDiscriminator(Required = true)]
-    [BsonKnownTypes(typeof(ItemDetailTeleprompter), typeof(ItemDetailComment), typeof(ItemDetailVideo), typeof(ItemDetailGraphic))]
-    public class ItemDetail
+    [BsonKnownTypes(typeof(StoryDetailTeleprompter), typeof(StoryDetailComment), typeof(StoryDetailVideo), typeof(StoryDetailGraphic))]
+    public class StoryDetail
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
         public Guid UUID { get; set; }
 
-        [BsonElement("itemId")]
-        public Guid ItemId { get; set; }
+        [BsonElement("storyId")]
+        public Guid StoryId { get; set; }
 
         [BsonElement("type")]
         public string? Type { get; set; }
@@ -28,44 +28,44 @@ namespace RundownDbService.Models
         public int Order { get; set; }
     }
 
-    [BsonDiscriminator("ItemDetailTeleprompter")]
-    public class ItemDetailTeleprompter : ItemDetail
+    [BsonDiscriminator("StoryDetailTeleprompter")]
+    public class StoryDetailTeleprompter : StoryDetail
     {
         [BsonElement("prompterText")]
         public string? PrompterText { get; set; }
 
         [BsonElement("detailType")]
-        public string? DetailType { get; set; } = "ItemDetailTeleprompter";
+        public string? DetailType { get; set; } = "StoryDetailTeleprompter";
     }
 
-    [BsonDiscriminator("ItemDetailVideo")]
-    public class ItemDetailVideo : ItemDetail
+    [BsonDiscriminator("StoryDetailVideo")]
+    public class StoryDetailVideo : StoryDetail
     {
 
         [BsonElement("videoPath")]
         public string? VideoPath { get; set; }
 
         [BsonElement("detailType")]
-        public string? DetailType { get; set; } = "ItemDetailVideo";
+        public string? DetailType { get; set; } = "StoryDetailVideo";
     }
 
-    [BsonDiscriminator("ItemDetailGraphic")]
-    public class ItemDetailGraphic : ItemDetail
+    [BsonDiscriminator("StoryDetailGraphic")]
+    public class StoryDetailGraphic : StoryDetail
     {
         [BsonElement("graphicId")]
         public string? GraphicId { get; set; }
 
         [BsonElement("detailType")]
-        public string? DetailType { get; set; } = "ItemDetailGraphic";
+        public string? DetailType { get; set; } = "StoryDetailGraphic";
     }
 
-    [BsonDiscriminator("ItemDetailComment")]
-    public class ItemDetailComment : ItemDetail
+    [BsonDiscriminator("StoryDetailComment")]
+    public class StoryDetailComment : StoryDetail
     {
         [BsonElement("comment")]
         public string? Comment { get; set; }
 
         [BsonElement("detailType")]
-        public string? DetailType { get; set; } = "ItemDetailComment";
+        public string? DetailType { get; set; } = "StoryDetailComment";
     }
 }

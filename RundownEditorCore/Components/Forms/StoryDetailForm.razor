@@ -73,14 +73,14 @@ else
     public bool isCreating { get; set; } = false;
 
 
-    public ItemDetailDTO.ItemDetail? GetModel(string type) =>
+    public StoryDetailDTO.StoryDetail? GetModel(string type) =>
     type switch
     {
-        "Video" => new ItemDetailDTO.ItemDetailVideo(),
-        "Teleprompter" => new ItemDetailDTO.ItemDetailTeleprompter(),
-        "Grafik" => new ItemDetailDTO.ItemDetailGraphic(),
-        "Kommentar" => new ItemDetailDTO.ItemDetailComment(),
-        "Voiceover" => new ItemDetailDTO.ItemDetailTeleprompter(),
+        "Video" => new StoryDetailDTO.StoryDetailVideo(),
+        "Teleprompter" => new StoryDetailDTO.StoryDetailTeleprompter(),
+        "Grafik" => new StoryDetailDTO.StoryDetailGraphic(),
+        "Kommentar" => new StoryDetailDTO.StoryDetailComment(),
+        "Voiceover" => new StoryDetailDTO.StoryDetailTeleprompter(),
         _ => null
 
     };
@@ -103,44 +103,44 @@ else
             return;
         }
         isCreating = true;
-        var newRundownItem = GetModel(DetailType);
+        var newRundownStory = GetModel(DetailType);
 
-        newRundownItem.UUID = Guid.NewGuid();
-        newRundownItem.ItemId = RundownState.Item.UUID;
-        newRundownItem.Type = DetailType;
-        newRundownItem.Title = Title;
-        newRundownItem.Duration = Duration.ToString("HH:mm:ss");
-        switch (newRundownItem)
+        newRundownStory.UUID = Guid.NewGuid();
+        newRundownStory.StoryId = RundownState.Story.UUID;
+        newRundownStory.Type = DetailType;
+        newRundownStory.Title = Title;
+        newRundownStory.Duration = Duration.ToString("HH:mm:ss");
+        switch (newRundownStory)
         {
-            case ItemDetailDTO.ItemDetailTeleprompter teleprompterItem:
-                teleprompterItem.PrompterText = Text;
+            case StoryDetailDTO.StoryDetailTeleprompter teleprompterStory:
+                teleprompterStory.PrompterText = Text;
                 break;
-            case ItemDetailDTO.ItemDetailVideo videoItem:
-                videoItem.VideoPath = "No video related";
+            case StoryDetailDTO.StoryDetailVideo videoStory:
+                videoStory.VideoPath = "No video related";
                 break;
-            case ItemDetailDTO.ItemDetailGraphic graphicItem:
-                graphicItem.GraphicId = "Graphic ID";
+            case StoryDetailDTO.StoryDetailGraphic graphicStory:
+                graphicStory.GraphicId = "Graphic ID";
                 break;
-            case ItemDetailDTO.ItemDetailComment commentItem:
-                commentItem.Comment = Text;
+            case StoryDetailDTO.StoryDetailComment commentStory:
+                commentStory.Comment = Text;
                 break;
         }
-        bool success = await SaveNewDetail(newRundownItem);
+        bool success = await SaveNewDetail(newRundownStory);
         isCreating = false;
         if (success) ModalState.Close();        
     }
 
-    private async Task<bool> SaveNewDetail(ItemDetailDTO.ItemDetail newRundownItem)
+    private async Task<bool> SaveNewDetail(StoryDetailDTO.StoryDetail newRundownStory)
     {
         await Task.Delay(1000); // Simulere at der går lidt tid før det er oprettet
-        var rundown = await RundownService.AddDetailToItemAsync(RundownState.Rundown.UUID, newRundownItem);
+        var rundown = await RundownService.AddDetailToStoryAsync(RundownState.Rundown.UUID, newRundownStory);
         if (rundown == null)
         {
             ToastState.FireToast("Der skete en fejl. Prøv igen", "text-bg-danger");
             return false;
         }        
         ToastState.FireToast($"{Title} er oprettet.", "text-bg-success");
-        Logger.LogWarning($"{Title} er oprettet i {RundownState.Item.Name}");
+        Logger.LogWarning($"{Title} er oprettet i {RundownState.Story.Name}");
         return true;
     }
 }

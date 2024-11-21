@@ -92,61 +92,61 @@ namespace RundownEditorCore.Services
             }
         }
 
-        public async Task<RundownDTO?> AddItemToRundownAsync(string rundownId, RundownItemDTO item)
+        public async Task<RundownDTO?> AddStoryToRundownAsync(string rundownId, RundownStoryDTO story)
         {
             try
             {
-                var response = await _httpClient.PutAsJsonAsync($"add-item-to-rundown/{rundownId}", item);
+                var response = await _httpClient.PutAsJsonAsync($"add-story-to-rundown/{rundownId}", story);
 
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
-                _logger.LogWarning($"ERROR adding item to rundown: {response.ReasonPhrase}");
+                _logger.LogWarning($"ERROR adding story to rundown: {response.ReasonPhrase}");
                 return null;
             }
             catch (Exception)
             {
-                _toastState.FireToast("Der skete en fejl under tilføjelse af item til rundown", "text-bg-warning");
+                _toastState.FireToast("Der skete en fejl under tilføjelse af story til rundown", "text-bg-warning");
                 return null;
             }
         }
 
-        public async Task<RundownDTO?> AddDetailToItemAsync(string rundownId, ItemDetailDTO.ItemDetail itemDetail)
+        public async Task<RundownDTO?> AddDetailToStoryAsync(string rundownId, StoryDetailDTO.StoryDetail storyDetail)
         {
             try
             {
-                var json = JsonConvert.SerializeObject(itemDetail);
+                var json = JsonConvert.SerializeObject(storyDetail);
                 var detail = JsonConvert.DeserializeObject<DetailDTO>(json);
 
-                var response = await _httpClient.PutAsJsonAsync($"add-detail-to-item/{rundownId}", detail);
+                var response = await _httpClient.PutAsJsonAsync($"add-detail-to-story/{rundownId}", detail);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("ADDED Detail to item");
+                    _logger.LogWarning($"Oprettet {detail.Title} i historie");
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
-                _logger.LogWarning($"ERROR adding detail to item: {response.ReasonPhrase}");
+                _logger.LogWarning($"ERROR adding detail to story: {response.ReasonPhrase}");
                 return null;
             }
             catch (Exception)
             {
-                _toastState.FireToast("Der skete en fejl under tilføjelse af detail til item i rundown", "text-bg-warning");
+                _toastState.FireToast("Der skete en fejl under tilføjelse af detail til story i rundown", "text-bg-warning");
                 return null;
             }
         }
 
-        public async Task<RundownDTO?> UpdateDetailAsync(string rundownId, DetailDTO itemDetail)
+        public async Task<RundownDTO?> UpdateDetailAsync(string rundownId, DetailDTO storyDetail)
         {
             try
             {
-                var response = await _httpClient.PutAsJsonAsync($"update-detail-in-item/{rundownId}", itemDetail);
+                var response = await _httpClient.PutAsJsonAsync($"update-detail-in-story/{rundownId}", storyDetail);
 
                 if (response.IsSuccessStatusCode)
                 {
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
-              //  _logger.LogWarning($"ERROR updating detail in item: {response.ReasonPhrase}");
+              //  _logger.LogWarning($"ERROR updating detail in story: {response.ReasonPhrase}");
                 return null;
             }
             catch (Exception)

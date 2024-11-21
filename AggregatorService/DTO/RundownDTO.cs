@@ -10,7 +10,7 @@ namespace AggregatorService.DTO
         [JsonPropertyName("controlRoomId")]
         public string? ControlRoomId { get; set; }
 
-        [JsonPropertyName("items")]
-        public List<RundownItemDTO> Items { get; set; } = new List<RundownItemDTO>();
+        [JsonPropertyName("stories")]
+        public List<RundownStoryDTO> Stories { get; set; } = [];
     }
 }

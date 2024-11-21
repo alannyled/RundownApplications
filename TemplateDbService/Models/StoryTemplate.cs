@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace TemplateDbService.Models
 {
-    public class ItemTemplate
+    public class StoryTemplate
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
@@ -22,6 +22,6 @@ namespace TemplateDbService.Models
         public int Order { get; set; }
 
         //[BsonElement("details")]
-        //public List<ItemDetail> Details { get; set; } = new List<ItemDetail>();
+        //public List<StoryDetail> Details { get; set; } = [];
     }
 }

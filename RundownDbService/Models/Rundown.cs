@@ -32,7 +32,7 @@ namespace RundownDbService.Models
         [BsonElement("archivedBy")]
         public string? ArchivedBy { get; set; }
 
-        [BsonElement("items")]
-        public List<RundownItem> Items { get; set; } = [];
+        [BsonElement("Stories")]
+        public List<RundownStory> Stories { get; set; } = [];
     }
 }

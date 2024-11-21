@@ -104,9 +104,9 @@
 
     private void HandleRundownStateChange(RundownState.StateAction action)
     {
-        if (Detail != null && action == RundownState.StateAction.ItemUpdated)
+        if (Detail != null && action == RundownState.StateAction.StoryUpdated)
         {
-            var updatedDetail = RundownState.Item.Details.FirstOrDefault(d => d.UUID == Detail.UUID);
+            var updatedDetail = RundownState.Story.Details.FirstOrDefault(d => d.UUID == Detail.UUID);
             if (updatedDetail != null && updatedDetail.UUID == updatedDetailUuid)
             {
                 Detail = updatedDetail;
@@ -172,13 +172,13 @@
         var rundown = SharedStates.AllRundowns.Find(r => r.UUID == updatedRundown.UUID);
         if (rundown == null) return;
 
-        var item = rundown?.Items.FirstOrDefault(i => i.UUID == Detail.ItemId);
-        if (item == null) return;
+        var story = rundown?.Stories.FirstOrDefault(i => i.UUID == Detail.StoryId);
+        if (story == null) return;
 
-        var detailIndex = item.Details.FindIndex(d => d.UUID == Detail.UUID);
+        var detailIndex = story.Details.FindIndex(d => d.UUID == Detail.UUID);
         if (detailIndex != -1)
         {
-            item.Details[detailIndex] = Detail;
+            story.Details[detailIndex] = Detail;
         }
         SharedStates.SharedAllRundowns(SharedStates.AllRundowns);
         ToastState.FireToast($"Ændringerne i {Detail.Title} er gemt", "text-bg-success");

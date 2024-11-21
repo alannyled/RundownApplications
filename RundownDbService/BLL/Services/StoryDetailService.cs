@@ -7,30 +7,30 @@ using CommonClassLibrary.Enum;
 
 namespace RundownDbService.BLL.Services
 {
-    public class ItemDetailService(IRundownRepository rundownRepository, IKafkaService kafkaService) : IItemDetailService
+    public class StoryDetailService(IRundownRepository rundownRepository, IKafkaService kafkaService) : IStoryDetailService
     {
         private readonly IRundownRepository _rundownRepository = rundownRepository;
         private readonly IKafkaService _kafkaService = kafkaService;
-        public ItemDetail? GetModel(string type)
+        public StoryDetail? GetModel(string type)
         {
             return type switch
             {
-                "Video" => new ItemDetailVideo(),
-                "Teleprompter" => new ItemDetailTeleprompter(),
-                "Grafik" => new ItemDetailGraphic(),
-                "Kommentar" => new ItemDetailComment(),
-                "Voiceover" => new ItemDetailTeleprompter(),
-                _ => new ItemDetail()
+                "Video" => new StoryDetailVideo(),
+                "Teleprompter" => new StoryDetailTeleprompter(),
+                "Grafik" => new StoryDetailGraphic(),
+                "Kommentar" => new StoryDetailComment(),
+                "Voiceover" => new StoryDetailTeleprompter(),
+                _ => new StoryDetail()
             };
         }      
 
-        public async Task<Rundown> CreateItemDetailAsync(Rundown rundown, RundownItem existingItem)
+        public async Task<Rundown> CreateStoryDetailAsync(Rundown rundown, RundownStory existingStory)
         {
-            await _rundownRepository.UpdateItemAsync(rundown.UUID, existingItem);
+            await _rundownRepository.UpdateStoryAsync(rundown.UUID, existingStory);
             var messageObject = new
             {
                 Action = MessageAction.Update.ToString(),
-                Item = existingItem,
+                Story = existingStory,
                 Rundown = rundown
             };
             string message = JsonConvert.SerializeObject(messageObject);

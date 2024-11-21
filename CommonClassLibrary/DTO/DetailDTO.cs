@@ -3,7 +3,7 @@
     public class DetailDTO
     {
         public Guid UUID { get; set; } = Guid.NewGuid();
-        public Guid ItemId { get; set; }
+        public Guid StoryId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         public int Order { get; set; }

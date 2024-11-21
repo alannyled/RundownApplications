@@ -8,11 +8,11 @@ namespace RundownDbService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RundownController(IRundownService rundownService, IItemDetailService itemDetailService, IRundownItemService rundownItemService) : ControllerBase
+    public class RundownController(IRundownService rundownService, IStoryDetailService storyDetailService, IRundownStoryService rundownStoryService) : ControllerBase
     {
         private readonly IRundownService _rundownService = rundownService;
-        private readonly IItemDetailService _itemDetailService = itemDetailService;
-        private readonly IRundownItemService _rundownItemService = rundownItemService;
+        private readonly IStoryDetailService _storyDetailService = storyDetailService;
+        private readonly IRundownStoryService _rundownStoryService = rundownStoryService;
 
         [HttpGet]
         public async Task<ActionResult<List<Rundown>>> GetAll()
@@ -73,17 +73,17 @@ namespace RundownDbService.Controllers
                 rundown.ArchivedDate = dto.ArchivedDate;
                 
 
-                foreach (var itemDto in dto.Items)
+                foreach (var storyDto in dto.Stories)
                 {
-                    var existingItem = rundown.Items.FirstOrDefault(i => i.UUID == itemDto.UUID);
-                    if (existingItem != null)
+                    var existingStory = rundown.Stories.FirstOrDefault(i => i.UUID == storyDto.UUID);
+                    if (existingStory != null)
                     {
-                        existingItem.Order = itemDto.Order;
+                        existingStory.Order = storyDto.Order;
                     }
                 }
-                // Fjern items der er slettede i DTO
-                var dtoUUIDs = dto.Items.Select(item => item.UUID).ToHashSet();
-                rundown.Items.RemoveAll(item => !dtoUUIDs.Contains(item.UUID));
+                // Fjern Stories der er slettede i DTO
+                var dtoUUIDs = dto.Stories.Select(story => story.UUID).ToHashSet();
+                rundown.Stories.RemoveAll(story => !dtoUUIDs.Contains(story.UUID));
 
                 await _rundownService.UpdateRundownAsync(id, rundown);
                 Console.WriteLine($"Opdatering af Rundown med ID: {id} lykkedes.");
@@ -98,8 +98,8 @@ namespace RundownDbService.Controllers
         }
 
 
-        [HttpPut("add-item-to-rundown/{id:guid}")]
-        public async Task<IActionResult> AddItemToRundown(Guid id, [FromBody] RundownItemDTO rundownDto)
+        [HttpPut("add-story-to-rundown/{id:guid}")]
+        public async Task<IActionResult> AddStoryToRundown(Guid id, [FromBody] RundownStoryDTO rundownDto)
         {
             if (rundownDto == null)
             {
@@ -116,7 +116,7 @@ namespace RundownDbService.Controllers
                 ? TimeSpan.Parse(rundownDto.Duration)
                 : TimeSpan.Zero;
 
-            existingRundown.Items.Add(new RundownItem
+            existingRundown.Stories.Add(new RundownStory
             {
                 UUID = Guid.NewGuid(),
                 RundownId = id,
@@ -130,8 +130,8 @@ namespace RundownDbService.Controllers
         }
 
 
-        [HttpPut("add-item-detail-to-rundown/{rundownId:guid}")]
-        public async Task<IActionResult> AddItemDetailToRundown(Guid rundownId, [FromBody] DetailDTO itemDetailDto)
+        [HttpPut("add-story-detail-to-rundown/{rundownId:guid}")]
+        public async Task<IActionResult> AddStoryDetailToRundown(Guid rundownId, [FromBody] DetailDTO storyDetailDto)
         {
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
             if (existingRundown == null)
@@ -139,54 +139,54 @@ namespace RundownDbService.Controllers
                 return NotFound("Rundown ikke fundet.");
             }
 
-            var existingItem = existingRundown.Items.FirstOrDefault(i => i.UUID == itemDetailDto.ItemId);
-            if (existingItem == null)
+            var existingStory = existingRundown.Stories.FirstOrDefault(i => i.UUID == storyDetailDto.StoryId);
+            if (existingStory == null)
             {
-                return NotFound("Item ikke fundet.");
+                return NotFound("Story ikke fundet.");
             }
 
-            var itemDetail = _itemDetailService.GetModel(itemDetailDto.Type);
-            if (itemDetail == null)
+            var storyDetail = _storyDetailService.GetModel(storyDetailDto.Type);
+            if (storyDetail == null)
             {
-                return BadRequest("Kunne ikke oprette item detail baseret på den angivne type.");
+                return BadRequest("Kunne ikke oprette story detail baseret på den angivne type.");
             }
 
-            // Sæt værdierne på den nye item detail
-            itemDetail.UUID = Guid.NewGuid();
-            itemDetail.Title = itemDetailDto.Title;
-            itemDetail.Duration = TimeSpan.Parse(itemDetailDto.Duration);
-            itemDetail.ItemId = itemDetailDto.ItemId;
-            itemDetail.Type = itemDetailDto.Type;
-            itemDetail.Order = itemDetailDto.Order;
+            // Sæt værdierne på den nye story detail
+            storyDetail.UUID = Guid.NewGuid();
+            storyDetail.Title = storyDetailDto.Title;
+            storyDetail.Duration = TimeSpan.Parse(storyDetailDto.Duration);
+            storyDetail.StoryId = storyDetailDto.StoryId;
+            storyDetail.Type = storyDetailDto.Type;
+            storyDetail.Order = storyDetailDto.Order;
 
-            // Tilpas værdier afhængigt af den specifikke type af item detail
-            switch (itemDetail)
+            // Tilpas værdier afhængigt af den specifikke type af story detail
+            switch (storyDetail)
             {
-                case ItemDetailVideo video when itemDetailDto.VideoPath != null:
-                    video.VideoPath = itemDetailDto.VideoPath;
+                case StoryDetailVideo video when storyDetailDto.VideoPath != null:
+                    video.VideoPath = storyDetailDto.VideoPath;
                     break;
-                case ItemDetailTeleprompter teleprompter when itemDetailDto.PrompterText != null:
-                    teleprompter.PrompterText = itemDetailDto.PrompterText;
+                case StoryDetailTeleprompter teleprompter when storyDetailDto.PrompterText != null:
+                    teleprompter.PrompterText = storyDetailDto.PrompterText;
                     break;
-                case ItemDetailGraphic graphic when itemDetailDto.GraphicId != null:
-                    graphic.GraphicId = itemDetailDto.GraphicId;
+                case StoryDetailGraphic graphic when storyDetailDto.GraphicId != null:
+                    graphic.GraphicId = storyDetailDto.GraphicId;
                     break;
-                case ItemDetailComment comment when itemDetailDto.Comment != null:
-                    comment.Comment = itemDetailDto.Comment;
+                case StoryDetailComment comment when storyDetailDto.Comment != null:
+                    comment.Comment = storyDetailDto.Comment;
                     break;
             }
 
-            // Tilføj itemDetail til existingItem's detaljer
-            existingItem.Details.Add(itemDetail);
+            // Tilføj StoryDetail til existingStory's detaljer
+            existingStory.Details.Add(storyDetail);
 
-           // await _itemDetailService.CreateItemDetailAsync(existingRundown.UUID, existingItem);
-            await _itemDetailService.CreateItemDetailAsync(existingRundown, existingItem);
+            // await _storyDetailService.CreateStoryDetailAsync(existingRundown.UUID, existingStory);
+            await _storyDetailService.CreateStoryDetailAsync(existingRundown, existingStory);
             return Ok(existingRundown);
         }
 
 
-        [HttpPut("edit-item-detail-in-rundown/{rundownId:guid}")]
-        public async Task<IActionResult> EditItemDetailInRundown(Guid rundownId, [FromBody] DetailDTO detailDto)
+        [HttpPut("edit-story-detail-in-rundown/{rundownId:guid}")]
+        public async Task<IActionResult> EditStoryDetailInRundown(Guid rundownId, [FromBody] DetailDTO detailDto)
         {
     
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
@@ -195,16 +195,16 @@ namespace RundownDbService.Controllers
                 return NotFound("Rundown ikke fundet.");
             }
 
-            var existingItem = existingRundown.Items.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailDto.UUID));
-            if (existingItem == null)
+            var existingStory = existingRundown.Stories.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailDto.UUID));
+            if (existingStory == null)
             {
-                return NotFound("Item der indeholder detail ikke fundet.");
+                return NotFound("story der indeholder detail ikke fundet.");
             }
    
-            var existingDetail = existingItem.Details.FirstOrDefault(d => d.UUID == detailDto.UUID);
+            var existingDetail = existingStory.Details.FirstOrDefault(d => d.UUID == detailDto.UUID);
             if (existingDetail == null)
             {
-                return NotFound($"ItemDetail med UUID {detailDto.UUID} blev ikke fundet.");
+                return NotFound($"StoryDetail med UUID {detailDto.UUID} blev ikke fundet.");
             }
       
             existingDetail.Title = detailDto.Title;
@@ -214,30 +214,30 @@ namespace RundownDbService.Controllers
 
             switch (existingDetail)
             {
-                case ItemDetailVideo video when detailDto.VideoPath != null:
+                case StoryDetailVideo video when detailDto.VideoPath != null:
                     video.VideoPath = detailDto.VideoPath;
                     break;
-                case ItemDetailTeleprompter teleprompter when detailDto.PrompterText != null:
+                case StoryDetailTeleprompter teleprompter when detailDto.PrompterText != null:
                     teleprompter.PrompterText = detailDto.PrompterText;
                     break;
-                case ItemDetailGraphic graphic when detailDto.GraphicId != null:
+                case StoryDetailGraphic graphic when detailDto.GraphicId != null:
                     graphic.GraphicId = detailDto.GraphicId;
                     break;
-                case ItemDetailComment comment when detailDto.Comment != null:
+                case StoryDetailComment comment when detailDto.Comment != null:
                     comment.Comment = detailDto.Comment;
                     break;
             }
 
             // Gem ændringerne
-            await _itemDetailService.CreateItemDetailAsync(existingRundown, existingItem);
+            await _storyDetailService.CreateStoryDetailAsync(existingRundown, existingStory);
 
             return Ok(existingRundown);
         }
 
 
 
-        [HttpDelete("delete-item-detail-from-rundown/{rundownId:guid}/{detailId:guid}")]
-        public async Task<IActionResult> DeleteItemDetailFromRundown(Guid rundownId, Guid detailId)
+        [HttpDelete("delete-story-detail-from-rundown/{rundownId:guid}/{detailId:guid}")]
+        public async Task<IActionResult> DeleteStoryDetailFromRundown(Guid rundownId, Guid detailId)
         {
         
             var existingRundown = await _rundownService.GetRundownByIdAsync(rundownId);
@@ -245,19 +245,19 @@ namespace RundownDbService.Controllers
             {
                 return NotFound("Rundown ikke fundet.");
             }
-            var existingItem = existingRundown.Items.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailId));
-            if (existingItem == null)
+            var existingStory = existingRundown.Stories.FirstOrDefault(i => i.Details.Any(d => d.UUID == detailId));
+            if (existingStory == null)
             {
-                return NotFound("Item med det ønskede ItemDetail ikke fundet.");
+                return NotFound("Story med det ønskede StoryDetail ikke fundet.");
             }
 
-            var detailToRemove = existingItem.Details.FirstOrDefault(d => d.UUID == detailId);
+            var detailToRemove = existingStory.Details.FirstOrDefault(d => d.UUID == detailId);
             if (detailToRemove == null)
             {
-                return NotFound("ItemDetail ikke fundet.");
+                return NotFound("StoryDetail ikke fundet.");
             }
 
-            existingItem.Details.Remove(detailToRemove);
+            existingStory.Details.Remove(detailToRemove);
 
             var updatedRundown = await _rundownService.UpdateRundownAsync(rundownId, existingRundown);
 

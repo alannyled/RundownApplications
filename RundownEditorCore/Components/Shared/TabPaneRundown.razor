@@ -22,7 +22,7 @@
                         }
                     </select>
                 </div>
-                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="ShowRundownItemForm"><i class="bi bi-plus"></i></button>
+                <button role="button" class="btn btn-sm btn-outline-danger py-0 me-1 fs-5" @onclick="ShowRundownStoryForm"><i class="bi bi-plus"></i></button>
 
 
             </div>
@@ -42,23 +42,23 @@
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    @foreach (var item in RundownState.Rundown.Items.OrderBy(i => i.Order))
+                    @foreach (var story in RundownState.Rundown.Stories.OrderBy(i => i.Order))
                     {
                         <tr draggable="true"
-                            @onclick="() => OpenTabPane.InvokeAsync(item)"
-                            @key="item.UUID"
-                            @ondragstart="(e) => OnDragStart(e, item.UUID.ToString())"
-                            @ondrop="(e) => OnDrop(e, item.UUID.ToString())"
+                            @onclick="() => OpenTabPane.InvokeAsync(story)"
+                            @key="story.UUID"
+                            @ondragstart="(e) => OnDragStart(e, story.UUID.ToString())"
+                            @ondrop="(e) => OnDrop(e, story.UUID.ToString())"
                             ondragover="allowDrop(event)"
                             ondragleave="leaveDrop(event)"
                             ondragend="endDrop(event)"
-                            class="drag-item">
-                            <td>@item.Name</td>
-                            <td>@item.Duration</td>
-                            <td>@item.Details.Count</td>
-                            <td>@item.Details.Count(detail => detail.Type == "Video")</td>
-                            <td>@item.Details.Count(detail => detail.Type == "Grafik")</td>
-                            <td class="text-danger text-center" role="button" @onclick:stopPropagation @onclick="() => ConfirmDelete(item)"><i class="bi bi-trash"></i></td>
+                            class="drag-story">
+                            <td>@story.Name</td>
+                            <td>@story.Duration</td>
+                            <td>@story.Details.Count</td>
+                            <td>@story.Details.Count(detail => detail.Type == "Video")</td>
+                            <td>@story.Details.Count(detail => detail.Type == "Grafik")</td>
+                            <td class="text-danger text-center" role="button" @onclick:stopPropagation @onclick="() => ConfirmDelete(story)"><i class="bi bi-trash"></i></td>
                         </tr>
                     }
                 </tbody>
@@ -71,7 +71,7 @@
 @code {
 
     [Parameter]
-    public EventCallback<RundownItemDTO> OpenTabPane { get; set; }
+    public EventCallback<RundownStoryDTO> OpenTabPane { get; set; }
     [Parameter]
     public string ActiveTab { get; set; } = string.Empty;
 
@@ -97,7 +97,7 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     {
-        if (action == SharedStates.StateAction.AllRundownsUpdated || action == SharedStates.StateAction.ItemUpdated)
+        if (action == SharedStates.StateAction.AllRundownsUpdated || action == SharedStates.StateAction.StoryUpdated)
         {
             if (RundownState?.Rundown == null || SharedStates.RundownUpdated == null) return;
             var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown.UUID);
@@ -131,13 +131,13 @@
 
     List<string> Templates = ["Template1", "Template2", "Template3"];
     /// <summary>
-    /// Kalder rending af Modal med RundownItemForm
+    /// Kalder rending af Modal med RundownStoryForm
     /// </summary>
-    private void ShowRundownItemForm()
+    private void ShowRundownStoryForm()
     {
         var content = new RenderFragment(builder =>
         {
-            builder.AddContent(0, FormRenderservice.RenderRundownItemForm(
+            builder.AddContent(0, FormRenderservice.RenderRundownStoryForm(
             Templates
         ));
         });
@@ -155,34 +155,34 @@
     {
         if (draggedChildId != null && draggedChildId != targetChildId)
         {
-            var itemsCopy = RundownState.Rundown.Items.ToList();
+            var storiesCopy = RundownState.Rundown.Stories.ToList();
 
-            var draggedItem = itemsCopy.FirstOrDefault(x => x.UUID.ToString() == draggedChildId);
-            var targetItem = itemsCopy.FirstOrDefault(x => x.UUID.ToString() == targetChildId);
+            var draggedStory = storiesCopy.FirstOrDefault(x => x.UUID.ToString() == draggedChildId);
+            var targetStory = storiesCopy.FirstOrDefault(x => x.UUID.ToString() == targetChildId);
 
-            if (draggedItem != null && targetItem != null)
+            if (draggedStory != null && targetStory != null)
             {
-                var targetIndex = itemsCopy.IndexOf(targetItem);
-                var draggedIndex = itemsCopy.IndexOf(draggedItem);
+                var targetIndex = storiesCopy.IndexOf(targetStory);
+                var draggedIndex = storiesCopy.IndexOf(draggedStory);
 
-                itemsCopy.Remove(draggedItem);
+                storiesCopy.Remove(draggedStory);
                 if (draggedIndex < targetIndex)
                 {
                     targetIndex--;
                 }
                 targetIndex++;
-                if (targetIndex > itemsCopy.Count)
+                if (targetIndex > storiesCopy.Count)
                 {
-                    targetIndex = itemsCopy.Count;
+                    targetIndex = storiesCopy.Count;
                 }
-                itemsCopy.Insert(targetIndex, draggedItem);
+                storiesCopy.Insert(targetIndex, draggedStory);
 
                 // Opdater order i kopien
-                UpdateItemOrderValues(itemsCopy);
+                UpdateStoryOrderValues(storiesCopy);
 
                 // Send kun kopien til databasen
                 var updatedRundown = RundownState.Rundown;
-                updatedRundown.Items = itemsCopy;
+                updatedRundown.Stories = storiesCopy;
                 await RundownService.UpdateRundownAsync(RundownState.Rundown.UUID, updatedRundown);
                 // RundownState opdateres først, når Kafka bekræfter ændringen
             }
@@ -190,32 +190,32 @@
         draggedChildId = null;
     }
 
-    private void UpdateItemOrderValues(List<RundownItemDTO> items)
+    private void UpdateStoryOrderValues(List<RundownStoryDTO> stories)
     {
-        for (int i = 0; i < items.Count; i++)
+        for (int i = 0; i < stories.Count; i++)
         {
-            items[i].Order = i;
+            stories[i].Order = i;
         }
     }
 
-    private void ConfirmDelete(RundownItemDTO item)
+    private void ConfirmDelete(RundownStoryDTO story)
     {
         var content = new RenderFragment(builder =>
         {
-            builder.AddContent(0, FormRenderservice.RenderDeleteItemForm(item));
+            builder.AddContent(0, FormRenderservice.RenderDeleteStoryForm(story));
         });
-        ModalState.SetContent(content, $"Bekræft sletning af {item.Name}");
+        ModalState.SetContent(content, $"Bekræft sletning af {story.Name}");
     }
 
     /// <summary>
     /// Opdaterer Order-værdien for hvert element i listen konsekvent fra 0 og opefter.
     /// </summary>
-    private void UpdateItemOrderValues()
+    private void UpdateStoryOrderValues()
     {
         int index = 0;
-        foreach (var item in RundownState.Rundown.Items)
+        foreach (var story in RundownState.Rundown.Stories)
         {
-            item.Order = index++;
+            story.Order = index++;
         }
     }
 

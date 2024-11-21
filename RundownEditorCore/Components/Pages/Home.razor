@@ -153,7 +153,7 @@
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
     { 
-        if (action == SharedStates.StateAction.ItemUpdated || 
+        if (action == SharedStates.StateAction.StoryUpdated || 
             action == SharedStates.StateAction.AllRundownsUpdated)
         {
             await FilterActiveRundowns();
@@ -217,7 +217,8 @@
         {
             var selectedRundown = ActiveRundowns.FirstOrDefault(r => r.UUID == uuid);
             RundownState.SelectedRundown(selectedRundown);
-            RundownState.SelectedItem(new RundownItemDTO());
+            RundownState.SelectedStory(new RundownStoryDTO());
+            Console.WriteLine($"Selected rundown stories: {selectedRundown.Stories.Count()}");
             await InvokeAsync(StateHasChanged);
         }
         catch (HttpRequestException e)

@@ -12,7 +12,7 @@ namespace RundownEditorCore.States
 
         public enum StateAction
         {
-            ItemUpdated,
+            StoryUpdated,
             RundownUpdated,
             ControlRoomsUpdated,
             TemplatesUpdated,
@@ -22,7 +22,7 @@ namespace RundownEditorCore.States
         }
 
         public event Action<StateAction>? OnChange;
-        public RundownItemDTO ItemUpdated { get; private set; } = new();
+        public RundownStoryDTO StoryUpdated { get; private set; } = new();
         public RundownDTO RundownUpdated { get; private set; } = new();
         public List<RundownDTO> AllRundowns { get; private set; } = [];
         public List<ControlRoomDTO> ControlRooms { get; private set; } = [];
@@ -35,10 +35,10 @@ namespace RundownEditorCore.States
             OnChange?.Invoke(action);
         }
 
-        public void SharedItem(RundownItemDTO item)
+        public void SharedItem(RundownStoryDTO story)
         {
-            ItemUpdated = item;
-            NotifyStateChanged(StateAction.ItemUpdated);
+            StoryUpdated = story;
+            NotifyStateChanged(StateAction.StoryUpdated);
         }
         public void SharedRundown(RundownDTO rundown)
         {

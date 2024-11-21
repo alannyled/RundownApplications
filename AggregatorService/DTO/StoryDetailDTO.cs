@@ -2,13 +2,13 @@
 
 namespace AggregatorService.DTO
 {
-    public class ItemDetailDTO
+    public class StoryDetailDTO
     {
         [JsonPropertyName("uuid")]
         public Guid UUID { get; set; } = Guid.NewGuid();
 
-        [JsonPropertyName("itemId")]
-        public Guid ItemId { get; set; }
+        [JsonPropertyName("storyId")]
+        public Guid StoryId { get; set; }
 
         [JsonPropertyName("title")]
         public string Title { get; set; } = string.Empty;

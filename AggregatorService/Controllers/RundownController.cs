@@ -47,27 +47,26 @@ namespace AggregatorService.Controllers
             return Ok(updatedRundown);
         }
 
-        [HttpPut("add-item-to-rundown/{rundownId}")]
-        public async Task<IActionResult> AddItemToRundown(string rundownId, [FromBody] RundownItemDTO itemDto)
+        [HttpPut("add-story-to-rundown/{rundownId}")]
+        public async Task<IActionResult> AddStoryToRundown(string rundownId, [FromBody] RundownStoryDTO storyDto)
         {
-            var rundown = await _rundownManager.AddItemToRundownAsync(Guid.Parse(rundownId), itemDto);
+            var rundown = await _rundownManager.AddStoryToRundownAsync(Guid.Parse(rundownId), storyDto);
             return Ok(rundown);
         }
 
-        [HttpPut("add-detail-to-item/{rundownId}")]
-        public async Task<IActionResult> AddDetailToItem(string rundownId, [FromBody] ItemDetailDTO itemDetailDto)
+        [HttpPut("add-detail-to-story/{rundownId}")]
+        public async Task<IActionResult> AddDetailToStory(string rundownId, [FromBody] StoryDetailDTO storyDetailDto)
         {
-            var json = JsonSerializer.Serialize(itemDetailDto);
-            Console.WriteLine("Adding detail to item: " + json);
-            var rundown = await _rundownManager.AddDetailToItemAsync(Guid.Parse(rundownId), itemDetailDto);
+            var json = JsonSerializer.Serialize(storyDetailDto);
+            var rundown = await _rundownManager.AddDetailToStoryAsync(Guid.Parse(rundownId), storyDetailDto);
             return Ok(rundown);
         }
 
-        [HttpPut("update-detail-in-item/{rundownId}")]
-        public async Task<IActionResult> UpdateDetailInItem(string rundownId, [FromBody] ItemDetailDTO itemDetailDto)
+        [HttpPut("update-detail-in-story/{rundownId}")]
+        public async Task<IActionResult> UpdateDetailInStory(string rundownId, [FromBody] StoryDetailDTO storyDetailDto)
         {
-            Console.WriteLine("Updating detail in item: " + JsonSerializer.Serialize(itemDetailDto));
-            var rundown = await _rundownManager.UpdateItemDetailAsync(Guid.Parse(rundownId), itemDetailDto);
+            Console.WriteLine("Updating detail in story: " + JsonSerializer.Serialize(storyDetailDto));
+            var rundown = await _rundownManager.UpdateStoryDetailAsync(Guid.Parse(rundownId), storyDetailDto);
             return Ok(rundown);
         }
 

@@ -55,7 +55,7 @@ namespace RundownEditorCore.Services
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IControlRoomService _controlRoomService = controlRoomService;
         private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
-        private static readonly LogRingBuffer<LogMessageDTO> _logBuffer = new(250); // Buffer med plads til 250 beskeder
+        private static readonly LogRingBuffer<LogMessageDTO> _logBuffer = new(100); // Buffer med plads til 100 beskeder
         public static event Action<LogMessageDTO>? LogMessageAdded;
         public static IEnumerable<LogMessageDTO> RecentLogs => _logBuffer;
 
@@ -112,7 +112,7 @@ namespace RundownEditorCore.Services
                                     {
                                         TimeStamp = DateTime.UtcNow,
                                         Message = $"{messageObject.Name} er blevet {(messageObject.Locked ? $"låst for redigering af {messageObject.UserName}" : "låst op")}",
-                                        LogLevel = LogLevel.Warning,
+                                        LogLevel = LogLevel.Information,
                                     };
                                     _logBuffer.Add(log);
                                     LogMessageAdded?.Invoke(log);
@@ -210,13 +210,13 @@ namespace RundownEditorCore.Services
     }
     public class ItemMessage
     {
-        public RundownItemDTO? Item { get; set; }
+        public RundownStoryDTO? Item { get; set; }
     }
 
     public class RundownMessage
     {
         public string? Action { get; set; }
-        public RundownItemDTO? Item { get; set; }
+        public RundownStoryDTO? Item { get; set; }
         public RundownDTO? Rundown { get; set; }
     }
 

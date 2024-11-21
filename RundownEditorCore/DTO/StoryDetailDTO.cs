@@ -2,12 +2,12 @@
 
 namespace RundownEditorCore.DTO
 {
-    public class ItemDetailDTO
+    public class StoryDetailDTO
     {
-        public class ItemDetail
+        public class StoryDetail
         {
             public Guid UUID { get; set; }
-            public Guid ItemId { get; set; }
+            public Guid StoryId { get; set; }
             public string Title { get; set; }
             public string Duration { get; set; }
             public string Type { get; set; }
@@ -15,25 +15,25 @@ namespace RundownEditorCore.DTO
         }
 
 
-        public class ItemDetailTeleprompter : ItemDetail
+        public class StoryDetailTeleprompter : StoryDetail
         {
             public string PrompterText { get; set; }
         }
 
 
-        public class ItemDetailVideo : ItemDetail
+        public class StoryDetailVideo : StoryDetail
         {           
             public string VideoPath { get; set; }            
         }
 
 
-        public class ItemDetailGraphic : ItemDetail
+        public class StoryDetailGraphic : StoryDetail
         {
             public string GraphicId { get; set; }
         }
 
 
-        public class ItemDetailComment : ItemDetail
+        public class StoryDetailComment : StoryDetail
         {
             public string Comment { get; set; }
 

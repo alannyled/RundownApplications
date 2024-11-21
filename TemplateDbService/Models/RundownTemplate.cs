@@ -21,7 +21,7 @@ namespace TemplateDbService.Models
         [BsonElement("archivedBy")]
         public string? ArchivedBy { get; set; }
 
-        [BsonElement("items")]
-        public List<ItemTemplate> Items { get; set; } = new List<ItemTemplate>();
+        [BsonElement("stories")]
+        public List<StoryTemplate> Stories { get; set; } = [];
     }
 }

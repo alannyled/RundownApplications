@@ -8,7 +8,7 @@ namespace RundownDbService.DAL.Interfaces
         Task<Rundown> GetByIdAsync(Guid uuid);
         Task<Rundown> CreateAsync(Rundown rundown);
         Task<Rundown> UpdateAsync(Guid uuid, Rundown rundown);
-        Task UpdateItemAsync(Guid rundownId, RundownItem updatedItem);
+        Task UpdateStoryAsync(Guid rundownId, RundownStory updatedStory);
         Task DeleteAsync(Guid uuid);
     }
 }

@@ -27,9 +27,9 @@
         </div>
 
         <div class="card-body">
-            @foreach (DetailDTO detail in RundownItem.Details)
+            @foreach (DetailDTO detail in RundownStory.Details)
             {
-                <ItemDetail Detail="detail" @key="detail.UUID"></ItemDetail>
+                <StoryDetail Detail="detail" @key="detail.UUID"></StoryDetail>
             }            
         </div>
     </div>
@@ -41,21 +41,21 @@
     [Parameter]
     public string Name { get; set; } = string.Empty;
     [Parameter]
-    public string ItemId { get; set; }
+    public string StoryId { get; set; }
     [Parameter]
     public EventCallback<string> OnRemove { get; set; }
 
-    public RundownItemDTO? RundownItem { get; set; } = new();
+    public RundownStoryDTO? RundownStory { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        Guid UUID = Guid.Parse(ItemId);
-        RundownItem = RundownState.Rundown.Items.FirstOrDefault(item => item.UUID == UUID);
+        Guid UUID = Guid.Parse(StoryId);
+        RundownStory = RundownState.Rundown.Stories.FirstOrDefault(story => story.UUID == UUID);
         SharedStates.OnChange += HandleSharedStateChange;
     }
     /// <summary>
     /// Håndterer ændringer i SharedStates forårsaget af Kafka beskeder
-    /// Hvis det påvirker det aktuelle RundownItem, opdateres det
+    /// Hvis det påvirker det aktuelle RundownStory, opdateres det
     /// Hvis den er blevet slettet, lukkes tabben
     /// </summary>
     private async void HandleSharedStateChange(SharedStates.StateAction action)
@@ -67,15 +67,15 @@
                 var currentRundown = SharedStates.AllRundowns.FirstOrDefault(r => r.UUID == RundownState.Rundown?.UUID);
                 if (currentRundown == null) return;
 
-                var currenItem = currentRundown.Items.FirstOrDefault(i => i.UUID == RundownItem?.UUID);
-                if (currenItem == null)
+                var currenStory = currentRundown.Stories.FirstOrDefault(i => i.UUID == RundownStory?.UUID);
+                if (currenStory == null)
                 {                    
                     await RemoveTabPane();
                 }
                 else
                 {
-                    RundownItem = currenItem;
-                    RundownState.SelectedItem(currenItem);
+                    RundownStory = currenStory;
+                    RundownState.SelectedStory(currenStory);
                     StateHasChanged(); 
                 }
             });
@@ -84,11 +84,11 @@
 
 
     /// <summary>
-    /// Kalder callback for at fjerne lukket items tabpane fra UI
+    /// Kalder callback for at fjerne lukket story tabpane fra UI
     /// </summary>
     public async Task RemoveTabPane()
     {
-        await OnRemove.InvokeAsync(ItemId);
+        await OnRemove.InvokeAsync(StoryId);
     }
     
     /// <summary>
@@ -98,7 +98,7 @@
     {
         var content = new RenderFragment(builder =>
         {
-            builder.AddContent(0, FormRenderservice.RenderItemDetailForm(
+            builder.AddContent(0, FormRenderservice.RenderStoryDetailForm(
                 type
             ));
         });

@@ -8,36 +8,36 @@ namespace RundownEditorCore.Services
 {
     public class FormRenderService
     {
-        public RenderFragment RenderDeleteItemForm(
-            RundownItemDTO Item
+        public RenderFragment RenderDeleteStoryForm(
+            RundownStoryDTO Story
                        )
         {
             return builder =>
             {
-                builder.OpenComponent(0, typeof(DeleteItemForm));
-                builder.AddAttribute(1, "Item", Item);
+                builder.OpenComponent(0, typeof(DeleteStoryForm));
+                builder.AddAttribute(1, "Story", Story);
                 builder.CloseComponent();
             };
         }
-        public RenderFragment RenderItemDetailForm(
+        public RenderFragment RenderStoryDetailForm(
             string DetailType
             )
         {
             return builder =>
             {
-                builder.OpenComponent(0, typeof(ItemDetailForm));
+                builder.OpenComponent(0, typeof(StoryDetailForm));
                 builder.AddAttribute(1, "DetailType", DetailType);
                 builder.CloseComponent();
             };
         }
 
-        public RenderFragment RenderRundownItemForm(
+        public RenderFragment RenderRundownStoryForm(
             List<string> Templates
             )
         {
             return builder =>
             {
-                builder.OpenComponent(0, typeof(RundownItemForm));
+                builder.OpenComponent(0, typeof(RundownStoryForm));
                 builder.AddAttribute(1, "Templates", Templates);
                 builder.CloseComponent();
             };

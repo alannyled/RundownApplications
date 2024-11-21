@@ -14,17 +14,17 @@ namespace TemplateDbService.Services
             _repository = repository;
         }
 
-        public async Task<List<ItemTemplate>> GetAllAsync() => await _repository.GetAllAsync();
+        public async Task<List<StoryTemplate>> GetAllAsync() => await _repository.GetAllAsync();
 
-        public async Task<ItemTemplate> GetByIdAsync(Guid uuid) => await _repository.GetByIdAsync(uuid);
+        public async Task<StoryTemplate> GetByIdAsync(Guid uuid) => await _repository.GetByIdAsync(uuid);
 
-        public async Task CreateAsync(ItemTemplate itemTemplate)
+        public async Task CreateAsync(StoryTemplate itemTemplate)
         {
             itemTemplate.UUID = Guid.NewGuid();
             await _repository.CreateAsync(itemTemplate);
         }
 
-        public async Task UpdateAsync(Guid uuid, ItemTemplate itemTemplate)
+        public async Task UpdateAsync(Guid uuid, StoryTemplate itemTemplate)
         {
             await _repository.UpdateAsync(uuid, itemTemplate);
         }

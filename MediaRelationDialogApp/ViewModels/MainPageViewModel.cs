@@ -37,8 +37,8 @@ namespace MediaRelationDialogApp.ViewModels
             }
         }        
 
-        private RundownItemDTO? _selectedItem;
-        public RundownItemDTO? SelectedItem
+        private RundownStoryDTO? _selectedItem;
+        public RundownStoryDTO? SelectedItem
         {
             get => _selectedItem;
             set

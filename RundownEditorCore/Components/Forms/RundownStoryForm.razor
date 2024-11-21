@@ -12,14 +12,14 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <p class="text-center my-5">Opretter @ItemName</p>
+    <p class="text-center my-5">Opretter @StoryName</p>
 }
 else
 {
 <form @onsubmit="HandleSubmit">
     <div class="mb-3">
-        <label for="itemname" class="form-label">Titel</label>
-        <input type="text" class="form-control form-control-sm" id="itemname" @bind="@ItemName"/>
+        <label for="Storyname" class="form-label">Titel</label>
+        <input type="text" class="form-control form-control-sm" id="Storyname" @bind="@StoryName"/>
     </div>
     <div class="mb-3">
         <label for="duration" class="form-label">Planlagt længde</label>
@@ -46,7 +46,7 @@ else
     [Parameter]
     public List<string> Templates { get; set; } = new List<string>();
 
-    public string ItemName { get; set; } = string.Empty;
+    public string StoryName { get; set; } = string.Empty;
     public TimeOnly Duration { get; set; } = new TimeOnly(0, 0, 0);
     public string Template { get; set; } = string.Empty;
     public bool isCreating { get; set; } = false;
@@ -54,40 +54,40 @@ else
     private async Task HandleSubmit()
     {
         var selectedRundown = RundownState.Rundown;
-        if (string.IsNullOrEmpty(ItemName))
+        if (string.IsNullOrEmpty(StoryName))
         {
             ToastState.FireToast("Du skal angive en titel", "text-bg-warning");
             return;
         }
         isCreating = true;
-        var newRundownItem = new RundownItemDTO
+        var newRundownStory = new RundownStoryDTO
             {
                 UUID = Guid.NewGuid(),
                 RundownId = selectedRundown.UUID,
-                Name = ItemName,
+                Name = StoryName,
                 Duration = Duration.ToString("HH:mm:ss"),
-                Order = selectedRundown.Items.Count // + 1  eller *10?
+                Order = selectedRundown.Stories.Count // + 1  eller *10?
             };
 
 
-        //var rundown = await RundownService.AddItemToRundownAsync(selectedRundown.UUID, newRundownItem);
-        bool success = await SaveNewItem(selectedRundown.UUID, newRundownItem);
+        //var rundown = await RundownService.AddStoryToRundownAsync(selectedRundown.UUID, newRundownStory);
+        bool success = await SaveNewStory(selectedRundown.UUID, newRundownStory);
         isCreating = false;
         if (success) ModalState.Close();
     }
 
-    private async Task<bool> SaveNewItem(string UUID, RundownItemDTO newRundownItem)
+    private async Task<bool> SaveNewStory(string UUID, RundownStoryDTO newRundownStory)
     {
         await Task.Delay(1000); // Simulere at der går lidt tid før det er oprettet
-        var rundown = await RundownService.AddItemToRundownAsync(UUID, newRundownItem);
+        var rundown = await RundownService.AddStoryToRundownAsync(UUID, newRundownStory);
         if (rundown == null)
         {
             ToastState.FireToast("Der skete en fejl. Prøv igen", "text-bg-danger");
             return false;
         }
-        ToastState.FireToast($"{ItemName} er oprettet.", "text-bg-success");
+        ToastState.FireToast($"{StoryName} er oprettet.", "text-bg-success");
 
-        Logger.LogWarning($"Ny hisorie: {ItemName} er oprettet i {rundown.Name}");
+        Logger.LogWarning($"Ny hisorie: {StoryName} er oprettet i {rundown.Name}");
         return true;
     }
 }

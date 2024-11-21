@@ -12,30 +12,30 @@ using System.Threading.Tasks;
 
 namespace RundownDbService.Tests.Services
 {
-    public class ItemDetailServiceTests
+    public class StoryDetailServiceTests
     {
         private readonly Mock<IRundownRepository> _mockRundownRepository;
         private readonly Mock<IKafkaService> _mockKafkaService;
-        private readonly ItemDetailService _itemDetailService;
+        private readonly StoryDetailService _storyDetailService;
 
-        public ItemDetailServiceTests()
+        public StoryDetailServiceTests()
         {
             _mockRundownRepository = new Mock<IRundownRepository>();
             _mockKafkaService = new Mock<IKafkaService>();
-            _itemDetailService = new ItemDetailService(_mockRundownRepository.Object, _mockKafkaService.Object);
+            _storyDetailService = new StoryDetailService(_mockRundownRepository.Object, _mockKafkaService.Object);
         }
 
         [Theory]
-        [InlineData("Video", typeof(ItemDetailVideo))]
-        [InlineData("Teleprompter", typeof(ItemDetailTeleprompter))]
-        [InlineData("Grafik", typeof(ItemDetailGraphic))]
-        [InlineData("Kommentar", typeof(ItemDetailComment))]
-        [InlineData("Voiceover", typeof(ItemDetailTeleprompter))]
-        [InlineData("Unknown", typeof(ItemDetail))]
-        public void GetModel_ShouldReturnCorrectItemDetailModel(string type, Type expectedType)
+        [InlineData("Video", typeof(StoryDetailVideo))]
+        [InlineData("Teleprompter", typeof(StoryDetailTeleprompter))]
+        [InlineData("Grafik", typeof(StoryDetailGraphic))]
+        [InlineData("Kommentar", typeof(StoryDetailComment))]
+        [InlineData("Voiceover", typeof(StoryDetailTeleprompter))]
+        [InlineData("Unknown", typeof(StoryDetail))]
+        public void GetModel_ShouldReturnCorrectStoryDetailModel(string type, Type expectedType)
         {
             // Act
-            var result = _itemDetailService.GetModel(type);
+            var result = _storyDetailService.GetModel(type);
 
             // Assert
             Assert.NotNull(result);
@@ -43,19 +43,19 @@ namespace RundownDbService.Tests.Services
         }
 
         [Fact]
-        public async Task CreateItemDetailAsync_WithValidRundownAndItem_UpdatesRundownAndSendsMessage()
+        public async Task CreateStoryDetailAsync_WithValidRundownAndStory_UpdatesRundownAndSendsMessage()
         {
             // Arrange
             var rundown = new Rundown { UUID = Guid.NewGuid(), Name = "Test Rundown" };
-            var item = new RundownItem { UUID = Guid.NewGuid(), Name = "Test Item" };
+            var story = new RundownStory { UUID = Guid.NewGuid(), Name = "Test Story" };
 
-            _mockRundownRepository.Setup(repo => repo.UpdateItemAsync(rundown.UUID, item)).Returns(Task.CompletedTask);
+            _mockRundownRepository.Setup(repo => repo.UpdateStoryAsync(rundown.UUID, story)).Returns(Task.CompletedTask);
 
             // Act
-            await _itemDetailService.CreateItemDetailAsync(rundown, item);
+            await _storyDetailService.CreateStoryDetailAsync(rundown, story);
 
             // Assert
-            _mockRundownRepository.Verify(repo => repo.UpdateItemAsync(rundown.UUID, item), Times.Once);
+            _mockRundownRepository.Verify(repo => repo.UpdateStoryAsync(rundown.UUID, story), Times.Once);
             _mockKafkaService.Verify(kafka => kafka.SendMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }

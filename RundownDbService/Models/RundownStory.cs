@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace RundownDbService.Models
 {
-    public class RundownItem
+    public class RundownStory
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
@@ -25,6 +25,6 @@ namespace RundownDbService.Models
         public int Order { get; set; }
 
         [BsonElement("details")]
-        public List<ItemDetail> Details { get; set; } = [];
+        public List<StoryDetail> Details { get; set; } = [];
     }
 }

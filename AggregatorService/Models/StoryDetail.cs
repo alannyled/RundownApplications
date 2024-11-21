@@ -3,13 +3,13 @@
 namespace AggregatorService.Models
 {
 
-    public class ItemDetail
+    public class StoryDetail
     {
         [JsonPropertyName("uuid")] 
         public Guid UUID { get; set; }
 
-        [JsonPropertyName("itemId")]
-        public Guid ItemId { get; set; }
+        [JsonPropertyName("storyId")]
+        public Guid StoryId { get; set; }
 
         [JsonPropertyName("type")]
         public string Type { get; set; }
@@ -25,7 +25,7 @@ namespace AggregatorService.Models
     }
 
   
-    public class ItemDetailTeleprompter : ItemDetail
+    public class ItemDetailTeleprompter : StoryDetail
     {
         [JsonPropertyName("prompterText")]
         public string? PrompterText { get; set; }
@@ -35,7 +35,7 @@ namespace AggregatorService.Models
     }
 
 
-    public class ItemDetailVideo : ItemDetail
+    public class ItemDetailVideo : StoryDetail
     {
 
         [JsonPropertyName("videoPath")]
@@ -46,7 +46,7 @@ namespace AggregatorService.Models
     }
 
 
-    public class ItemDetailGraphic : ItemDetail
+    public class ItemDetailGraphic : StoryDetail
     {
 
         [JsonPropertyName("graphicId")]
@@ -57,7 +57,7 @@ namespace AggregatorService.Models
     }
 
 
-    public class ItemDetailComment : ItemDetail
+    public class ItemDetailComment : StoryDetail
     {
         [JsonPropertyName("comment")]
         public string? Comment { get; set; }

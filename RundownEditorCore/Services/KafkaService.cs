@@ -112,7 +112,7 @@ namespace RundownEditorCore.Services
                                     {
                                         TimeStamp = DateTime.UtcNow,
                                         Message = $"{messageObject.Name} er blevet {(messageObject.Locked ? $"låst for redigering af {messageObject.UserName}" : "låst op")}",
-                                        LogLevel = LogLevel.Information,
+                                        LogLevel = LogLevel.Warning,
                                     };
                                     _logBuffer.Add(log);
                                     LogMessageAdded?.Invoke(log);

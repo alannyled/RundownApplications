@@ -80,13 +80,13 @@
                             <ul>
                                 @foreach (var log in LogMessages.AsEnumerable().Reverse())
                                 {
-                                    if (log.LogLevel >= LogLevel.Warning)  // Vis kun logbeskeder fra Warning og op
+                                    if (log.LogLevel >= LogLevel.Warning)
                                     {
                                         <li>
-                                            <small>
-                                                <em class="@GetBgColor(log.LogLevel)">
+                                            <small class="@GetBgColor(log.LogLevel)">
+                                               @*  <em>
                                                     @log.TimeStamp.ToLongTimeString():
-                                                </em>
+                                                </em> *@
                                                 @log.Message
                                             </small>
                                         </li>

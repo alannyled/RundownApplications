@@ -5,14 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace RemoteLoggerLibrary.Providers
 {
-    public class RemoteLoggerProvider : ILoggerProvider
+    public class RemoteLoggerProvider(ILogService logService) : ILoggerProvider
     {
-        private readonly ILogService _logService;
-
-        public RemoteLoggerProvider(ILogService logService)
-        {
-            _logService = logService;
-        }
+        private readonly ILogService _logService = logService;
 
         public ILogger CreateLogger(string categoryName)
         {
@@ -21,7 +16,7 @@ namespace RemoteLoggerLibrary.Providers
 
         public void Dispose()
         {
-            // Intet cleanup nødvendigt her, men det er her for at opfylde ILoggerProvider interface
+            // Intet cleanup
         }
     }
 }

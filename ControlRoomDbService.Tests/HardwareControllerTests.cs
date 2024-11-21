@@ -1,13 +1,9 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using ControlRoomDbService.Controllers;
 using ControlRoomDbService.BLL.Interfaces;
 using ControlRoomDbService.Models;
 using ControlRoomDbService.DTO;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ControlRoomDbService.Tests.Controllers
 {

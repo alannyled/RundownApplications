@@ -1,5 +1,7 @@
 ﻿@inject ModalState ModalState
 @inject RundownState RundownState
+@inject ToastState ToastState
+@inject ILogger<TabPaneRundown> Logger
 @inject IRundownService RundownService
 
 <form @onsubmit="HandleSubmit">
@@ -17,7 +19,7 @@
     {
         if (Item.RundownId == null)
         {
-            Console.WriteLine("RundownId er null. Kan ikke fjerne item.");
+            Logger.LogError("RundownId er null. Kan ikke fjerne historien.");
             return;
         }
 
@@ -26,26 +28,25 @@
         if (rundown.Items.Contains(Item))
         {
             rundown.Items.Remove(Item);
-            Console.WriteLine($"Historien {Item.Name} blev fjernet.");
+         
+            string msg = $"Historien {Item.Name} blev fjernet fra {RundownState.Rundown.Name}. Åbne versioner lukkes.";
+            ToastState.FireToast(msg, "text-bg-info");
+            Logger.LogWarning(msg);
         }
         else
         {
-            Console.WriteLine("Item blev ikke fundet i listen.");
+            Logger.LogError("Historie blev ikke fundet i listen.");
             return;
         }
 
         try
         {
-            foreach (var item in rundown.Items)
-            {
-              Console.WriteLine($"Item: {item.Name}");
-            }
             await RundownService.UpdateRundownAsync(Item.RundownId, rundown);
-            Console.WriteLine("Rundown blev opdateret.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fejl ved opdatering af Rundown: {ex.Message}");
+            Logger.LogError($"Fejl ved opdatering af Rundown: {ex.Message}");
+            Logger.LogDebug($"StackTrace: {ex.StackTrace}");
         }
 
         ModalState.Close();

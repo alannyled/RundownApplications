@@ -2,6 +2,7 @@
 @inject ApplicationDbContext ApplicationDbContext
 @inject IKafkaService KafkaService
 @inject IMessageBuilderService MessageBuilderService
+@inject ILogger<TabPaneRundown> Logger
 @inject RundownState RundownState
 @inject SharedStates SharedStates
 @inject DetailLockState DetailLockState
@@ -181,6 +182,7 @@
         }
         SharedStates.SharedAllRundowns(SharedStates.AllRundowns);
         ToastState.FireToast($"Ændringerne i {Detail.Title} er gemt", "text-bg-success");
+        Logger.LogWarning($"Ændringer i {Detail.Title} er gemt af {userName}");
     }
 
     /// <summary>

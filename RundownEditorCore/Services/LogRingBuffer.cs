@@ -2,18 +2,11 @@
 
 namespace RundownEditorCore.Services
 {
-    public class LogRingBuffer<T> : IEnumerable<T>
+    public class LogRingBuffer<T>(int capacity) : IEnumerable<T>
     {
-        private readonly T[] _buffer;
-        private int _index;
-        private bool _isFull;
-
-        public LogRingBuffer(int capacity)
-        {
-            _buffer = new T[capacity];
-            _index = 0;
-            _isFull = false;
-        }
+        private readonly T[] _buffer = new T[capacity];
+        private int _index = 0;
+        private bool _isFull = false;
 
         public void Add(T item)
         {

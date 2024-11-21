@@ -1,5 +1,4 @@
 
-
 namespace RundownEditorCore.Tests
 {
     public class UnitTest1

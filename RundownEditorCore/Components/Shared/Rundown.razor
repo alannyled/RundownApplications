@@ -153,10 +153,7 @@
         {
             tabPanes.Remove(tabToRemove);
             await RemoveTab(tabToRemove);
-            // den skal ikke være her ha ha!
-            string msg = $"Historien {tabToRemove?.Name} blev fjernet fra {RundownState.Rundown.Name}. Åbne versioner lukkes.";
-            ToastState.FireToast(msg, "text-bg-info");
-            Logger.LogWarning(msg);
+            
         }
     }
     /// <summary>

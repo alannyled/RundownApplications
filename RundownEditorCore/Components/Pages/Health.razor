@@ -1,4 +1,7 @@
 ﻿@page "/status"
+
+@using CommonClassLibrary.DTO
+@using CommonClassLibrary.Enum
 @inject RundownEditorCore.States.SharedStates SharedStates
 
 @attribute [Authorize(Roles = "Administrator")]
@@ -28,10 +31,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var log in InMemoryLogger.GetLogs().Reverse())
+                    @foreach (var log in LogMessages.AsEnumerable().Reverse())
                     {
-                        <tr class="font-monospace" style="font-size:12px">@((MarkupString)log)</tr>
+                        <tr>
+                            <td>@log.TimeStamp.ToString("G")</td>
+                            <td>@log.LogLevel</td>
+                            <td>@log.Assembly</td>
+                            <td>@log.Message</td>
+                        </tr>
                     }
+               
                 </tbody>
             </table>
         </div>
@@ -39,9 +48,14 @@
 </div>
 
 @code {
+
+    private List<LogMessageDTO> LogMessages = [];
+
     protected override void OnInitialized()
     {
         SharedStates.OnChange += HandleStateChange;
+        LogMessages = KafkaBackgroundService.RecentLogs.ToList();
+        KafkaBackgroundService.LogMessageAdded += OnLogMessageAdded;
     }
 
     private void HandleStateChange(SharedStates.StateAction action)
@@ -50,6 +64,15 @@
         {
             InvokeAsync(StateHasChanged); 
         }
+    }
+
+    /// <summary>
+    /// Tilføjer nye logs til listen
+    /// </summary>
+    private void OnLogMessageAdded(LogMessageDTO logMessage)
+    {
+        LogMessages.Add(logMessage);
+        InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()

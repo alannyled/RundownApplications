@@ -1,5 +1,6 @@
 ﻿@using Newtonsoft.Json;
 @inject IRundownService RundownService
+@inject ILogger<TabPaneRundown> Logger
 @inject RundownState RundownState
 @inject ToastState ToastState
 @inject ModalState ModalState
@@ -139,6 +140,7 @@ else
             return false;
         }        
         ToastState.FireToast($"{Title} er oprettet.", "text-bg-success");
+        Logger.LogWarning($"{Title} er oprettet i {RundownState.Item.Name}");
         return true;
     }
 }

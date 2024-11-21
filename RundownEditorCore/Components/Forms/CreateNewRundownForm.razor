@@ -1,6 +1,7 @@
 ﻿@using CommonClassLibrary.DTO
 @using RundownEditorCore.Interfaces
 @inject IRundownService RundownService
+@inject ILogger<TabPaneRundown> Logger
 @inject RundownState RundownState
 @inject SharedStates SharedStates
 @inject ModalState ModalState
@@ -87,6 +88,7 @@ else
         if (rundown == null)
         {
             ToastState.FireToast("Der skete en fejl. Prøv igen", "text-bg-danger");
+            Logger.LogError("Rækkefølge blev ikke oprettet korrekt.");
             return false;
         }
         ToastState.FireToast($"Ny rækkefølge er oprettet.", "text-bg-success");

@@ -1,4 +1,9 @@
 ﻿@page "/log"
+
+@using CommonClassLibrary.DTO
+@using CommonClassLibrary.Enum
+@inject RundownEditorCore.States.SharedStates SharedStates
+
 <PageTitle>System log</PageTitle>
 <div class="container-fluid">
     <h3>Log</h3>
@@ -12,11 +17,35 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var log in InMemoryLogger.GetLogs().Reverse())
+            @foreach (var log in LogMessages.AsEnumerable().Reverse())
             {
-                <tr>@((MarkupString)log)</tr>
+                <tr>
+                    <td>@log.TimeStamp.ToString("G")</td>
+                    <td>@log.LogLevel</td>
+                    <td>@log.Assembly</td>
+                    <td>@log.Message</td>
+                </tr>
             }
         </tbody>
     </table>
 </div>
 
+@code {
+
+    private List<LogMessageDTO> LogMessages = [];
+
+    protected override void OnInitialized()
+    {
+        LogMessages = KafkaBackgroundService.RecentLogs.ToList();
+        KafkaBackgroundService.LogMessageAdded += OnLogMessageAdded;
+    }
+
+    /// <summary>
+    /// Tilføjer nye logs til listen
+    /// </summary>
+    private void OnLogMessageAdded(LogMessageDTO logMessage)
+    {
+        LogMessages.Add(logMessage);
+        InvokeAsync(StateHasChanged);
+    }
+}

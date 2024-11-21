@@ -80,7 +80,17 @@
                             <ul>
                                 @foreach (var log in LogMessages.AsEnumerable().Reverse())
                                 {
-                                    <li><small><em class="@GetBgColor(log.LogLevel)">@log.TimeStamp.ToLongTimeString() @log.LogLevel:</em> @log.Message</small></li>
+                                    if (log.LogLevel >= LogLevel.Warning)  // Vis kun logbeskeder fra Warning og op
+                                    {
+                                        <li>
+                                            <small>
+                                                <em class="@GetBgColor(log.LogLevel)">
+                                                    @log.TimeStamp.ToLongTimeString():
+                                                </em>
+                                                @log.Message
+                                            </small>
+                                        </li>
+                                    }
                                 }
                             </ul>
                         </div>
@@ -179,9 +189,10 @@
     {
         return level switch
         {
-            LogLevel.Information => "bg-primary-subtle", // Blå baggrund for info
-            LogLevel.Warning => "bg-warning-subtle",      // Gul baggrund for warning
-            LogLevel.Error => "bg-danger-subtle",        // Rød baggrund for error
+            LogLevel.Information => "bg-primary-subtle", 
+            LogLevel.Warning => "bg-info-subtle",  
+            LogLevel.Error => "bg-danger-subtle",  
+            LogLevel.Critical => "bg-danger-subtle",
             _ => ""
         };
     }

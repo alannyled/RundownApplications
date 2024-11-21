@@ -1,5 +1,6 @@
 ﻿@using CommonClassLibrary.DTO
 @inject IRundownService RundownService
+@inject ILogger<TabPaneRundown> Logger
 @inject RundownState RundownState
 @inject ToastState ToastState
 @inject ModalState ModalState
@@ -85,6 +86,8 @@ else
             return false;
         }
         ToastState.FireToast($"{ItemName} er oprettet.", "text-bg-success");
+
+        Logger.LogWarning($"Ny hisorie: {ItemName} er oprettet i {rundown.Name}");
         return true;
     }
 }

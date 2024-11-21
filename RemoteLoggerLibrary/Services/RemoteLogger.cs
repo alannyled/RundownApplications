@@ -2,6 +2,7 @@
 using RemoteLoggerLibrary.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace RemoteLoggerLibrary.Providers
 {
@@ -20,16 +21,19 @@ namespace RemoteLoggerLibrary.Providers
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            if (!IsEnabled(logLevel)) return;
+            if (!IsEnabled(logLevel)) return;            
 
             if (formatter != null)
             {
+                var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
+                var methodName = new StackTrace().GetFrame(1)?.GetMethod()?.Name;
                 string message = formatter(state, exception);
                 var logMessage = new LogMessageDTO
                 {
                     TimeStamp = DateTime.UtcNow,
                     LogLevel = logLevel,
-                    Host = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name,
+                    Assembly = assemblyName,
+                    Method = methodName,
                     Message = message,
                     Exception = exception?.ToString()
                 };

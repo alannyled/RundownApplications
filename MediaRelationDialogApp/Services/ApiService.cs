@@ -28,7 +28,7 @@ namespace MediaRelationDialogApp.Services
 
         public async Task<RundownDTO?> UpdateDetailAsync(string rundownId, DetailDTO itemDetail)
         {
-            var response = await _httpClient.PutAsJsonAsync($"https://localhost:3010/api/Rundown/update-detail-in-item/{rundownId}", itemDetail);
+            var response = await _httpClient.PutAsJsonAsync($"https://localhost:3010/api/Rundown/update-detail-in-story/{rundownId}", itemDetail);
 
             if (response.IsSuccessStatusCode)
             {

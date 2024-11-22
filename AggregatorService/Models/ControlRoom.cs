@@ -21,7 +21,7 @@ namespace AggregatorService.Models
 
         [JsonPropertyName("archivedBy")]
         public string? ArchivedBy { get; set; }
-
+        [JsonPropertyName("hardwareItems")]
         public List<Hardware>? HardwareItems { get; set; }
     }
 

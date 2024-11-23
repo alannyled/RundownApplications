@@ -6,7 +6,7 @@
 @inject ApiService ApiService
 
 <Modal @bind-ShowModal="IsModalVisible" OnFileSave="SaveChanges"></Modal>
-<p class="text-danger">@statusMessage</p>
+<p class="lead text-warning fixed-top">@statusMessage</p>
 <h1 class="text-center text-info">Fuse til rækkefølge</h1>
 <div class="row" style="opacity:@(IsModalVisible ? "0.3" : "1")">
     <div class="col-4 p-4">
@@ -105,13 +105,14 @@
         {
             Stories = [];
             Details = [];
-            statusMessage = string.Empty;
+            statusMessage = "Kæmpe succes!";
         }
         else
         {
-            statusMessage = "Fejl ved opdatering af video";
+            statusMessage = "Kæmpe fiasko!";
         }
         IsModalVisible = false;
+        SelectedRundownUuid = Guid.Empty;
        
         
     }

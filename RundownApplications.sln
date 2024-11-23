@@ -25,15 +25,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownDbService.Tests", "R
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonClassLibrary", "CommonClassLibrary\CommonClassLibrary.csproj", "{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaRelationDialogApp", "MediaRelationDialogApp\MediaRelationDialogApp.csproj", "{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogStoreService", "LogStoreService\LogStoreService.csproj", "{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteLoggerLibrary", "RemoteLoggerLibrary\RemoteLoggerLibrary.csproj", "{A87E40CE-6633-41A9-A0E8-3C456CDFBD82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlRoomDbService.Tests", "ControlRoomDbService.Tests\ControlRoomDbService.Tests.csproj", "{FA7C0B2F-A812-4B4D-AC40-1AE4508B939D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RundownEditorCore.Tests", "RundownEditorCore.Tests\RundownEditorCore.Tests.csproj", "{BB0308D3-E756-475D-BD45-ADE014FE6521}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownEditorCore.Tests", "RundownEditorCore.Tests\RundownEditorCore.Tests.csproj", "{BB0308D3-E756-475D-BD45-ADE014FE6521}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaRelationApp", "MediaRelationApp\MediaRelationApp.csproj", "{7AEDF93C-82B6-4539-9378-06E9ADD2A468}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,12 +85,6 @@ Global
 		{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FA0ED87-6AF5-4599-BBFA-7CB2BD2C28DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9C5885F-F464-4776-8EF9-DCD00F05F8AE}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A41AC57C-8F8D-41CE-8339-B77EB81CA04A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -107,6 +101,12 @@ Global
 		{BB0308D3-E756-475D-BD45-ADE014FE6521}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB0308D3-E756-475D-BD45-ADE014FE6521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB0308D3-E756-475D-BD45-ADE014FE6521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AEDF93C-82B6-4539-9378-06E9ADD2A468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AEDF93C-82B6-4539-9378-06E9ADD2A468}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AEDF93C-82B6-4539-9378-06E9ADD2A468}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7AEDF93C-82B6-4539-9378-06E9ADD2A468}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AEDF93C-82B6-4539-9378-06E9ADD2A468}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AEDF93C-82B6-4539-9378-06E9ADD2A468}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,73 @@
+﻿<div class="modal @ModalClass" tabindex="-1" style="display: @(ShowModal ? "block" : "none");">
+    <div class="modal-dialog">
+        <div class="modal-content bg-black border border-primary">
+            <div class="modal-header">
+                <h5 class="modal-title">Vælg video</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <input type="file" class="form-control" id="input" aria-describedby="input" aria-label="Upload" @onchange="OnFileSelected">
+                    <button class="btn btn-outline-primary" type="button" id="input" @onclick="() => SaveChange()">Tilknyt video</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CloseModal">Fortryd</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool _showModal;
+    private string SelectedFilePath { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool ShowModal
+    {
+        get => _showModal;
+        set
+        {
+            if (_showModal != value)
+            {
+                _showModal = value;
+                UpdateModalState();
+                ShowModalChanged.InvokeAsync(value); 
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<bool> ShowModalChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnFileSave { get; set; }
+
+    public string ModalClass { get; set; } = string.Empty;
+
+    private void UpdateModalState()
+    {
+        ModalClass = _showModal ? "show" : string.Empty;
+        StateHasChanged();
+    }
+
+    public void CloseModal()
+    {
+        ShowModal = false;
+    }
+
+    private void OnFileSelected(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            SelectedFilePath = ((string)e.Value).ToString();
+        }
+    }
+
+    public async Task SaveChange()
+    {
+        if (!string.IsNullOrWhiteSpace(SelectedFilePath))
+        {
+            await OnFileSave.InvokeAsync(SelectedFilePath); 
+        }
+    }
+}

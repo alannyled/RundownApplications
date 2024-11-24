@@ -2,7 +2,7 @@
 
 @using MediaRelationApp.Services
 @using MediaRelationApp.Components.Shared
-@using CommonClassLibrary.DTO
+@using MediaRelationApp.DTO
 @inject ApiService ApiService
 
 <Modal @bind-ShowModal="IsModalVisible" OnFileSave="SaveChanges"></Modal>
@@ -26,7 +26,8 @@
         }
         else
         {
-            <p class="text-center"><em>Loading Rundowns...</em></p>
+            <p class="text-center"><em>@rundownMessage</em></p>
+            <button class="btn btn-sm btn-primary w-100 @(!IsRetryButtonVisible ? "d-none" : "")" @onclick="RetryGetRundowns">Prøv igen</button>
         }
     </div>
     <div class="col-4 p-4">
@@ -79,7 +80,8 @@
     public List<RundownStoryDTO> Stories { get; set; } = [];
     public List<DetailDTO> Details { get; set; } = [];
 
-    public string storyMessage = "Vælg en rækkefølge for at se historier.";
+    public string rundownMessage = "Henter rækkefølger...";
+    public string storyMessage = string.Empty;
     public string detailMessage = string.Empty;
     public string statusMessage = string.Empty;
 
@@ -88,10 +90,33 @@
     private Guid SelectedDetailUuid { get; set; }
 
     private bool IsModalVisible { get; set; } = false;
+    private bool IsRetryButtonVisible { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
-        Rundowns = await ApiService.GetRundownsAsync();
+        await GetRundowns();
+    }
+
+    public async Task GetRundowns()
+    {
+        var rundowns = await ApiService.GetRundownsAsync();
+        if (rundowns != null)
+        {
+            Rundowns = rundowns;
+            rundownMessage = "Ingen rækkefølger fundet";
+            IsRetryButtonVisible = true;
+        }
+        else
+        {
+            storyMessage = "Vælg en rækkefølge for at se historier.";
+            IsRetryButtonVisible = false;
+        }
+    }
+    public async Task RetryGetRundowns()
+    {
+        IsRetryButtonVisible = false;
+        rundownMessage = "Forsøger igen...";
+        await GetRundowns();
     }
 
     public async Task SaveChanges(string file)

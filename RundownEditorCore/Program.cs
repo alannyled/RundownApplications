@@ -54,14 +54,6 @@ builder.Services.AddLogging(loggingBuilder =>
     //loggingBuilder.AddFilter("ControlRoomDbService", LogLevel.Information);
 });
 
-//builder.Services.AddLogging(loggingBuilder =>
-//{
-//    //loggingBuilder.ClearProviders(); // Fjern standard loggere
-//    loggingBuilder.AddProvider(new InMemoryLoggerProvider()); // Tilføj  custom logger
-//    //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning); // Logger kun advarsler eller højere fra Microsoft namespace
-//    //loggingBuilder.AddFilter("System", LogLevel.Warning); // Logger kun advarsler eller højere fra System namespace
-//    //loggingBuilder.AddFilter("RundownEditorCore", LogLevel.Information); // Log kun for app namespace
-//});
 
 builder.Services.AddScoped<RundownState>();
 builder.Services.AddScoped<ModalState>();

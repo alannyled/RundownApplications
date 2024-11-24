@@ -1,4 +1,4 @@
-﻿using CommonClassLibrary.DTO;
+﻿using MediaRelationApp.DTO;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 
@@ -18,10 +18,13 @@ namespace MediaRelationApp.Services
         public async Task<List<RundownDTO>> GetRundownsAsync()
         {
             var response = await _httpClient.GetAsync("https://localhost:3010/api/Rundown/fetch-rundowns-with-controlrooms");
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            var rundowns = JsonConvert.DeserializeObject<List<RundownDTO>>(json);
-            return rundowns ?? [];
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var rundowns = JsonConvert.DeserializeObject<List<RundownDTO>>(json);
+                return rundowns;
+            }
+            return [];
         }
 
 

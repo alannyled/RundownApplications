@@ -5,8 +5,6 @@ VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RundownEditorCore", "RundownEditorCore\RundownEditorCore.csproj", "{07A467F8-72CD-4CD4-BAEE-6AD4E1358931}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeleprompterSimulator", "TeleprompterSimulator\TeleprompterSimulator.csproj", "{CF13503B-A63D-41B1-BFFC-197D95E8E294}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaServiceTestApp", "KafkaFactoryTestApp\KafkaServiceTestApp.csproj", "{D2429722-1EDF-4382-82F4-6AE00A892F71}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaServiceLibrary", "KafkaFactoryLibrary\KafkaServiceLibrary.csproj", "{6DCCEC9F-D12E-45AA-8325-992EF87A3961}"
@@ -45,10 +43,6 @@ Global
 		{07A467F8-72CD-4CD4-BAEE-6AD4E1358931}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07A467F8-72CD-4CD4-BAEE-6AD4E1358931}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07A467F8-72CD-4CD4-BAEE-6AD4E1358931}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF13503B-A63D-41B1-BFFC-197D95E8E294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF13503B-A63D-41B1-BFFC-197D95E8E294}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF13503B-A63D-41B1-BFFC-197D95E8E294}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF13503B-A63D-41B1-BFFC-197D95E8E294}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2429722-1EDF-4382-82F4-6AE00A892F71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D2429722-1EDF-4382-82F4-6AE00A892F71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2429722-1EDF-4382-82F4-6AE00A892F71}.Release|Any CPU.ActiveCfg = Release|Any CPU

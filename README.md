@@ -1,5 +1,6 @@
 # RundownApplications
-
+Afgangsprojekt på Diplom i Softwareudvikling.  
+## Sådan startes projektet/softwaren
 Der er lavet en Docker Compose, som ligger i roden af Solution. Kør med:
 ```
 docker-compose up -d

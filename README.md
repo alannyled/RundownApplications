@@ -1,7 +1,11 @@
 # RundownApplications
 Afgangsprojekt på Diplom i Softwareudvikling.  
 ## Sådan startes projektet/softwaren
-Der er lavet en Docker Compose, som ligger i roden af Solution. Kør med:
+Softwaren er afhængig af en række databaser, samt Kafka message broker.  
+
+Der er lavet en Docker Compose til at starte disse afhængigheder, som ligger i roden af Solution. 
+Brug Docker Desktop til at monitere og evt. genstarte containere der har brug for det.  
+Start alle containere med:
 ```
 docker-compose up -d
 

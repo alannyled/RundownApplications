@@ -16,7 +16,7 @@ docker-compose up -d
 Første gang vil den downloade en del images, så det kan tage lidt tid.  
 Hvis du bliver spurgt om du vil tillade Docker Desktop Backend i din Firewall, skal du svare ja.  
 
-Åben Solution i Visual Studio. Lav evt. en multible startup, med følgende projekter:  
+Åben Solution i Visual Studio. Lav evt. en multible startup, med minimum følgende projekter:  
 - TemplateDbService
 - RundownDbService
 - ControlRoomDbService
@@ -26,16 +26,8 @@ Hvis du bliver spurgt om du vil tillade Docker Desktop Backend i din Firewall, s
 - RundownEditorCore
 
 Eller start dem manuelt. RundownEditorCore skal helst startes til sidst.  
+KafkaServiceTestApp kan også startes hvis det ønskes. Den er dog ikke nødvendig for at køre systemet.  
 
-Herefter kan MediaRelationApp2 også startes, hvis den skal prøves af.  
-Den kræver en del afhhængigheder installeret.  
-Sørg for at stå i roden af projektet og installer workloads:
-```
-cd MediaRelationApp2
-dotnet workload restore
-
-```
-Det tager ret lang tid at installere workloads, så vær tålmodig.
 
 ## Login
 Der er oprettet to brugere i den medfølgende SQLite database:  
@@ -55,6 +47,18 @@ Der er lavet en dataseeder, som kan bruges til at oprette demo data i databasern
 I menubaren er der et link til "Nulstil App data" (kun synlig for Administrator).  
 Klik på dette link og vælg Nulstil databaser med demodata (Reset Data). Herefter vil der blive oprettet demo data i databaserne.
 
+## MediaRelationApp2
+(Ja, den hedder 2... fordi der var en før den.)  
+Herefter kan MediaRelationApp2 også startes, hvis den skal prøves af.  
+I Visual STudio skal pakken .Net Maui Multi-platform App UI development + Android SDK installeres.  
+Den kræver også en del afhhængigheder installeret.  
+Sørg for at stå i roden af projektet og installer workloads:
+```
+cd MediaRelationApp2
+dotnet workload restore
+
+```
+Det tager ret lang tid at installere workloads, så vær tålmodig. Det kan også være nødvendigt at gøre det af flere omgange, med en clean ind i mellem.
 
 # Noter til mig selv
 

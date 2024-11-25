@@ -97,7 +97,7 @@ while (true)
             while (true)
             {
                 var result = consumer.Consume();
-                Console.WriteLine($"Modtaget besked fra topic '{result.Topic}': Key={result.Key}, Value={result.Value}");
+                Console.WriteLine($"Modtaget besked fra topic '{result.Topic}': Key={result.Message.Key}, Value={result.Message.Value}");
             }
         });
 

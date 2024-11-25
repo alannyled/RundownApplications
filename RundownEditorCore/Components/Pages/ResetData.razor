@@ -67,7 +67,7 @@
         }
     }
 
-    public async Task ResetStatesAsync()
+    public void ResetStatesAsync()
     {
         RundownState.SelectedRundown(new());
         SharedStates.SharedAllRundowns(new List<RundownDTO>());

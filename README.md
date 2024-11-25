@@ -5,11 +5,23 @@ Softwaren er afhængig af en række databaser, samt Kafka message broker.
 
 Der er lavet en Docker Compose til at starte disse afhængigheder, som ligger i roden af Solution. 
 Brug Docker Desktop til at monitere og evt. genstarte containere der har brug for det.  
-Start alle containere med:
+Bemærk at Kafka er afhængig af Zookeeper, og skal startes først. Lad Zookeeper køre i 15-20 sekunder før Kafka startes.  
+Start alle containere, fra roden af Solution, med:
 ```
 docker-compose up -d
 
 ```
+Åben Solution i Visual Studio. Lav evt. en multible startup, med følgende projekter:  
+- TemplateDbService
+- RundownDbService
+- ControlRoomDbService
+- AggrregatorService
+- ApiGateway
+- LogStoreService
+- RundownEditorCore
+
+Eller start dem manuelt. RundownEditorCore skal helst startes til sidst.  
+Herefter kan MediaRelationApp også startes, hvis den skal prøves af. Systemet er ikke afhængig af MediaRelationApp.
 
 # Noter til mig selv
 

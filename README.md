@@ -13,6 +13,9 @@ Start alle containere, fra roden af Solution, med:
 docker-compose up -d
 
 ```
+Første gang vil den downloade en del images, så det kan tage lidt tid.  
+Hvis du bliver spurgt om du vil tillade Docker Desktop Backend i din Firewall, skal du svare ja.  
+
 Åben Solution i Visual Studio. Lav evt. en multible startup, med følgende projekter:  
 - TemplateDbService
 - RundownDbService
@@ -23,8 +26,16 @@ docker-compose up -d
 - RundownEditorCore
 
 Eller start dem manuelt. RundownEditorCore skal helst startes til sidst.  
-Herefter kan MediaRelationApp også startes, hvis den skal prøves af.  
-Systemet er ikke afhængig af MediaRelationApp.
+
+Herefter kan MediaRelationApp2 også startes, hvis den skal prøves af.  
+Den kræver en del afhhængigheder installeret.  
+Sørg for at stå i roden af projektet og installer workloads:
+```
+cd MediaRelationApp2
+dotnet workload restore
+
+```
+Det tager ret lang tid at installere workloads, så vær tålmodig.
 
 ## Login
 Der er oprettet to brugere i den medfølgende SQLite database:  
@@ -40,9 +51,9 @@ Der er oprettet to brugere i den medfølgende SQLite database:
 Login som Administrator for at få alle rettigheder.
 
 ## Opret demo data i databaserne
-Der er lavet en række seeders, som kan bruges til at oprette demo data i databaserne.  
-I menubaren er der et link til "Reset Data" (kun synlig for Administrator).  
-Klik på dette link og vælg Reset Databaser. Herefter vil der blive oprettet demo data i databaserne.
+Der er lavet en dataseeder, som kan bruges til at oprette demo data i databaserne.  
+I menubaren er der et link til "Nulstil App data" (kun synlig for Administrator).  
+Klik på dette link og vælg Nulstil databaser med demodata (Reset Data). Herefter vil der blive oprettet demo data i databaserne.
 
 
 # Noter til mig selv

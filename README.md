@@ -5,7 +5,9 @@ Softwaren er afhængig af en række databaser, samt Kafka message broker.
 
 Der er lavet en Docker Compose til at starte disse afhængigheder, som ligger i roden af Solution. 
 Brug Docker Desktop til at monitere og evt. genstarte containere der har brug for det.  
-Bemærk at Kafka er afhængig af Zookeeper, og skal startes først. Lad Zookeeper køre i 15-20 sekunder før Kafka startes.  
+
+Bemærk at Kafka er afhængig af Zookeeper, som skal startes først. Lad Zookeeper køre i 15-20 sekunder før Kafka startes.  
+
 Start alle containere, fra roden af Solution, med:
 ```
 docker-compose up -d
@@ -21,7 +23,27 @@ docker-compose up -d
 - RundownEditorCore
 
 Eller start dem manuelt. RundownEditorCore skal helst startes til sidst.  
-Herefter kan MediaRelationApp også startes, hvis den skal prøves af. Systemet er ikke afhængig af MediaRelationApp.
+Herefter kan MediaRelationApp også startes, hvis den skal prøves af.  
+Systemet er ikke afhængig af MediaRelationApp.
+
+## Login
+Der er oprettet to brugere i den medfølgende SQLite database:  
+- Admin:  
+  - Brugernavn: admin  
+  - Password: 123456
+	- Rolle: Administrator
+- User:  
+  - Brugernavn: user  
+  - Password: 123456
+	- Rolle: User  
+
+Login som Administrator for at få alle rettigheder.
+
+## Opret demo data i databaserne
+Der er lavet en række seeders, som kan bruges til at oprette demo data i databaserne.  
+I menubaren er der et link til "Reset Data" (kun synlig for Administrator).  
+Klik på dette link og vælg Reset Databaser. Herefter vil der blive oprettet demo data i databaserne.
+
 
 # Noter til mig selv
 

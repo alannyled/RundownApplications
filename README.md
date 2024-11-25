@@ -6,6 +6,8 @@ docker-compose up -d
 
 ```
 
+# Noter til mig selv
+
 Manuel start af Kafka, uden Docker-Compose (Vigtigt at Zookeeper startes først)
 ```
 docker network create kafka-net

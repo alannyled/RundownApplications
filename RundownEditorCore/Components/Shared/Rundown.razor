@@ -40,7 +40,7 @@
 
     protected override void OnInitialized()
     {
-        activeTab = RundownState.Rundown.Name;
+        activeTab = RundownState.Rundown.Name ?? string.Empty;
         RundownState.OnChange += HandleRundownStateChange;
     }
 

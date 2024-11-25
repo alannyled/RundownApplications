@@ -50,6 +50,16 @@ namespace ControlRoomDbService.Controllers
 
                 };
 
+                var hardware = new List<Hardware>
+                {
+                    new() { UUID = Guid.NewGuid(), ControlRoomId = "ebf89c25-90c8-4a2e-bdca-91db0eb39c93", Name = "Videomixer", Vendor="Snell", Model="Kahuna 360", CreatedDate = now},
+                    new() { UUID = Guid.NewGuid(), ControlRoomId = "ebf89c25-90c8-4a2e-bdca-91db0eb39c93", Name = "Teleprompter", Vendor="AutoScript", Model="IP", CreatedDate = now},
+                    new() { UUID = Guid.NewGuid(), ControlRoomId = "ebf89c25-90c8-4a2e-bdca-91db0eb39c93", Name = "Kamera", Vendor="Sony", Model="2500", CreatedDate = now},
+                    new() { UUID = Guid.NewGuid(), ControlRoomId = "7b4c4fe6-2d9e-4276-949f-79cac408858c", Name = "Videomixer", Vendor="Snell", Model="Kahuna 360", CreatedDate = now},
+                    new() { UUID = Guid.NewGuid(), ControlRoomId = "7b4c4fe6-2d9e-4276-949f-79cac408858c", Name = "Teleprompter", Vendor="AutoScript", Model="IP", CreatedDate = now},
+                    new() { UUID = Guid.NewGuid(), ControlRoomId = "7b4c4fe6-2d9e-4276-949f-79cac408858c", Name = "Kamera", Vendor="Sony", Model="2500", CreatedDate = now}
+                };
+
                 await _controlroomCollection.InsertManyAsync(controlrooms);
                 string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = "reset" });
                 _kafkaService.SendMessage("controlroom", message);

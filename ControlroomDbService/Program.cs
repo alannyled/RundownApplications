@@ -31,10 +31,7 @@ builder.Services.AddSingleton<RemoteLoggerProvider>();
 
 builder.Services.AddLogging(loggingBuilder =>
 {
-    var serviceProvider = builder.Services.BuildServiceProvider();
-    var remoteLoggerProvider = serviceProvider.GetRequiredService<RemoteLoggerProvider>();
-
-    loggingBuilder.AddProvider(remoteLoggerProvider);
+    loggingBuilder.Services.AddSingleton<ILoggerProvider, RemoteLoggerProvider>();
 
     //loggingBuilder.AddFilter("Microsoft", LogLevel.Warning);
     //loggingBuilder.AddFilter("System", LogLevel.Warning);

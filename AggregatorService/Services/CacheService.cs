@@ -9,19 +9,14 @@ namespace AggregatorService.Services
         void DeleteData(string cacheKey);
     }
 
-    public class CacheService : ICacheService
+    public class CacheService(IMemoryCache memoryCache) : ICacheService
     {
-        private readonly IMemoryCache _memoryCache;
-
-        public CacheService(IMemoryCache memoryCache)
-        {
-            _memoryCache = memoryCache;
-        }
+        private readonly IMemoryCache _memoryCache = memoryCache;
 
         public Task<T> GetDataAsync<T>(string cacheKey)
         {
-            _memoryCache.TryGetValue(cacheKey, out T data);
-            return Task.FromResult(data);
+            _memoryCache.TryGetValue(cacheKey, out T? data);
+            return Task.FromResult(data ?? default!);
         }
 
         public void SetData<T>(string cacheKey, T data, TimeSpan time)

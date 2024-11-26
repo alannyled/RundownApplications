@@ -2,7 +2,7 @@
 {
     public class ToastState
     {
-        public event Action OnChange;
+        public event Action? OnChange;
         public bool Show { get; private set; } = false;
         public string Message { get; private set; } = string.Empty;
         public string Color { get; private set; } = "text-bg-success";

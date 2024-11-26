@@ -41,16 +41,16 @@
     [Parameter]
     public string Name { get; set; } = string.Empty;
     [Parameter]
-    public string StoryId { get; set; }
+    public string StoryId { get; set; } = string.Empty;
     [Parameter]
     public EventCallback<string> OnRemove { get; set; }
 
-    public RundownStoryDTO? RundownStory { get; set; } = new();
+    public RundownStoryDTO RundownStory { get; set; } = new();
 
     protected override void OnInitialized()
     {
         Guid UUID = Guid.Parse(StoryId);
-        RundownStory = RundownState.Rundown.Stories.FirstOrDefault(story => story.UUID == UUID);
+        RundownStory = RundownState.Rundown.Stories.FirstOrDefault(story => story.UUID == UUID) ?? new();
         SharedStates.OnChange += HandleSharedStateChange;
     }
     /// <summary>

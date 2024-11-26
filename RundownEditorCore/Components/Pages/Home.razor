@@ -115,7 +115,7 @@
 
         if(SharedStates.ControlRooms.Count == 0)
         {
-            ControlRooms = await ControlRoomService.GetControlRoomsAsync();
+            ControlRooms = await ControlRoomService.GetControlRoomsAsync() ?? [];
             SharedStates.SharedControlRoom(ControlRooms);
         }
         if(SharedStates.Templates.Count == 0)
@@ -212,7 +212,7 @@
     {
         try
         {
-            var selectedRundown = ActiveRundowns.FirstOrDefault(r => r.UUID == uuid);
+            var selectedRundown = ActiveRundowns.FirstOrDefault(r => r.UUID == uuid) ?? new();
             RundownState.SelectedRundown(selectedRundown);
             RundownState.SelectedStory(new RundownStoryDTO());
             Console.WriteLine($"Selected rundown stories: {selectedRundown.Stories.Count()}");

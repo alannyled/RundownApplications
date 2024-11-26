@@ -10,7 +10,7 @@ namespace TemplateDbService.Models
         public Guid UUID { get; set; } = Guid.NewGuid();
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [BsonElement("createdDate")]
         public DateTime CreatedDate { get; set; }

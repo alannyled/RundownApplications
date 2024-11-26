@@ -14,6 +14,6 @@ namespace CommonClassLibrary.DTO
         public DateTime CreatedDate { get; set; }
         public DateTime? ArchivedDate { get; set; }
         public string? ArchivedBy { get; set; } = null;
-        public List<HardwareDTO>? HardwareItems { get; set; }
+        public List<HardwareDTO> HardwareItems { get; set; } = [];
     }
 }

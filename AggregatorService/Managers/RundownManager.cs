@@ -29,17 +29,17 @@ namespace AggregatorService.Managers
             {
                 Uuid = Guid.NewGuid(),
                 BroadcastDate = date,
-                ControlRoomId = controlRoom.Uuid,
-                ControlRoomName = controlRoom.Name,
-                Name = template.Name,
-                Stories = template.Stories
+                ControlRoomId = controlRoom?.Uuid ?? Guid.Empty,
+                ControlRoomName = controlRoom?.Name ?? string.Empty,
+                Name = template?.Name ?? string.Empty,
+                Stories = template?.Stories ?? []
             };
 
             var response = await rundownService.PostAsJsonAsync(_apiUrls.RundownApi, newRundown);
             response.EnsureSuccessStatusCode();
 
-            var createdRundown = await response.Content.ReadFromJsonAsync<Rundown>();
-            createdRundown.ControlRoomName = controlRoom.Name;
+            var createdRundown = await response.Content.ReadFromJsonAsync<Rundown>() ?? new();
+            createdRundown.ControlRoomName = controlRoom?.Name ?? string.Empty;
             return createdRundown;
         }
 
@@ -75,14 +75,14 @@ namespace AggregatorService.Managers
             var controlRoomService = _serviceFactory.GetService<ControlRoomService>();
 
             var rundownData = await rundownService.FetchData($"{_apiUrls.RundownApi}/{rundownId}");
-            var rundown = JsonConvert.DeserializeObject<Rundown>(rundownData);
+            var rundown = JsonConvert.DeserializeObject<Rundown>(rundownData) ?? new(); 
             //var json = JsonConvert.SerializeObject(rundown, Formatting.Indented);
             //Console.WriteLine("Fetching rundown: " + json);
 
             var controlRoomData = await controlRoomService.FetchData(_apiUrls.ControlRoomApi, rundown.ControlRoomId.ToString());
             var controlRoom = JsonConvert.DeserializeObject<ControlRoom>(controlRoomData);
 
-            rundown.ControlRoomName = controlRoom.Name;
+            rundown.ControlRoomName = controlRoom?.Name ?? string.Empty;
 
 
             return rundown;
@@ -96,7 +96,8 @@ namespace AggregatorService.Managers
             var dto = new RundownDTO
             {
                 Uuid = rundownId,
-                ControlRoomId = controlRoom.ControlRoomId
+                ControlRoomId = controlRoom.ControlRoomId,
+                Stories = controlRoom.Stories
             };
 
             var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/{rundownId}", dto);
@@ -118,7 +119,7 @@ namespace AggregatorService.Managers
             }
             storyDto.UUID = Guid.NewGuid();
             // Tilføj det nye story til eksisterende liste
-            rundown.Stories.Add(storyDto);
+            rundown?.Stories.Add(storyDto);
 
             // Send opdateringen tilbage til service
             var response = await rundownService.PutAsJsonAsync($"{_apiUrls.RundownApi}/add-story-to-rundown/{rundownId}", storyDto);
@@ -152,16 +153,8 @@ namespace AggregatorService.Managers
             {
                 throw new Exception("Rundown not found.");
             }
-            var story = rundown?.Stories.FirstOrDefault(i => i.UUID == storyDetailDto.StoryId);
-            if (story is null)
-            {
-                throw new Exception("Story not found.");
-            }
-            var detail = story.Details.FirstOrDefault(d => d.UUID == storyDetailDto.UUID);
-            if (detail is null)
-            {
-                throw new Exception("Detail not found.");
-            }
+            var story = (rundown?.Stories.FirstOrDefault(i => i.UUID == storyDetailDto.StoryId)) ?? throw new Exception("Story not found.");
+            var detail = story.Details.FirstOrDefault(d => d.UUID == storyDetailDto.UUID) ?? throw new Exception("Detail not found.");
             detail.UUID = storyDetailDto.UUID;
             detail.StoryId = storyDetailDto.StoryId;
             detail.Title = storyDetailDto.Title;

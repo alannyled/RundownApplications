@@ -63,7 +63,7 @@
     public bool active = true;
     public bool locked = false;
     public string userName = string.Empty;
-    public string lockedByUser = string.Empty;
+    public string lockedByUser = "Unknown";
     public string lockedClass = string.Empty;
     public Guid updatedDetailUuid = Guid.Empty;
 
@@ -168,7 +168,7 @@
             _ => "Noget gik helt galt her??!!"
         };
 
-        var updatedRundown = await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail);
+        var updatedRundown = await RundownService.UpdateDetailAsync(RundownState.Rundown.UUID, Detail) ?? new();
         var rundown = SharedStates.AllRundowns.Find(r => r.UUID == updatedRundown.UUID);
         if (rundown == null) return;
 

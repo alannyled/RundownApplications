@@ -44,8 +44,7 @@ namespace RundownEditorCore.Services
         DetailLockState detailLockState,
         SharedStates sharedStates,
         ILogger<RundownService> logger,
-        IControlRoomService controlRoomService,
-        IMessageBuilderService messageBuilderService
+        IControlRoomService controlRoomService
             ) : BackgroundService
     {
 
@@ -54,7 +53,6 @@ namespace RundownEditorCore.Services
        // private readonly SharedStates _sharedStates = sharedStates;
         private readonly ILogger<RundownService> _logger = logger;
         private readonly IControlRoomService _controlRoomService = controlRoomService;
-        private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
         private static readonly LogRingBuffer<LogMessageDTO> _logBuffer = new(100); // Buffer med plads til 100 beskeder
         public static event Action<LogMessageDTO>? LogMessageAdded;
         public static IEnumerable<LogMessageDTO> RecentLogs => _logBuffer;
@@ -127,13 +125,13 @@ namespace RundownEditorCore.Services
                             {
                                 var messageObject = ConvertMessageToJson<ControlRoomMessage>(message);
                                 //var controlrooms = messageObject.ControlRooms; (der mangler hardware her)                       
-                                var controlrooms = await _controlRoomService.GetControlRoomsAsync();
+                                var controlrooms = await _controlRoomService.GetControlRoomsAsync() ?? [];
                                 sharedStates.SharedControlRoom(controlrooms);
                             }
 
                             if (message.Topic == MessageTopic.Error.ToKafkaTopic())
                             {
-                                var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message);
+                                var messageObject = ConvertMessageToJson<ErrorMessageDTO>(message) ?? new();
                                 sharedStates.SharedError(messageObject);
                                 _logger.LogError($"Kritisk Fejlbesked: {message.Message.Value}");
                             }
@@ -222,11 +220,11 @@ namespace RundownEditorCore.Services
 
     public class DetailMessage : RundownMessage
     {
-        public DetailDTO? Detail { get; set; }
-        public string? ItemId { get; set; }
+        public DetailDTO Detail { get; set; } = new();
+        public string ItemId { get; set; } = string.Empty;
         public bool Locked { get; set; }
-        public string? Name { get; set; }
-        public string? UserName { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
     }
 
 }

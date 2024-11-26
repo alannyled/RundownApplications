@@ -15,7 +15,7 @@ namespace TemplateDbService.BLL.Services
         {
             var templates = await _resilienceService.ExecuteWithResilienceAsync(() => _repository.GetAllAsync());
             _logger.LogInformation("Alle templates er hentet i databasen");
-            return templates;
+            return templates ?? [];
         }
 
         public async Task<RundownTemplate> GetByIdAsync(Guid uuid) => await _repository.GetByIdAsync(uuid);

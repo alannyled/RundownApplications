@@ -73,9 +73,9 @@ while (true)
             var message = Console.ReadLine();
             if (message?.ToLower() == "x")
                 break;
-
-            producerClient.Producer.Produce(topic, new Message<string, string> { Key = Guid.NewGuid().ToString(), Value = message });
-            Console.WriteLine($"Besked sendt til topic '{topic}': {message}");
+            var msg = message ?? string.Empty;
+            producerClient.Producer.Produce(topic, new Message<string, string> { Key = Guid.NewGuid().ToString(), Value = msg });
+            Console.WriteLine($"Besked sendt til topic '{topic}': {msg}");
         }
     }
     else if (choice == "2")

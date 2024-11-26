@@ -2,10 +2,10 @@
 {
     public class RundownObjects
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Duration { get; set; }
-        public string Category { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Duration { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
 
     }
 }

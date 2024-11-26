@@ -2,12 +2,12 @@
 {
     public class ApiUrls
     {
-        public string RundownApi { get; set; }
-        public string RundownItemApi { get; set; }
-        public string ItemDetailApi { get; set; }
-        public string HardwareApi { get; set; }
-        public string ControlRoomApi { get; set; }
-        public string RundownTemplateApi { get; set; }
+        public string RundownApi { get; set; } = string.Empty;
+        public string RundownItemApi { get; set; } = string.Empty;
+        public string ItemDetailApi { get; set; } = string.Empty;
+        public string HardwareApi { get; set; } = string.Empty;
+        public string ControlRoomApi { get; set; } = string.Empty;
+        public string RundownTemplateApi { get; set; } = string.Empty;
 
     }
 

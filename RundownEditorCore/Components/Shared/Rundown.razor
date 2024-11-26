@@ -167,7 +167,9 @@
         {
             menuTabs.Remove(tabToRemove);
             activeTab = menuTabs.FirstOrDefault()?.Name ?? RundownState.Rundown.Name;
-            await UnlockDetailsOnTabPaneRemove(removedTab.StoryId);
+            var tabId = removedTab.StoryId;
+            if(tabId != null)
+                await UnlockDetailsOnTabPaneRemove(tabId);
             await InvokeAsync(StateHasChanged);
         }
     }

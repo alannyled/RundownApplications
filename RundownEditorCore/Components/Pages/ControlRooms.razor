@@ -72,12 +72,14 @@
                                         <td>@room.Name</td>
                                         <td>@room.Location</td>
                                         <td>
+                                            @if(room.HardwareItems?.Count > 0){
                                             <ul>
                                                 @foreach (var hardware in room.HardwareItems)
                                                 {
                                                     <li><a role="button" @onclick="() => EditHardware(hardware.Uuid)">@hardware.Name (@hardware.Model)</a></li>
                                                 }
                                             </ul>
+                                            }
                                         </td>
                                         <td>@room.CreatedDate.ToLocalTime().ToShortDateString()</td>
                                         <td>
@@ -99,7 +101,7 @@
 
 @code {
     private List<ControlRoomDTO> controlRooms = [];
-    private ControlRoomDTO newControlRoom = new ControlRoomDTO();
+    private ControlRoomDTO newControlRoom = new();
     private ControlRoomDTO? editingControlRoom;
     private ControlRoomDTO? addingHardwareToRoom;
     private HardwareDTO newHardware = new HardwareDTO();

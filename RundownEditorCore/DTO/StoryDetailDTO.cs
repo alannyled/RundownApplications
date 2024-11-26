@@ -8,34 +8,34 @@ namespace RundownEditorCore.DTO
         {
             public Guid UUID { get; set; }
             public Guid StoryId { get; set; }
-            public string Title { get; set; }
-            public string Duration { get; set; }
-            public string Type { get; set; }
+            public string Title { get; set; } = string.Empty;
+            public string Duration { get; set; } = string.Empty;
+            public string Type { get; set; } = string.Empty;
             public int Order { get; set; }
         }
 
 
         public class StoryDetailTeleprompter : StoryDetail
         {
-            public string PrompterText { get; set; }
+            public string PrompterText { get; set; } = string.Empty;
         }
 
 
         public class StoryDetailVideo : StoryDetail
         {           
-            public string VideoPath { get; set; }            
+            public string VideoPath { get; set; } = string.Empty;            
         }
 
 
         public class StoryDetailGraphic : StoryDetail
         {
-            public string GraphicId { get; set; }
+            public string GraphicId { get; set; } = string.Empty;
         }
 
 
         public class StoryDetailComment : StoryDetail
         {
-            public string Comment { get; set; }
+            public string Comment { get; set; } = string.Empty;
 
         }
     }

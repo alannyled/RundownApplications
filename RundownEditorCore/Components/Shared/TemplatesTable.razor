@@ -48,7 +48,7 @@ else
     // public EventCallback<string> OnTemplateSelect { get; set; }
      
     [Parameter]
-    public List<TemplateDTO> Templates { get; set; }
+    public List<TemplateDTO> Templates { get; set; } = [];
     private bool isLoading = true;
 
     protected override async Task OnParametersSetAsync()

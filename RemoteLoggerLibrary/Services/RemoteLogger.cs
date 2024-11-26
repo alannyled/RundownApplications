@@ -6,14 +6,9 @@ using System.Diagnostics;
 
 namespace RemoteLoggerLibrary.Providers
 {
-    public class RemoteLogger : ILogger
+    public class RemoteLogger(ILogService logService) : ILogger
     {
-        private readonly ILogService _logService;
-
-        public RemoteLogger(ILogService logService)
-        {
-            _logService = logService;
-        }
+        private readonly ILogService _logService = logService;
 
         IDisposable? ILogger.BeginScope<TState>(TState state) => null;
 
@@ -25,8 +20,8 @@ namespace RemoteLoggerLibrary.Providers
 
             if (formatter != null)
             {
-                var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
-                var methodName = new StackTrace().GetFrame(1)?.GetMethod()?.Name;
+                var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name ?? "Unknown";
+                var methodName = new StackTrace().GetFrame(1)?.GetMethod()?.Name ?? string.Empty;
                 string message = formatter(state, exception);
                 var logMessage = new LogMessageDTO
                 {
@@ -35,7 +30,7 @@ namespace RemoteLoggerLibrary.Providers
                     Assembly = assemblyName,
                     Method = methodName,
                     Message = message,
-                    Exception = exception?.ToString()
+                    Exception = exception?.ToString() ?? string.Empty
                 };
 
                 var logJson = JsonConvert.SerializeObject(logMessage);

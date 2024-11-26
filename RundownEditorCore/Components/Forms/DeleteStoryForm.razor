@@ -59,10 +59,10 @@
     }
 
     private async Task UpdateStory(RundownDTO rundown)
-    {
+    {        
         try
         {
-            await RundownService.UpdateRundownAsync(Story.RundownId, rundown);
+            await RundownService.UpdateRundownAsync(rundown.UUID, rundown);
         }
         catch (Exception ex)
         {

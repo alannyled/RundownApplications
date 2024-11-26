@@ -35,7 +35,7 @@ namespace AggregatorService.Services
             return response;
         }
 
-        public override async Task<HttpResponseMessage> DeleteAsync(string url)
+        public override Task<HttpResponseMessage> DeleteAsync(string url)
         {
             throw new NotImplementedException();
         }

@@ -5,17 +5,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace RundownEditorCore.Services
 {
-    public class HardwareService(HttpClient httpClient, ILogger<HardwareService> logger) : IHardwareService
+    public class HardwareService(HttpClient httpClient) : IHardwareService
     {
         private readonly HttpClient _httpClient = httpClient;
-        private readonly ILogger<HardwareService> _logger = logger;
 
         public async Task<List<HardwareDTO>> GetHardwareAsync()
         {
             return await Task.FromResult(new List<HardwareDTO>());
         }
 
-        public async Task<HardwareDTO> AddHardwareAsync(HardwareDTO newHardware)
+        public async Task<HardwareDTO?> AddHardwareAsync(HardwareDTO newHardware)
         {
             try
             {
@@ -35,7 +34,7 @@ namespace RundownEditorCore.Services
             }
         }
 
-        public async Task<HardwareDTO> UpdateHardwareAsync(string hardwareId, HardwareDTO updatedHardware)
+        public async Task<HardwareDTO?> UpdateHardwareAsync(string hardwareId, HardwareDTO updatedHardware)
         {
             try
             {

@@ -8,7 +8,7 @@ namespace AggregatorService.Models
         public Guid Uuid { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [JsonPropertyName("description")]
         public string? Description { get; set; }
@@ -29,9 +29,9 @@ namespace AggregatorService.Models
         public Guid ControlRoomId { get; set; }
 
         [JsonPropertyName("controlRoomName")]
-        public string ControlRoomName { get; set; }
+        public string ControlRoomName { get; set; } = string.Empty;
 
         [JsonPropertyName("stories")]
-        public List<RundownStory> Stories { get; set; } = new List<RundownStory>();
+        public List<RundownStory> Stories { get; set; } = [];
     }
 }

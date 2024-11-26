@@ -123,7 +123,7 @@
 
     private async Task OnControlRoomChange(ChangeEventArgs e)
     {
-        var selectedControlRoomUuid = e.Value.ToString();
+        var selectedControlRoomUuid = e?.Value?.ToString() ?? string.Empty;
         await RundownService.UpdateRundownControlRoomAsync(RundownState.Rundown.UUID, selectedControlRoomUuid);      
     }
 

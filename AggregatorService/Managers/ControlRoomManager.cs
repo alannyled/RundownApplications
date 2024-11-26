@@ -20,12 +20,12 @@ namespace AggregatorService.Managers
 
             var hardwareData = await hardwareService.FetchData(_apiUrls.HardwareApi);
 
-            var controlRooms = JsonSerializer.Deserialize<List<ControlRoom>>(controlRoomData);
-            var hardwareItems = JsonSerializer.Deserialize<List<Hardware>>(hardwareData);
+            var controlRooms = JsonSerializer.Deserialize<List<ControlRoom>>(controlRoomData) ?? [];
+            var hardwareItems = JsonSerializer.Deserialize<List<Hardware>>(hardwareData) ?? [];
 
             foreach (var room in controlRooms)
             {
-                room.HardwareItems = hardwareItems
+                room.HardwareItems = hardwareItems 
                     .Where(h => h.ControlRoomId == room.Uuid)
                     .ToList();
             }
@@ -40,7 +40,7 @@ namespace AggregatorService.Managers
             var response = await controlRoomService.PostAsJsonAsync(_apiUrls.ControlRoomApi, newControlRoom);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadFromJsonAsync<ControlRoom>();
+                return await response.Content.ReadFromJsonAsync<ControlRoom>() ?? new();
 
             throw new Exception("Failed to create control room in the database API.");
         }
@@ -53,7 +53,7 @@ namespace AggregatorService.Managers
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<ControlRoom>();
+                return await response.Content.ReadFromJsonAsync<ControlRoom>() ?? new();
             }
             else
             {
@@ -69,7 +69,7 @@ namespace AggregatorService.Managers
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<ControlRoom>();
+                return await response.Content.ReadFromJsonAsync<ControlRoom>() ?? new();
             }
             else
             {

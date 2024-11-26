@@ -103,7 +103,7 @@ else
             return;
         }
         isCreating = true;
-        var newRundownStory = GetModel(DetailType);
+        var newRundownStory = GetModel(DetailType) ?? new();
 
         newRundownStory.UUID = Guid.NewGuid();
         newRundownStory.StoryId = RundownState.Story.UUID;

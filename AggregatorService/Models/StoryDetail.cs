@@ -12,13 +12,13 @@ namespace AggregatorService.Models
         public Guid StoryId { get; set; }
 
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
         [JsonPropertyName("order")]
         public int Order { get; set; }
 
         [JsonPropertyName("title")]
-        public string title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [JsonPropertyName("duration")]
         public TimeSpan Duration { get; set; }

@@ -80,7 +80,7 @@
             message = "Rækkefølge er aktiveret igen";
         }
 
-        rundown = await RundownService.UpdateRundownAsync(rundown.UUID, rundown);
+        rundown = await RundownService.UpdateRundownAsync(rundown.UUID, rundown) ?? new();
 
         if (ToastState.Show)
             ToastState.Close();

@@ -7,26 +7,25 @@ using RundownEditorCore.States;
 
 namespace RundownEditorCore.Services
 {
-    public class RundownService(HttpClient httpClient, ToastState toastState, SharedStates sharedStates, ILogger<RundownService> logger, IKafkaService kafkaService, IMessageBuilderService messageBuilderService) : IRundownService
+    public class RundownService(HttpClient httpClient, ToastState toastState, SharedStates sharedStates, RundownState rundownState, ILogger<RundownService> logger) : IRundownService
     {
         private readonly HttpClient _httpClient = httpClient;
            private readonly ToastState _toastState = toastState;
         private readonly SharedStates _sharedStates = sharedStates;
+        private readonly RundownState _rundownState = rundownState;
         private readonly ILogger<RundownService> _logger = logger;
-        private readonly IKafkaService _kafkaService = kafkaService;
-        private readonly IMessageBuilderService _messageBuilderService = messageBuilderService;
 
         public async Task<List<RundownDTO>> GetRundownsAsync()
         {
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<List<RundownDTO>>("fetch-rundowns-with-controlrooms");
-                return response ?? new List<RundownDTO>();
+                return response ?? [];
             }
             catch (Exception)
             {
                 _toastState.FireToast("Der skete en fejl under hentning af alle rundowns", "text-bg-warning");
-                return new List<RundownDTO>();
+                return [];
             }
         }
 
@@ -68,11 +67,12 @@ namespace RundownEditorCore.Services
         {
             try
             {
+                var stories = new List<RundownStoryDTO>(_rundownState.Rundown.Stories);
                 var updateRequest = new RundownDTO
                 {
-                    ControlRoomId = controlRoomId
+                    ControlRoomId = controlRoomId,
+                    Stories = stories
                 };
-
                 var response = await _httpClient.PutAsJsonAsync($"update-rundown-controlroom/{rundownId}", updateRequest);
 
                 if (response.IsSuccessStatusCode)
@@ -82,7 +82,8 @@ namespace RundownEditorCore.Services
                      _sharedStates.SharedAllRundowns(allUpdatedRundowns);
                     return rundown;
                 }
-                _logger.LogWarning($"ERROR updating controlroom: {response.ReasonPhrase}");
+                var msg = $"Error updating controlroom: {response.ReasonPhrase}";
+                _logger.LogWarning(msg);
                 return null;
             }
             catch (Exception)
@@ -102,7 +103,7 @@ namespace RundownEditorCore.Services
                 {
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
-                _logger.LogWarning($"ERROR adding story to rundown: {response.ReasonPhrase}");
+                _logger.LogWarning($"Eroor adding story to rundown: {response.ReasonPhrase}");
                 return null;
             }
             catch (Exception)
@@ -123,7 +124,7 @@ namespace RundownEditorCore.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning($"Oprettet {detail.Title} i historie");
+                    _logger.LogWarning($"Oprettet {detail?.Title} i historie");
                     return await response.Content.ReadFromJsonAsync<RundownDTO>();
                 }
                 _logger.LogWarning($"ERROR adding detail to story: {response.ReasonPhrase}");

@@ -13,7 +13,7 @@ namespace TemplateDbService.Models
         public Guid RundownId { get; set; }
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [BsonElement("duration")]
         public TimeSpan Duration { get; set; }

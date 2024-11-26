@@ -20,9 +20,9 @@
 @code {
     private bool _showModal;
     private string SelectedFilePath { get; set; } = string.Empty;
-
+#pragma warning disable BL0007
     [Parameter]
-    public bool ShowModal
+    public bool ShowModal 
     {
         get => _showModal;
         set

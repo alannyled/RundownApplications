@@ -15,8 +15,8 @@ namespace AggregatorService.Controllers
         [HttpPost("create-rundown-from-template/{templateId}")]
         public async Task<IActionResult> CreateRundownFromTemplate(string templateId, [FromBody] CreateRundownRequest request)
         {
-
-            var rundown = await _rundownManager.CreateRundownFromTemplate(templateId, request.ControlRoomId, request.BroadcastDate);
+            var controlRoomId = request.ControlRoomId ?? string.Empty;
+            var rundown = await _rundownManager.CreateRundownFromTemplate(templateId, controlRoomId, request.BroadcastDate);
             return Ok(rundown);
         }
         
@@ -57,7 +57,6 @@ namespace AggregatorService.Controllers
         [HttpPut("add-detail-to-story/{rundownId}")]
         public async Task<IActionResult> AddDetailToStory(string rundownId, [FromBody] StoryDetailDTO storyDetailDto)
         {
-            var json = JsonSerializer.Serialize(storyDetailDto);
             var rundown = await _rundownManager.AddDetailToStoryAsync(Guid.Parse(rundownId), storyDetailDto);
             return Ok(rundown);
         }

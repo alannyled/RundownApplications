@@ -24,7 +24,12 @@ namespace ControlRoomDbService.BLL.Services
         public async Task CreateHardwareAsync(Hardware hardware)
         {
             await _hardwareRepository.CreateAsync(hardware);
-            string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = MessageAction.Create.ToString() });
+            string message = JsonConvert.SerializeObject(
+                new
+                {
+                    TimeStamp = DateTime.Now,
+                    Action = MessageAction.Create.ToString()
+                });
             string topic = MessageTopic.ControlRoom.ToKafkaTopic();
             _kafkaService.SendMessage(topic, message);
         }
@@ -32,7 +37,12 @@ namespace ControlRoomDbService.BLL.Services
         public async Task UpdateHardwareAsync(string id, Hardware updatedHardware)
         {
             await _hardwareRepository.UpdateAsync(id, updatedHardware);
-            string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = MessageAction.Update.ToString() });
+            string message = JsonConvert.SerializeObject(
+                new
+                {
+                    TimeStamp = DateTime.Now,
+                    Action = MessageAction.Update.ToString()
+                });
             string topic = MessageTopic.ControlRoom.ToKafkaTopic();
             _kafkaService.SendMessage(topic, message);
         }
@@ -40,7 +50,12 @@ namespace ControlRoomDbService.BLL.Services
         public async Task DeleteHardwareAsync(string id)
         {
             await _hardwareRepository.RemoveAsync(id);
-            string message = JsonConvert.SerializeObject(new { TimeStamp = DateTime.Now, Action = MessageAction.Delete.ToString() });
+            string message = JsonConvert.SerializeObject(
+                new
+                {
+                    TimeStamp = DateTime.Now,
+                    Action = MessageAction.Delete.ToString()
+                });
             string topic = MessageTopic.ControlRoom.ToKafkaTopic();
             _kafkaService.SendMessage(topic, message);
         }

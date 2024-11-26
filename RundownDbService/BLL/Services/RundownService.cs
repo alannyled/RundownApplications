@@ -46,7 +46,8 @@ namespace RundownDbService.BLL.Services
                 var messageObject = new
                 {
                     Action = MessageAction.Create.ToString(),
-                    Rundown = rundown
+                    Rundown = rundown,
+                    Timestamp = DateTime.Now
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 string topic = MessageTopic.Rundown.ToKafkaTopic();
@@ -68,7 +69,8 @@ namespace RundownDbService.BLL.Services
                 var messageObject = new
                 {
                     Action = MessageAction.Update.ToString(),
-                    Rundown = rundown
+                    Rundown = rundown,
+                    Timestamp = DateTime.Now
                 };
                 string message = JsonConvert.SerializeObject(messageObject);
                 string topic = MessageTopic.Rundown.ToKafkaTopic();

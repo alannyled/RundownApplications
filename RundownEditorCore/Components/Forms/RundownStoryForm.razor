@@ -78,7 +78,7 @@ else
 
     private async Task<bool> SaveNewStory(string UUID, RundownStoryDTO newRundownStory)
     {
-        await Task.Delay(1000); // Simulere at der går lidt tid før det er oprettet
+        await Task.Delay(500); // Simulere at der går lidt tid før det er oprettet
         var rundown = await RundownService.AddStoryToRundownAsync(UUID, newRundownStory);
         if (rundown == null)
         {

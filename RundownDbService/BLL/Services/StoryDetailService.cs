@@ -4,6 +4,7 @@ using RundownDbService.DAL.Repositories;
 using RundownDbService.Models;
 using Newtonsoft.Json;
 using CommonClassLibrary.Enum;
+using Confluent.Kafka;
 
 namespace RundownDbService.BLL.Services
 {
@@ -31,7 +32,8 @@ namespace RundownDbService.BLL.Services
             {
                 Action = MessageAction.Update.ToString(),
                 Story = existingStory,
-                Rundown = rundown
+                Rundown = rundown,
+                TimeStamp = DateTime.Now
             };
             string message = JsonConvert.SerializeObject(messageObject);
             string topic = MessageTopic.Rundown.ToKafkaTopic();

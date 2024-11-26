@@ -84,10 +84,7 @@
                                     {
                                         <li>
                                             <small class="@GetBgColor(log.LogLevel)">
-                                               @*  <em>
-                                                    @log.TimeStamp.ToLongTimeString():
-                                                </em> *@
-                                                @log.Message
+                                                @((MarkupString)log.Message)
                                             </small>
                                         </li>
                                     }

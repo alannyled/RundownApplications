@@ -1,5 +1,6 @@
 ﻿@inject ModalState ModalState
 @inject RundownState RundownState
+@inject DetailLockState DetailLockState
 @inject ToastState ToastState
 @inject ILogger<TabPaneRundown> Logger
 @inject IRundownService RundownService
@@ -27,9 +28,26 @@
 
         if (rundown.Stories.Contains(Story))
         {
-            rundown.Stories.Remove(Story);
-         
-            string msg = $"Historien {Story.Name} blev fjernet fra {RundownState.Rundown.Name}. Åbne versioner lukkes.";
+            
+            string msg = $"Historien {Story.Name} blev fjernet fra {RundownState.Rundown.Name}.<br> Åbne historier lukkes.";
+            var lockedDetail = Story.Details
+                .Select(detail => new
+                {
+                    Detail = detail,
+                    IsLocked = DetailLockState.IsLocked(detail.UUID.ToString(), out var user),
+                    User = user
+                })
+                .FirstOrDefault(x => x.IsLocked);
+
+            if (lockedDetail != null)
+            {
+                msg = $"Historien er låst af {lockedDetail.User}.<br> Kan ikke slettes.";
+            }
+            else
+            {
+                rundown.Stories.Remove(Story);
+                await UpdateStory(rundown);
+            }   
             ToastState.FireToast(msg, "text-bg-info");
             Logger.LogWarning(msg);
         }
@@ -37,8 +55,11 @@
         {
             Logger.LogError("Historie blev ikke fundet i listen.");
             return;
-        }
+        }        
+    }
 
+    private async Task UpdateStory(RundownDTO rundown)
+    {
         try
         {
             await RundownService.UpdateRundownAsync(Story.RundownId, rundown);
@@ -51,6 +72,5 @@
 
         ModalState.Close();
     }
-
 
 }

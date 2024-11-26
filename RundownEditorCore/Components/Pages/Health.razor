@@ -37,7 +37,7 @@
                             <td>@log.TimeStamp.ToString("G")</td>
                             <td>@log.LogLevel</td>
                             <td>@log.Assembly</td>
-                            <td>@log.Message</td>
+                            <td>@((MarkupString)log.Message)</td>
                         </tr>
                     }
                

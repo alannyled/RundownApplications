@@ -1,4 +1,5 @@
 ﻿using CommonClassLibrary.DTO;
+using Confluent.Kafka;
 using RundownEditorCore.Interfaces;
 using System.Text.Json;
 
@@ -27,7 +28,8 @@ namespace RundownEditorCore.Services
                 Action = action,
                 Locked = locked,
                 Detail = detail,
-                UserName = userName
+                UserName = userName,
+                Timestamp = System.DateTime.Now
             };
             return JsonSerializer.Serialize(messageObject);
         }
